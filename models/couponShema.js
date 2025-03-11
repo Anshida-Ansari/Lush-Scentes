@@ -35,7 +35,7 @@ const couponSchema=new Schema({
         ref:'User'
 
     }]
-})
+},{timestamps:true})
 
 
 const Coupon = mongoose.model('Coupon',couponSchema)

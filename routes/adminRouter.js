@@ -6,6 +6,7 @@ const categoryController = require('../controllers/admin/categoryController')
 const productController = require('../controllers/admin/productController')
 const orderController = require('../controllers/admin/orderController')
 const offerController = require('../controllers/admin/offerController')
+const couponController = require('../controllers/admin/couponController')
 const upload = require('../helpers/multer')
 const {isAuthenticated,isLogin}= require('../middlewares/adminAuth')
 
@@ -55,6 +56,11 @@ router.get('/offer-list',isAuthenticated,offerController.offerList)
 router.post('/offer',isAuthenticated,offerController.addOffer)
 router.put('/offer-update/:offerId',isAuthenticated,offerController.updateOffer)
 router.delete('/offer-remove/:offerId',isAuthenticated,offerController.removeOffer)
+
+router.get('/coupon',isAuthenticated,couponController.loadCoupon)
+router.post('/coupon',isAuthenticated,couponController.createCoupon)
+router.put('/coupon/:couponId',isAuthenticated,couponController.editCoupon)
+router.delete('/coupon/:couponId',isAuthenticated,couponController.deleteCoupon)
 
 
 module.exports = router
