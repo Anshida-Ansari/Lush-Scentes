@@ -1,0 +1,95 @@
+<%-include('../../views/partials/user/header')%>
+
+<div class="site-blocks-cover inner-page" data-aos="fade">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 ml-auto order-md-2 align-self-start">
+        <div class="site-block-cover-content">
+        <h2 class="sub-title">#New Summer Collection 2019</h2>
+        <h1>Arrivals Sales</h1>
+        <p><a href="/shop" class="btn btn-black rounded-0">Shop Now</a></p>
+        </div>
+      </div>
+      <div class="col-md-6 order-1 align-self-end">
+        <img src="images/unisex.jpg" alt="Image" class="img-fluid">
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- <div class="site-section">
+      <div class="container">
+        <div class="title-section mb-5">
+          <h2 class="text-uppercase"><span class="d-block">Explore </span> Our Fragrance Collections</h2>
+        </div>
+        <div class="row align-items-stretch">
+          <div class="col-lg-8">
+            <div class="product-item sm-height full-height bg-gray">
+              <a href="#" class="product-category">Women <span>25 items</span></a>
+              <img src="images/women.jpg" alt="Image" class="img-fluid">
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="product-item sm-height bg-gray mb-4">
+              <a href="#" class="product-category">Men <span>25 items</span></a>
+              <img src="images/wom1.jpg" alt="Image" class="img-fluid">
+            </div>
+
+            <div class="product-item sm-height bg-gray">
+              <a href="#" class="product-category">Unisex <span>25 items</span></a>
+              <img src="images/unisex2.jpg" alt="Image" class="img-fluid">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> -->
+
+
+    
+    <div class="site-section">
+      <div class="container">
+        <div class="row">
+          <div class="title-section mb-5 col-12">
+            <h2 class="text-uppercase">Our Top Picks</h2>
+          </div>
+        </div>
+        <div class="row">
+         
+          <% for( let i = 0; i < products.length; i++ ) { %>
+
+          <div class="col-lg-4 col-md-6 item-entry mb-4">
+                      
+            <a href="/productDetailsPage?id=<%=products[i]._id%>" class="product-item md-height bg-gray d-block">
+              <img src="<%=products[i].productImage[0]%>" alt="<%=products[i].productName%>" class="img-fluid">
+            </a>      
+            <h2 class="item-title"><%=products[i].productName%></h2>
+            <strong class="item-price"><del><%=products[i].regularPrice%></del><%=products[i].salesPrice%></strong>
+          </div>
+      
+          <% } %>
+
+        </div>
+      </div>
+    </div>
+
+   
+
+
+    <div class="site-blocks-cover inner-page py-5" data-aos="fade">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 ml-auto order-md-2 align-self-start">
+            <div class="site-block-cover-content">
+            <h2 class="sub-title">#Summer Scents You Can't Miss</h2>
+            <h1>Dior Sauvage</h1>
+          
+            <p><a href="#" class="btn btn-black rounded-0">Shop Now</a></p>
+            </div>
+          </div>
+          <div class="col-md-6 order-1 align-self-end">
+            <img src="images/unisex.jpg" alt="Image" class="img-fluid">
+          </div>
+        </div>
+      </div>
+    </div>
+   <%-include('../../views/partials/user/footer')%>

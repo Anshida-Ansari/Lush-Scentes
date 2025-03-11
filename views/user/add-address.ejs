@@ -1,0 +1,247 @@
+
+<%-include('../../views/partials/user/header')%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Address - Lush Scentes</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff4081;
+            --secondary-color: #333;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #e91e63;
+            border-color: #e91e63;
+        }
+        
+        .breadcrumb-item a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .text-danger {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+
+        .form-control.is-valid {
+            border-color: #198754;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+    </style>
+</head>
+<body class="bg-light">
+   
+    <div class="bg-white border-bottom">
+        <div class="container py-2">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/userProfile">Profile</a></li>
+                    <li class="breadcrumb-item active">Add Address</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+  
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0">Add New Address</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="addressForm" action="/addAddress" method="POST" novalidate>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Address Type</label>
+                                    <input type="text" id="addressType" name="addressType" class="form-control" 
+                                           placeholder="e.g., Home, Office" required
+                                           data-validation="required alphabets">
+                                    <div class="invalid-feedback">Please enter a valid address type (Home, Office, etc.)</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" id="name" name="name" class="form-control" required
+                                           data-validation="required alphabets">
+                                    <div class="invalid-feedback">Please enter a valid name (alphabets only)</div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">City</label>
+                                    <input type="text" id="city" name="city" class="form-control" required
+                                           data-validation="required alphabets">
+                                    <div class="invalid-feedback">Please enter a valid city name</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Landmark</label>
+                                    <input type="text" id="landMark" name="landMark" class="form-control" required
+                                           data-validation="required">
+                                    <div class="invalid-feedback">Please enter a landmark</div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">State</label>
+                                    <input type="text" id="state" name="state" class="form-control" required
+                                           data-validation="required alphabets">
+                                    <div class="invalid-feedback">Please enter a valid state name</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Pincode</label>
+                                    <input type="text" id="pincode" name="pincode" class="form-control" required
+                                           data-validation="required pincode">
+                                    <div class="invalid-feedback">Please enter a valid 6-digit pincode</div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" id="phone" name="phone" class="form-control" required
+                                           data-validation="required phone">
+                                    <div class="invalid-feedback">Please enter a valid 10-digit phone number</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Alternative Number</label>
+                                    <input type="tel" id="altPhone" name="altPhone" class="form-control" required
+                                           data-validation="required phone">
+                                    <div class="invalid-feedback">Please enter a different 10-digit phone number</div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Save Address
+                                </button>
+                                <a href="/userProfile" class="btn btn-secondary">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('addressForm');
+            const inputs = form.querySelectorAll('input[data-validation]');
+            
+            
+            const patterns = {
+                alphabets: /^[A-Za-z\s]+$/,
+                pincode: /^\d{6}$/,
+                phone: /^\d{10}$/
+            };
+
+           
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    validateInput(this);
+                });
+            });
+
+            function validateInput(input) {
+                const validations = input.dataset.validation.split(' ');
+                let isValid = true;
+                
+                
+                input.classList.remove('is-valid', 'is-invalid');
+
+              
+                if (validations.includes('required') && !input.value.trim()) {
+                    isValid = false;
+                }
+
+             
+                if (input.value.trim()) {
+                    validations.forEach(validation => {
+                        if (patterns[validation] && !patterns[validation].test(input.value)) {
+                            isValid = false;
+                        }
+                    });
+                }
+
+               
+                if (input.id === 'altPhone' && input.value === document.getElementById('phone').value) {
+                    isValid = false;
+                    input.nextElementSibling.textContent = 'Alternative number must be different from primary number';
+                }
+
+                input.classList.add(isValid ? 'is-valid' : 'is-invalid');
+                return isValid;
+            }
+
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                let isValid = true;
+
+                
+                inputs.forEach(input => {
+                    if (!validateInput(input)) {
+                        isValid = false;
+                    }
+                });
+
+                if (!isValid) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Validation Error',
+                        text: 'Please check the form for errors',
+                        confirmButtonColor: '#ff4081'
+                    });
+                    return;
+                }
+
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Address saved successfully',
+                    confirmButtonColor: '#ff4081'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
+
+    <%-include('../../views/partials/user/footer')%>
+</body>
+</html>

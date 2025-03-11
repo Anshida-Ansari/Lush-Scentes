@@ -1,0 +1,159 @@
+<%- include('../../views/partials/user/header') %>
+
+<div class="container mt-5">
+    <h2>Edit Address</h2>
+    <form action="/editAddress" method="POST" id="editAddressForm">
+        <input type="hidden" name="_id" value="<%= address._id %>">
+        
+        <div class="form-group">
+            <label for="addressType">Address Type</label>
+            <input type="text" class="form-control" id="addressType" name="addressType" 
+                   value="<%= address.addressType %>" required>
+        </div>
+
+        <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" class="form-control" id="name" name="name" 
+                   value="<%= address.name %>" required>
+        </div>
+
+        <div class="form-group">
+            <label for="city">City</label>
+            <input type="text" class="form-control" id="city" name="city" 
+                   value="<%= address.city %>" required>
+        </div>
+
+        <div class="form-group">
+            <label for="landMark">Landmark</label>
+            <input type="text" class="form-control" id="landMark" name="landMark" 
+                   value="<%= address.landMark %>" required>
+        </div>
+
+        <div class="form-group">
+            <label for="state">State</label>
+            <input type="text" class="form-control" id="state" name="state" 
+                   value="<%= address.state %>" required>
+        </div>
+
+        <div class="form-group">
+            <label for="pincode">Pincode</label>
+            <input type="text" class="form-control" id="pincode" name="pincode" 
+                   value="<%= address.pincode %>" required>
+        </div>
+
+        <div class="form-group">
+            <label for="phoneNumber">Phone Number</label>
+            <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" 
+                   value="<%= address.phoneNumber %>" required>
+        </div>
+
+        <div class="form-group">
+            <label for="altPhone">Alternative Phone</label>
+            <input type="text" class="form-control" id="altPhone" name="altPhone" 
+                   value="<%= address.altPhone %>">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update Address</button>
+        <div id="errorMessages" class="text-danger mt-2"></div>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).ready(function() {
+        $('#editAddressForm').on('submit', function(event) {
+            event.preventDefault();
+
+            const errorMessages = $('#errorMessages');
+            errorMessages.empty();
+            let isValid = true;
+
+            // Validate all fields
+            const addressType = $('#addressType').val().trim();
+            const name = $('#name').val().trim();
+            const city = $('#city').val().trim();
+            const landMark = $('#landMark').val().trim();
+            const state = $('#state').val().trim();
+            const pincode = $('#pincode').val().trim();
+            const phoneNumber = $('#phoneNumber').val().trim();
+            const altPhone = $('#altPhone').val().trim();
+
+            if (!addressType || !/^[A-Za-z\s]+$/.test(addressType)) {
+                errorMessages.append('<p>Address type is required and should contain only letters and spaces.</p>');
+                isValid = false;
+            }
+            if (!name || !/^[A-Za-z\s]+$/.test(name)) {
+                errorMessages.append('<p>Full name is required and should contain only letters and spaces.</p>');
+                isValid = false;
+            }
+            if (!city || !/^[A-Za-z\s]+$/.test(city)) {
+                errorMessages.append('<p>City is required and should contain only letters and spaces.</p>');
+                isValid = false;
+            }
+            if (!state || !/^[A-Za-z\s]+$/.test(state)) {
+                errorMessages.append('<p>State is required and should contain only letters and spaces.</p>');
+                isValid = false;
+            }
+            if (!pincode || !/^\d{6}$/.test(pincode)) {
+                errorMessages.append('<p>Pincode must be exactly 6 digits.</p>');
+                isValid = false;
+            }
+            if (!phoneNumber || !/^\d{10}$/.test(phoneNumber)) {
+                errorMessages.append('<p>Phone number must be exactly 10 digits.</p>');
+                isValid = false;
+            }
+            if (altPhone && !/^\d{10}$/.test(altPhone)) {
+                errorMessages.append('<p>Alternative phone must be exactly 10 digits.</p>');
+                isValid = false;
+            }
+
+            if (isValid) {
+                $.ajax({
+                    url: '/editAddress',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify($(this).serializeObject()),
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: 'Success',
+                                text: response.message,
+                                icon: 'success'
+                            }).then(() => {
+                                window.location.href = '/user/profile';
+                            });
+                        } else {
+                            errorMessages.append('<p>' + response.message + '</p>');
+                            if (response.errors) {
+                                response.errors.forEach(err => errorMessages.append('<p>' + err.msg + '</p>'));
+                            }
+                        }
+                    },
+                    error: function(xhr) {
+                        const error = xhr.responseJSON || { message: 'Server error' };
+                        errorMessages.append('<p>' + error.message + '</p>');
+                    }
+                });
+            }
+        });
+
+        $.fn.serializeObject = function() {
+            const o = {};
+            const a = this.serializeArray();
+            $.each(a, function() {
+                if (o[this.name]) {
+                    if (!o[this.name].push) {
+                        o[this.name] = [o[this.name]];
+                    }
+                    o[this.name].push(this.value || '');
+                } else {
+                    o[this.name] = this.value || '';
+                }
+            });
+            return o;
+        };
+    });
+</script>
+
+<%- include('../../views/partials/user/footer') %>

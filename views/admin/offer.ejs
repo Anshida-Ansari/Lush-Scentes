@@ -1,0 +1,232 @@
+<%- include('../partials/admin/header') %>
+<br><br><br><br>
+    <div class="main-content container py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="content-header">
+                    <h2 class="content-title">Add New Offer</h2>
+                </div>
+            </div>
+        </div>
+<br><br>
+        <div class="card">
+            <div class="card-body">
+                <form id="offerForm" action="/admin/offer" method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">Offer Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="type" class="form-label">Offer Type</label>
+                            <select class="form-select" id="type" name="type" required onchange="handleTypeChange()">
+                                <option value="">Select Type</option>
+                                <option value="product">Product Offer</option>
+                                <option value="category">Category Offer</option>
+                                <option value="referral">Referral Offer</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="discount" class="form-label">Discount Percentage</label>
+                            <input type="number" class="form-control" id="discount" name="discount" min="0" max="100"
+                                required>
+                        </div>
+
+                        <div class="col-md-6 mb-3" id="productSelectDiv" style="display: none;">
+                            <label for="productId" class="form-label">Select Product</label>
+                            <select class="form-select" id="productId" name="productId">
+                                <option value="">Select Product</option>
+                                <% products.forEach(product=> { %>
+                                    <option value="<%= product.productName %>" data-price="<%= product.salePrice %>">
+                                        <%= product.productName %> : ₹<%= product.salePrice %>
+                                    </option>
+                                    <% }); %>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3" id="categorySelectDiv" style="display: none;">
+                            <label for="categoryId" class="form-label">Select Category</label>
+                            <select class="form-select" id="categoryId" name="categoryId">
+                                <option value="">Select Category</option>
+                                <% categories.forEach(category=> { %>
+                                    <option value="<%= category._id %>">
+                                        <%= category.name %>
+                                    </option>
+                                    <% }); %>
+                            </select>
+                        </div>
+
+                        <!-- <div class="col-md-6 mb-3" id="referralDiv" style="display: none;">
+                            <label for="referralCode" class="form-label">Referral Code</label>
+                            <input type="text" class="form-control" id="referralCode" name="referralCode">
+                        </div> -->
+
+                        <div class="col-md-6 mb-3">
+                            <label for="startDate" class="form-label">Start Date</label>
+                            <input type="datetime-local" class="form-control" id="startDate" name="startDate" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="endDate" class="form-label">End Date</label>
+                            <input type="datetime-local" class="form-control" id="endDate" name="endDate" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3" id="discountedPriceDiv" style="display: none;">
+                            <label class="form-label">Discounted Price</label>
+                            <div class="form-control bg-light">₹<span id="discountedPrice">0.00</span></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary">Create Offer</button>
+                        <a href="/admin/offer-list" class="btn btn-light ml-2">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById('offerForm');
+    const typeSelect = document.getElementById('type');
+    const productSelect = document.getElementById('productId');
+    const categorySelect = document.getElementById('categoryId');
+    const discountInput = document.getElementById('discount');
+    let isSubmitting = false;
+
+    // Handle type change
+    function handleTypeChange() {
+        const type = typeSelect.value;
+        productSelect.value = '';
+        categorySelect.value = '';
+        document.getElementById('discountedPrice').textContent = '0.00';
+
+        document.getElementById('productSelectDiv').style.display = type === 'product' ? 'block' : 'none';
+        document.getElementById('categorySelectDiv').style.display = type === 'category' ? 'block' : 'none';
+        document.getElementById('referralDiv').style.display = type === 'referral' ? 'block' : 'none';
+        document.getElementById('discountedPriceDiv').style.display = type === 'product' ? 'block' : 'none';
+    }
+
+    // Calculate discounted price
+    function calculateDiscountedPrice() {
+        if (typeSelect.value === 'product' && productSelect.selectedIndex > 0) {
+            const originalPrice = parseFloat(productSelect.options[productSelect.selectedIndex].dataset.price);
+            const discount = parseFloat(discountInput.value) || 0;
+            const discountAmount = (originalPrice * discount) / 100;
+            const discountedPrice = originalPrice - discountAmount;
+            document.getElementById('discountedPrice').textContent = discountedPrice.toFixed(2);
+        }
+    }
+
+    // Validate dates
+    function validateDates() {
+        const startDate = new Date(document.getElementById('startDate').value);
+        const endDate = new Date(document.getElementById('endDate').value);
+        if (endDate < startDate) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Date Range',
+                text: 'End date cannot be before start date'
+            });
+            document.getElementById('endDate').value = document.getElementById('startDate').value;
+            return false;
+        }
+        return true;
+    }
+
+    // Validate form
+    function validateForm() {
+        const type = typeSelect.value;
+        const discount = parseFloat(discountInput.value);
+        const validations = [
+            { condition: !document.getElementById('name').value.trim(), message: 'Please enter an offer name', focus: 'name' },
+            { condition: !type, message: 'Please select an offer type', focus: 'type' },
+            { condition: isNaN(discount) || discount < 1 || discount > 100, message: 'Discount must be between 1 and 100', focus: 'discount' },
+            { condition: !new Date(document.getElementById('startDate').value).getTime(), message: 'Please select a valid start date', focus: 'startDate' },
+            { condition: !new Date(document.getElementById('endDate').value).getTime(), message: 'Please select a valid end date', focus: 'endDate' },
+            { condition: new Date(document.getElementById('endDate').value) < new Date(document.getElementById('startDate').value), message: 'End date cannot be before start date', focus: 'endDate' },
+            { condition: new Date(document.getElementById('startDate').value) < new Date(), message: 'Start date cannot be in the past', focus: 'startDate' }
+        ];
+
+        if (type === 'product') validations.push({ condition: !productSelect.value, message: 'Please select a product', focus: 'productId' });
+        if (type === 'category') validations.push({ condition: !categorySelect.value, message: 'Please select a category', focus: 'categoryId' });
+
+        for (const validation of validations) {
+            if (validation.condition) {
+                Swal.fire({ icon: 'error', title: 'Validation Error', text: validation.message });
+                const errorElement = document.getElementById(validation.focus);
+                if (errorElement) {
+                    errorElement.focus();
+                    errorElement.classList.add('is-invalid');
+                    errorElement.addEventListener('input', function () { this.classList.remove('is-invalid'); }, { once: true });
+                }
+                return false;
+            }
+        }
+        return validateDates();
+    }
+
+    // Event listeners
+    typeSelect.addEventListener('change', handleTypeChange);
+    productSelect?.addEventListener('change', calculateDiscountedPrice);
+    discountInput?.addEventListener('input', function () {
+        let value = parseFloat(this.value);
+        if (value > 100) this.value = 100;
+        if (value < 0) this.value = 0;
+        calculateDiscountedPrice();
+    });
+
+    // Form submission
+    form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        if (isSubmitting || !validateForm()) return;
+
+        isSubmitting = true;
+        const formData = {
+            name: document.getElementById('name').value,
+            type: typeSelect.value,
+            discount: discountInput.value,
+            productId: productSelect?.value || null,
+            categoryId: categorySelect?.value || null,
+            referralCode: document.getElementById('referralCode')?.value || null,
+            startDate: document.getElementById('startDate').value,
+            endDate: document.getElementById('endDate').value
+        };
+
+        try {
+            const response = await fetch("/admin/offer", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Offer Added',
+                    text: data.message || 'The new offer has been added successfully.',
+                    showConfirmButton: true
+                });
+                window.location.href = "/admin/offer";
+            } else {
+                throw new Error(data.message || 'Failed to add offer');
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Failed to add offer. Please try again.',
+                showConfirmButton: true
+            });
+        } finally {
+            isSubmitting = false;
+        }
+    });
+});
+</script>

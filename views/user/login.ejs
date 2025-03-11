@@ -1,0 +1,299 @@
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 480px;
+        }
+
+        .site-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .site-logo a {
+            font-size: 28px;
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #666;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .login-btn:hover {
+            background: #444;
+        }
+
+        .google-btn {
+            width: 100%;
+            padding: 14px;
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .google-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background: #ddd;
+        }
+
+        .divider::before {
+            left: 0;
+        }
+
+        .divider::after {
+            right: 0;
+        }
+
+        .signup-link {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .signup-link a {
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #d9534f;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-top: -15px;
+            margin-bottom: 20px;
+        }
+
+        .forgot-password a {
+            color: #666;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="site-logo">
+            <a href="/" class="js-logo-clone">LUSH SCENTES</a>
+        </div>
+
+        <form id="loginform" method="post" action="" novalidate>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" required placeholder="Enter your email" name="email">
+            </div>
+            <div id="error1" class="error-message"></div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="Enter your password" name="password">
+            </div>
+            <%if(typeof message !=='undefined' ){%>
+                <div class="alert alert-danger text-center">
+
+                    <%=message%>
+
+                </div>
+                <%}%>
+                    <div id="error2" class="error-message"></div>
+
+                    <div class="forgot-password">
+                        <a href="/forgot-password">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="login-btn">Login</button>
+
+                    <div class="divider">or</div>
+
+                    <a href="/auth/google" class="google-btn">
+                        <svg width="18" height="18" viewBox="0 0 18 18">
+                            <path
+                                d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"
+                                fill="#4285f4" />
+                            <path
+                                d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"
+                                fill="#34a853" />
+                            <path
+                                d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.549 0 9s.348 2.825.957 4.039l3.007-2.332z"
+                                fill="#fbbc05" />
+                            <path
+                                d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"
+                                fill="#ea4335" />
+                        </svg>
+                        Login with Google
+                    </a>
+
+                    <div class="signup-link">
+                        Don't have an account? <a href="/signup">Sign Up</a>
+                    </div>
+        </form>
+    </div>
+
+    <script>
+        const emailId = document.getElementById('email');
+        const passId = document.getElementById('password');
+        const error1 = document.getElementById('error1');
+        const error2 = document.getElementById('error2');
+        const loginform = document.getElementById('loginform');
+
+        
+        function emailValidateChecking() {
+            const emailval = emailId.value;
+            const emailpattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+            if (emailval.trim() === '') {
+                error1.style.display = 'block';
+                error1.innerHTML = 'Please enter your email address';
+                return false;
+            } else if (!emailpattern.test(emailval)) {
+                error1.style.display = 'block';
+                error1.innerHTML = 'Please enter a valid email address';
+                return false;
+            } else {
+                error1.style.display = 'none';
+                error1.innerHTML = '';
+                return true;
+            }
+        }
+
+      
+        function passValidateChecking() {
+            const passval = passId.value;
+
+            if (passval.trim() === '') {
+                error2.style.display = 'block';
+                error2.innerHTML = 'Please enter your password';
+                return false;
+            } else {
+                error2.style.display = 'none';
+                error2.innerHTML = '';
+                return true;
+            }
+        }
+
+       
+        document.addEventListener('DOMContentLoaded', function () {
+            loginform.addEventListener('submit', function (e) {
+                const isEmailValid = emailValidateChecking();
+                const isPassValid = passValidateChecking();
+
+                if (!isEmailValid || !isPassValid) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

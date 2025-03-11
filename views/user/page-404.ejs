@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Not Found - Lush Scents</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Helvetica', Arial, sans-serif;
+    }
+    
+    body {
+      background-color: #f8f8f8;
+      color: #333;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 10%;
+      background-color: white;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .logo {
+      font-size: 24px;
+      letter-spacing: 2px;
+      border: 1px solid #333;
+      padding: 5px 15px;
+      color: #333;
+      text-decoration: none;
+    }
+    
+    .nav {
+      display: flex;
+      gap: 30px;
+    }
+    
+    .nav a {
+      text-decoration: none;
+      color: #333;
+      position: relative;
+    }
+    
+    .nav a:hover {
+      color: #ff6b6b;
+    }
+    
+    .icons {
+      display: flex;
+      gap: 20px;
+    }
+    
+    .icons a {
+      color: #333;
+      text-decoration: none;
+    }
+    
+    .main-content {
+      display: flex;
+      min-height: 70vh;
+      align-items: center;
+      justify-content: center;
+      padding: 50px 10%;
+    }
+    
+    .content-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 30px;
+      max-width: 800px;
+    }
+    
+    .perfume-image {
+      width: 220px;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f0f0f0;
+      border-radius: 50%;
+      position: relative;
+      margin-bottom: 20px;
+    }
+    
+    .perfume-bottle {
+      width: 80px;
+      height: 140px;
+      background-color: #333;
+      position: relative;
+      border-radius: 5px 5px 20px 20px;
+    }
+    
+    .perfume-bottle:before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 20px;
+      background-color: #222;
+      border-radius: 5px 5px 0 0;
+    }
+    
+    .perfume-bottle:after {
+      content: '404';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ff6b6b;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    
+    .title {
+      font-size: 48px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      font-size: 18px;
+      color: #777;
+      margin-bottom: 40px;
+    }
+    
+    .btn {
+      background-color: #000;
+      color: white;
+      padding: 15px 40px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-block;
+      margin-top: 20px;
+    }
+    
+    .btn:hover {
+      background-color: #ff6b6b;
+    }
+    
+    .suggestions {
+      margin-top: 50px;
+      text-align: center;
+    }
+    
+    .suggestions h3 {
+      margin-bottom: 30px;
+      font-size: 24px;
+      font-weight: 500;
+      position: relative;
+      display: inline-block;
+    }
+    
+    .suggestions h3:after {
+      content: '';
+      position: absolute;
+      left: -20px;
+      top: 50%;
+      width: 10px;
+      height: 40px;
+      background-color: #ff6b6b;
+      transform: translateY(-50%);
+    }
+    
+    .suggestion-links {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 20px;
+    }
+    
+    .suggestion-links a {
+      color: #333;
+      text-decoration: none;
+      padding: 10px 20px;
+      border: 1px solid #ddd;
+      transition: all 0.3s ease;
+    }
+    
+    .suggestion-links a:hover {
+      background-color: #f0f0f0;
+      border-color: #ccc;
+    }
+    
+    @media (max-width: 768px) {
+      .header {
+        padding: 15px 5%;
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .main-content {
+        padding: 30px 5%;
+      }
+      
+      .title {
+        font-size: 36px;
+      }
+      
+      .suggestion-links {
+        flex-direction: column;
+        gap: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+    <%-include('../../views/partials/user/header')%>
+
+  
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="perfume-image">
+        <div class="perfume-bottle"></div>
+      </div>
+      
+      <div class="text-content">
+        <h1 class="title">Scent Not Found</h1>
+        <p class="subtitle">The fragrance you're looking for seems to have evaporated.</p>
+        <p>Don't worry, we have many other captivating scents waiting for you in our collection.</p>
+        <a href="/" class="btn">BACK TO HOME</a>
+      </div>
+      
+    </div>
+  </main>
+</body>
+</html>
+<%-include('../../views/partials/user/footer')%>

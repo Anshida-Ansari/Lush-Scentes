@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - LUSH Scents</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .signup-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 480px;
+        }
+
+        .site-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .site-logo a {
+            font-size: 28px;
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #666;
+        }
+
+        .signup-btn {
+            width: 100%;
+            padding: 14px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .signup-btn:hover {
+            background: #444;
+        }
+
+        .google-btn {
+            width: 100%;
+            padding: 14px;
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .google-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background: #ddd;
+        }
+
+        .divider::before {
+            left: 0;
+        }
+
+        .divider::after {
+            right: 0;
+        }
+
+        .login-link {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .login-link a {
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        .error-message {
+    color: #d9534f; 
+    font-size: 0.85rem; 
+    font-weight: 500; 
+    margin-top: 5px; 
+    display: none; 
+    
+}
+.alert {
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.text-center {
+    text-align: center;
+}
+
+       
+
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="site-logo">
+            <a href="index.html" class="js-logo-clone">LUSH SCENTES</a>
+        </div>
+
+        <form id="signform" method="post" action="/signup" novalidate >
+            <div class="form-group">
+                <label for="fullname">Full Name</label>
+                <input type="text" id="fullname" required placeholder="Enter your full name" name="name">
+
+            </div>
+            <div id="error1" class="error-message"></div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" required placeholder="Enter your email" name="email">
+            </div>
+            <div id="error2" class="error-message"></div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" required placeholder="Enter your phone number", name="phone">
+            </div>
+            <div id="error3" class="error-message"></div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="Create a password" name="password">
+            </div>
+            <div id="error4" class="error-message"></div>
+
+            <div class="form-group">
+                <label for="confirm-password">Confirm Password</label>
+                <input type="password" id="confirm-password" required placeholder="Confirm your password" name="Cpassword">
+            </div>
+
+            <div id="error5" class="error-message"></div>
+            <%if(typeof message !=='undefined' ){%>
+                <div class="alert alert-danger text-center">
+
+                    <%=message%>
+
+                </div>
+                <%}%>
+
+            <button type="submit" class="signup-btn">Sign Up</button>
+
+            <div class="divider">or</div>
+
+            <a href="/auth/google" class="google-btn">
+                <svg width="18" height="18" viewBox="0 0 18 18">
+                    <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285f4"/>
+                    <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34a853"/>
+                    <path d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.549 0 9s.348 2.825.957 4.039l3.007-2.332z" fill="#fbbc05"/>
+                    <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z" fill="#ea4335"/>
+                </svg>
+                Sign up with Google
+            </a>
+
+            <div class="login-link">
+                Already registered? <a href="/login">Login</a>
+            </div>
+        </form>
+    </div>
+</body>
+<script>
+    const nameId = document.getElementById('fullname');
+    const emailId = document.getElementById('email');
+    const phoneId = document.getElementById('phone');
+    const passId = document.getElementById('password');
+    const cpassId = document.getElementById('confirm-password');
+    const error1 = document.getElementById('error1');
+    const error2 = document.getElementById('error2');
+    const error3 = document.getElementById('error3');
+    const error4 = document.getElementById('error4');
+    const error5 = document.getElementById('error5');
+    const signform = document.getElementById('signform');
+
+    // Name validation
+    function nameValidateChecking() {
+        const nameval = nameId.value;
+        const namepattern = /^[A-Za-z\s]+$/;
+
+        if (nameval.trim() === '') {
+            error1.style.display = 'block';
+            error1.innerHTML = 'Please enter your name';
+        } else if (!namepattern.test(nameval)) {
+            error1.style.display = 'block';
+            error1.innerHTML = 'Name can only contain alphabets and spaces';
+        } else {
+            error1.style.display = 'none';
+            error1.innerHTML = '';
+        }
+    }
+
+   
+    function emailValidateChecking() {
+        const emailval = emailId.value;
+        const emailpattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        if (emailval.trim() === '') {
+            error2.style.display = 'block';
+            error2.innerHTML = 'Please enter your email address';
+        } else if (!emailpattern.test(emailval)) {
+            error2.style.display = 'block';
+            error2.innerHTML = 'Please enter a valid email address';
+        } else {
+            error2.style.display = 'none';
+            error2.innerHTML = '';
+        }
+    }
+
+   
+    function phoneValidateChecking() {
+        const phoneval = phoneId.value;
+        const phonepattern = /^[0-9]{10}$/;
+
+        if (phoneval.trim() === '') {
+            error3.style.display = 'block';
+            error3.innerHTML = 'Please enter your phone number';
+        } else if (!phonepattern.test(phoneval)) {
+            error3.style.display = 'block';
+            error3.innerHTML = 'Phone number must be exactly 10 digits';
+        } else {
+            error3.style.display = 'none';
+            error3.innerHTML = '';
+        }
+    }
+
+   
+    function passValidateChecking() {
+        const passval = passId.value;
+        const passpattern = /^(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+
+        if (passval.trim() === '') {
+            error4.style.display = 'block';
+            error4.innerHTML = 'Please enter your password';
+        } else if (!passpattern.test(passval)) {
+            error4.style.display = 'block';
+            error4.innerHTML =
+                'Password must be at least 8 characters, include an uppercase letter, a lowercase letter, a number, and a special character';
+        } else {
+            error4.style.display = 'none';
+            error4.innerHTML = '';
+        }
+    }
+
+   
+    function cpassValidateChecking() {
+        const cpassval = cpassId.value;
+        const passval = passId.value;
+
+        if (cpassval.trim() === '') {
+            error5.style.display = 'block';
+            error5.innerHTML = 'Please confirm your password';
+        } else if (cpassval !== passval) {
+            error5.style.display = 'block';
+            error5.innerHTML = 'Passwords do not match';
+        } else {
+            error5.style.display = 'none';
+            error5.innerHTML = '';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        signform.addEventListener('submit', function (e) {
+            nameValidateChecking();
+            emailValidateChecking();
+            phoneValidateChecking();
+            passValidateChecking();
+            cpassValidateChecking();
+
+           
+            if (
+                error1.innerHTML ||
+                error2.innerHTML ||
+                error3.innerHTML ||
+                error4.innerHTML ||
+                error5.innerHTML
+            ) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+</html>
+

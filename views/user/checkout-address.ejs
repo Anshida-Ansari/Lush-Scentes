@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%-include('../../views/partials/user/header')%>
+  <head>
+    <title>LUSH SCENTES - Add Address</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Google Fonts & Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mukta:300,400,700"> 
+    <link rel="stylesheet" href="fonts/icomoon/style.css">
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/jquery-ui.css">
+    <link rel="stylesheet" href="css/aos.css">
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+  
+  <div class="site-wrap">
+    <div class="site-navbar bg-white py-2">
+      <!-- Navbar content -->
+    </div>
+    
+    <div class="bg-light py-3">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12 mb-0">
+            <a href="/">Home</a> 
+            <span class="mx-2 mb-0">/</span> 
+            <a href="/checkout">Checkout</a> 
+            <span class="mx-2 mb-0">/</span> 
+            <strong class="text-black">Add New Address</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="site-section">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <h2 class="h3 mb-3 text-black">Add New Address</h2>
+            <form action="/add-checkout-address" method="post" class="p-3 p-lg-5 border">
+              <!-- Address Type -->
+              <div class="form-group row">
+                <div class="col-md-12">
+                  <label for="addressType" class="text-black">Address Type <span class="text-danger">*</span></label>
+                  <select id="addressType" name="addressType" class="form-control" required>
+                    <option value="">Select type</option>
+                    <option value="Home">Home</option>
+                    <option value="Work">Work</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+              
+              <!-- Name -->
+              <div class="form-group row">
+                <div class="col-md-12">
+                  <label for="name" class="text-black">Full Name <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+              </div>
+              
+              <!-- Phone Numbers -->
+              <div class="form-group row">
+                <div class="col-md-6">
+                  <label for="phoneNumber" class="text-black">Phone Number <span class="text-danger">*</span></label>
+                  <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" 
+                         pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number" required>
+                </div>
+                <div class="col-md-6">
+                  <label for="altPhone" class="text-black">Alternative Phone <span class="text-danger">*</span></label>
+                  <input type="tel" class="form-control" id="altPhone" name="altPhone" 
+                         pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number" required>
+                </div>
+              </div>
+              
+              <!-- Landmark -->
+              <div class="form-group row">
+                <div class="col-md-12">
+                  <label for="landMark" class="text-black">Landmark/Street <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="landMark" name="landMark" 
+                         placeholder="House/Flat No., Building Name, Street" required>
+                </div>
+              </div>
+              
+              <!-- City -->
+              <div class="form-group row">
+                <div class="col-md-12">
+                  <label for="city" class="text-black">City <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="city" name="city" required>
+                </div>
+              </div>
+              
+              <!-- State and Pincode -->
+              <div class="form-group row">
+                <div class="col-md-6">
+                  <label for="state" class="text-black">State <span class="text-danger">*</span></label>
+                  <select id="state" name="state" class="form-control" required>
+                    <option value="">Select State</option>
+                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                    <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                    <option value="Assam">Assam</option>
+                    <option value="Bihar">Bihar</option>
+                    <option value="Chhattisgarh">Chhattisgarh</option>
+                    <option value="Goa">Goa</option>
+                    <option value="Gujarat">Gujarat</option>
+                    <option value="Haryana">Haryana</option>
+                    <option value="Himachal Pradesh">Himachal Pradesh</option>
+                    <option value="Jharkhand">Jharkhand</option>
+                    <option value="Karnataka">Karnataka</option>
+                    <option value="Kerala">Kerala</option>
+                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                    <option value="Maharashtra">Maharashtra</option>
+                    <option value="Manipur">Manipur</option>
+                    <option value="Meghalaya">Meghalaya</option>
+                    <option value="Mizoram">Mizoram</option>
+                    <option value="Nagaland">Nagaland</option>
+                    <option value="Odisha">Odisha</option>
+                    <option value="Punjab">Punjab</option>
+                    <option value="Rajasthan">Rajasthan</option>
+                    <option value="Sikkim">Sikkim</option>
+                    <option value="Tamil Nadu">Tamil Nadu</option>
+                    <option value="Telangana">Telangana</option>
+                    <option value="Tripura">Tripura</option>
+                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                    <option value="Uttarakhand">Uttarakhand</option>
+                    <option value="West Bengal">West Bengal</option>
+                    <option value="Delhi">Delhi</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="pincode" class="text-black">Pincode <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="pincode" name="pincode" 
+                         pattern="[0-9]{6}" title="Please enter a valid 6-digit pincode" required>
+                </div>
+              </div>
+              
+              <!-- Submit Button -->
+              <div class="form-group row">
+                <div class="col-lg-12">
+                  <input type="submit" class="btn btn-primary btn-lg btn-block" value="Save Address">
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Files -->
+  <script src="js/jquery-3.3.1.min.js"></script>
+  <script src="js/jquery-ui.js"></script>
+  <script src="js/popper.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/aos.js"></script>
+  <script src="js/main.js"></script>
+  
+ <!-- <script>
+  // Remove the first event listener since we're handling everything in the enhanced validation
+document.addEventListener('DOMContentLoaded', function() {
+  const addressForm = document.querySelector('form');
+  
+  // Add flag to track if form has been submitted
+  let hasAttemptedSubmit = false;
+  
+  // Input field validations
+  const validators = {
+    name: {
+      validate: value => value.trim().length >= 3 && /^[A-Za-z\s.'-]+$/.test(value),
+      message: 'Please enter a valid name (minimum 3 characters, letters only)'
+    },
+    phoneNumber: {
+      validate: value => /^[0-9]{10}$/.test(value),
+      message: 'Please enter a valid 10-digit phone number'
+    },
+    altPhone: {
+      validate: value => /^[0-9]{10}$/.test(value),
+      message: 'Please enter a valid 10-digit alternative phone number'
+    },
+    landMark: {
+      validate: value => value.trim().length >= 5,
+      message: 'Please enter a detailed address with at least 5 characters'
+    },
+    city: {
+      validate: value => /^[A-Za-z\s]{2,}$/.test(value),
+      message: 'Please enter a valid city name (letters only)'
+    },
+    pincode: {
+      validate: value => /^[0-9]{6}$/.test(value),
+      message: 'Please enter a valid 6-digit pincode'
+    }
+  };
+  
+  // Real-time validation for each field
+  Object.keys(validators).forEach(fieldName => {
+    const field = document.getElementById(fieldName);
+    if (field) {
+      // Only validate on blur if form has been submitted once
+      field.addEventListener('blur', function() {
+        if (hasAttemptedSubmit) {
+          validateField(this, validators[fieldName]);
+        }
+      });
+
+      // Add input event listener for real-time validation after first submit
+      field.addEventListener('input', function() {
+        if (hasAttemptedSubmit) {
+          validateField(this, validators[fieldName]);
+        }
+      });
+    }
+  });
+  
+  // Select field validations
+  const addressTypeSelect = document.getElementById('addressType');
+  if (addressTypeSelect) {
+    addressTypeSelect.addEventListener('change', function() {
+      if (hasAttemptedSubmit) {
+        validateSelect(this, 'Please select an address type');
+      }
+    });
+  }
+  
+  const stateSelect = document.getElementById('state');
+  if (stateSelect) {
+    stateSelect.addEventListener('change', function() {
+      if (hasAttemptedSubmit) {
+        validateSelect(this, 'Please select a state');
+      }
+    });
+  }
+  
+  // Phone number formatting as user types
+  const phoneFields = ['phoneNumber', 'altPhone'];
+  phoneFields.forEach(fieldId => {
+    const field = document.getElementById(fieldId);
+    if (field) {
+      field.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10);
+      });
+    }
+  });
+  
+  // Pincode formatting as user types
+  const pincodeField = document.getElementById('pincode');
+  if (pincodeField) {
+    pincodeField.addEventListener('input', function() {
+      this.value = this.value.replace(/[^0-9]/g, '').substring(0, 6);
+    });
+  }
+  
+  // Form submission validation
+  addressForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+    hasAttemptedSubmit = true;
+    let isValid = true;
+    
+    // Validate all required fields
+    const requiredFields = addressForm.querySelectorAll('[required]');
+    requiredFields.forEach(field => {
+      if (field.tagName === 'SELECT') {
+        if (!validateSelect(field, `Please select a ${field.name}`)) {
+          isValid = false;
+        }
+      } else if (validators[field.id]) {
+        if (!validateField(field, validators[field.id])) {
+          isValid = false;
+        }
+      } else if (!field.value.trim()) {
+        showError(field, 'This field is required');
+        isValid = false;
+      } else {
+        removeError(field);
+      }
+    });
+    
+    // Check if alternative phone is different from primary phone
+    const phone = document.getElementById('phoneNumber')?.value;
+    const altPhone = document.getElementById('altPhone')?.value;
+    if (phone && altPhone && phone === altPhone) {
+      showError(document.getElementById('altPhone'), 
+                'Alternative phone must be different from primary phone');
+      isValid = false;
+    }
+    
+    if (!isValid) {
+      // Scroll to the first error
+      const firstError = addressForm.querySelector('.is-invalid');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstError.focus();
+      }
+    } else {
+      // If the form is valid, submit it
+      addressForm.submit();
+    }
+  });
+  
+  // Helper functions
+  function validateField(field, validator) {
+    if (!field.value.trim()) {
+      showError(field, 'This field is required');
+      return false;
+    } else if (!validator.validate(field.value)) {
+      showError(field, validator.message);
+      return false;
+    } else {
+      removeError(field);
+      return true;
+    }
+  }
+  
+  function validateSelect(field, message) {
+    if (!field.value) {
+      showError(field, message);
+      return false;
+    } else {
+      removeError(field);
+      return true;
+    }
+  }
+  
+  function showError(field, message) {
+    field.classList.add('is-invalid');
+    
+    // Create or update error message
+    let errorDiv = field.nextElementSibling;
+    if (!errorDiv || !errorDiv.classList.contains('invalid-feedback')) {
+      errorDiv = document.createElement('div');
+      errorDiv.className = 'invalid-feedback';
+      field.parentNode.insertBefore(errorDiv, field.nextSibling);
+    }
+    errorDiv.textContent = message;
+  }
+  
+  function removeError(field) {
+    field.classList.remove('is-invalid');
+    const errorDiv = field.nextElementSibling;
+    if (errorDiv && errorDiv.classList.contains('invalid-feedback')) {
+      errorDiv.textContent = '';
+    }
+  }
+});
+ </script> -->
+<!-- <script>
+  document.addEventListener('DOMContentLoaded', function() {
+  const addressForm = document.querySelector('form');
+  let hasAttemptedSubmit = false;
+  
+  // Input field validations
+  const validators = {
+    name: {
+      validate: value => value.trim().length >= 3 && /^[A-Za-z\s.'-]+$/.test(value),
+      message: 'Please enter a valid name (minimum 3 characters, letters only)'
+    },
+    phoneNumber: {
+      validate: value => /^[0-9]{10}$/.test(value),
+      message: 'Please enter a valid 10-digit phone number'
+    },
+    altPhone: {
+      validate: value => /^[0-9]{10}$/.test(value),
+      message: 'Please enter a valid 10-digit alternative phone number'
+    },
+    landMark: {
+      validate: value => value.trim().length >= 5,
+      message: 'Please enter a detailed address with at least 5 characters'
+    },
+    city: {
+      validate: value => /^[A-Za-z\s]{2,}$/.test(value),
+      message: 'Please enter a valid city name (letters only)'
+    },
+    pincode: {
+      validate: value => /^[0-9]{6}$/.test(value),
+      message: 'Please enter a valid 6-digit pincode'
+    }
+  };
+  
+  // Real-time validation for each field
+  Object.keys(validators).forEach(fieldName => {
+    const field = document.getElementById(fieldName);
+    if (field) {
+      field.addEventListener('blur', function() {
+        if (hasAttemptedSubmit) {
+          validateField(this, validators[fieldName]);
+        }
+      });
+
+      field.addEventListener('input', function() {
+        if (hasAttemptedSubmit) {
+          validateField(this, validators[fieldName]);
+        }
+      });
+    }
+  });
+  
+  // Select field validations
+  const addressTypeSelect = document.getElementById('addressType');
+  if (addressTypeSelect) {
+    addressTypeSelect.addEventListener('change', function() {
+      if (hasAttemptedSubmit) {
+        validateSelect(this, 'Please select an address type');
+      }
+    });
+  }
+  
+  const stateSelect = document.getElementById('state');
+  if (stateSelect) {
+    stateSelect.addEventListener('change', function() {
+      if (hasAttemptedSubmit) {
+        validateSelect(this, 'Please select a state');
+      }
+    });
+  }
+  
+  // Phone number formatting
+  const phoneFields = ['phoneNumber', 'altPhone'];
+  phoneFields.forEach(fieldId => {
+    const field = document.getElementById(fieldId);
+    if (field) {
+      field.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10);
+      });
+    }
+  });
+  
+  // Pincode formatting
+  const pincodeField = document.getElementById('pincode');
+  if (pincodeField) {
+    pincodeField.addEventListener('input', function() {
+      this.value = this.value.replace(/[^0-9]/g, '').substring(0, 6);
+    });
+  }
+  
+  // Form submission validation
+  addressForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+    hasAttemptedSubmit = true;
+    let isValid = true;
+    
+    // Validate all required fields
+    const requiredFields = addressForm.querySelectorAll('[required]');
+    requiredFields.forEach(field => {
+      if (field.tagName === 'SELECT') {
+        if (!validateSelect(field, `Please select a ${field.name}`)) {
+          isValid = false;
+        }
+      } else if (validators[field.id]) {
+        // Always show the specific validation message, even if empty
+        if (!validators[field.id].validate(field.value)) {
+          showError(field, validators[field.id].message);
+          isValid = false;
+        } else {
+          removeError(field);
+        }
+      }
+    });
+    
+    // Check phone numbers
+    const phone = document.getElementById('phoneNumber')?.value;
+    const altPhone = document.getElementById('altPhone')?.value;
+    if (phone && altPhone && phone === altPhone) {
+      showError(document.getElementById('altPhone'), 
+                'Alternative phone must be different from primary phone');
+      isValid = false;
+    }
+    
+    if (!isValid) {
+      const firstError = addressForm.querySelector('.is-invalid');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstError.focus();
+      }
+    } else {
+      addressForm.submit();
+    }
+  });
+  
+  function validateField(field, validator) {
+    if (!validator.validate(field.value)) {
+      showError(field, validator.message);
+      return false;
+    } else {
+      removeError(field);
+      return true;
+    }
+  }
+  
+  function validateSelect(field, message) {
+    if (!field.value) {
+      showError(field, message);
+      return false;
+    } else {
+      removeError(field);
+      return true;
+    }
+  }
+  
+  function showError(field, message) {
+    field.classList.add('is-invalid');
+    
+    let errorDiv = field.nextElementSibling;
+    if (!errorDiv || !errorDiv.classList.contains('invalid-feedback')) {
+      errorDiv = document.createElement('div');
+      errorDiv.className = 'invalid-feedback';
+      field.parentNode.insertBefore(errorDiv, field.nextSibling);
+    }
+    errorDiv.textContent = message;
+  }
+  
+  function removeError(field) {
+    field.classList.remove('is-invalid');
+    const errorDiv = field.nextElementSibling;
+    if (errorDiv && errorDiv.classList.contains('invalid-feedback')) {
+      errorDiv.textContent = '';
+    }
+  }
+});
+</script>  -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const addressForm = document.querySelector('form');
+  let hasAttemptedSubmit = false;
+  
+  // Input field validations with modified messages
+  const validators = {
+    name: {
+      validate: value => value.trim().length >= 3 && /^[A-Za-z\s.'-]+$/.test(value),
+      message: 'Please enter a valid name (minimum 3 characters, letters only)'
+    },
+    phoneNumber: {
+      validate: value => /^[0-9]{10}$/.test(value),
+      message: 'Please enter a valid 10-digit phone number'
+    },
+    altPhone: {
+      validate: value => /^[0-9]{10}$/.test(value),
+      message: 'Please enter a valid 10-digit alternative phone number'
+    },
+    landMark: {
+      validate: value => value.trim().length >= 5,
+      message: 'Please enter a detailed address with at least 5 characters'
+    },
+    city: {
+      validate: value => /^[A-Za-z\s]{2,}$/.test(value),
+      message: 'Please enter a valid city name (letters only)'
+    },
+    pincode: {
+      validate: value => /^[0-9]{6}$/.test(value),
+      message: 'Please enter a valid 6-digit pincode'
+    }
+  };
+  
+  // Real-time validation for each field
+  Object.keys(validators).forEach(fieldName => {
+    const field = document.getElementById(fieldName);
+    if (field) {
+      field.addEventListener('blur', function() {
+        if (hasAttemptedSubmit) {
+          validateField(this, validators[fieldName]);
+        }
+      });
+
+      field.addEventListener('input', function() {
+        if (hasAttemptedSubmit) {
+          validateField(this, validators[fieldName]);
+        }
+      });
+    }
+  });
+  
+  // Select field validations
+  const addressTypeSelect = document.getElementById('addressType');
+  if (addressTypeSelect) {
+    addressTypeSelect.addEventListener('change', function() {
+      if (hasAttemptedSubmit) {
+        validateSelect(this);
+      }
+    });
+  }
+  
+  const stateSelect = document.getElementById('state');
+  if (stateSelect) {
+    stateSelect.addEventListener('change', function() {
+      if (hasAttemptedSubmit) {
+        validateSelect(this);
+      }
+    });
+  }
+  
+  // Phone number formatting
+  const phoneFields = ['phoneNumber', 'altPhone'];
+  phoneFields.forEach(fieldId => {
+    const field = document.getElementById(fieldId);
+    if (field) {
+      field.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10);
+      });
+    }
+  });
+  
+  // Pincode formatting
+  const pincodeField = document.getElementById('pincode');
+  if (pincodeField) {
+    pincodeField.addEventListener('input', function() {
+      this.value = this.value.replace(/[^0-9]/g, '').substring(0, 6);
+    });
+  }
+  
+  // Form submission validation
+  addressForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+    hasAttemptedSubmit = true;
+    let isValid = true;
+    
+    // Validate all fields with specific messages
+    const requiredFields = addressForm.querySelectorAll('[required]');
+    requiredFields.forEach(field => {
+      if (field.tagName === 'SELECT') {
+        if (!validateSelect(field)) {
+          isValid = false;
+        }
+      } else if (validators[field.id]) {
+        if (!validateField(field, validators[field.id])) {
+          isValid = false;
+        }
+      }
+    });
+    
+    // Check phone numbers
+    const phone = document.getElementById('phoneNumber')?.value;
+    const altPhone = document.getElementById('altPhone')?.value;
+    if (phone && altPhone && phone === altPhone) {
+      showError(document.getElementById('altPhone'), 
+                'Alternative phone must be different from primary phone');
+      isValid = false;
+    }
+    
+    if (!isValid) {
+      const firstError = addressForm.querySelector('.is-invalid');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstError.focus();
+      }
+    } else {
+      addressForm.submit();
+    }
+  });
+  
+  function validateField(field, validator) {
+    // Always use the specific validation message, even for empty fields
+    if (!validator.validate(field.value)) {
+      showError(field, validator.message);
+      return false;
+    } else {
+      removeError(field);
+      return true;
+    }
+  }
+  
+  function validateSelect(field) {
+    if (!field.value) {
+      // Custom messages for select fields
+      const messages = {
+        addressType: 'Please select an address type',
+        state: 'Please select your state'
+      };
+      showError(field, messages[field.id] || 'Please make a selection');
+      return false;
+    } else {
+      removeError(field);
+      return true;
+    }
+  }
+  
+  function showError(field, message) {
+    field.classList.add('is-invalid');
+    
+    let errorDiv = field.nextElementSibling;
+    if (!errorDiv || !errorDiv.classList.contains('invalid-feedback')) {
+      errorDiv = document.createElement('div');
+      errorDiv.className = 'invalid-feedback';
+      field.parentNode.insertBefore(errorDiv, field.nextSibling);
+    }
+    errorDiv.textContent = message;
+  }
+  
+  function removeError(field) {
+    field.classList.remove('is-invalid');
+    const errorDiv = field.nextElementSibling;
+    if (errorDiv && errorDiv.classList.contains('invalid-feedback')) {
+      errorDiv.textContent = '';
+    }
+  }
+});
+</script>
+
+</body>
+</html>

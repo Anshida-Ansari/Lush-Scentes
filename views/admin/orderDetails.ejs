@@ -1,0 +1,156 @@
+<%- include("../partials/admin/header") %>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+   
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-10 p-4">
+                <h1 class="mb-4">Order Details</h1>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Order ID: <%= order.orderId %></h5>
+                        <p class="card-text">Total Amount: ₹<%= order.finalAmount %></p>
+                        <p class="card-text">Status: <%= order.status %></p>
+                        <p class="card-text">Order Date: <%= order.createdOn.toLocaleString() %></p>
+                        
+                        <h6 class="mt-4">Items:</h6>
+                        <ul class="list-group">
+                            <% order.orderedItems.forEach(item => { %>
+                                <li class="list-group-item">
+                                    <%= item.name %> - ₹<%= item.price %> (Qty: <%= item.variant.quantity %>)
+                                    <p class="text-muted">Cancel Status: <%= item.cancelStatus || 'completed' %></p>
+                                    <p class="text-muted">Return Status: <%= item.returnStatus || 'Not Requested' %></p>
+                                    <% if (item.returnStatus && item.returnStatus !== 'Not Requested') { %>
+                                        <p><strong>Return Reason:</strong> <%= item.returnReason || 'No reason provided' %></p>
+                                        <p><strong>Requested At:</strong> <%= item.returnRequestedAt ? item.returnRequestedAt.toLocaleString() : 'N/A' %></p>
+                                    <% } %>
+                                    <% if (item.returnStatus === 'Requested') { %>
+                                        <button class="btn btn-success btn-sm me-2" 
+                                                onclick="approveReturn('<%= order._id %>', '<%= item._id %>')">
+                                            Approve
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" 
+                                                onclick="rejectReturn('<%= order._id %>', '<%= item._id %>')">
+                                            Reject
+                                        </button>
+                                    <% } %>
+                                </li>
+                            <% }) %>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <script>
+    window.approveReturn = function(orderId, productId) {
+        console.log('Fetching:', '/admin/approve-return', { orderId, productId });
+        Swal.fire({
+            title: 'Approve Return',
+            text: 'Are you sure you want to approve this return?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Approve',
+            confirmButtonColor: '#28a745',
+            cancelButtonText: 'Cancel',
+            showLoaderOnConfirm: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('/admin/approve-return', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ orderId, productId })
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Approved',
+                            text: data.message,
+                            icon: 'success'
+                        }).then(() => location.reload());
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: data.message || 'Failed to approve return',
+                            icon: 'error'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'An error occurred while processing your request.',
+                        icon: 'error'
+                    });
+                });
+            }
+        });
+    };
+
+    window.rejectReturn = function(orderId, productId) {
+        console.log('Fetching:', '/admin/reject-return', { orderId, productId });
+        Swal.fire({
+            title: 'Reject Return',
+            text: 'Are you sure you want to reject this return?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Reject',
+            confirmButtonColor: '#dc3545',
+            cancelButtonText: 'Cancel',
+            showLoaderOnConfirm: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('/admin/reject-return', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ orderId, productId })
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Rejected',
+                            text: data.message,
+                            icon: 'success'
+                        }).then(() => location.reload());
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: data.message || 'Failed to reject return',
+                            icon: 'error'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'An error occurred while processing your request.',
+                        icon: 'error'
+                    });
+                });
+            }
+        });
+    };
+</script>
+    
+    <%- include("../partials/admin/footer") %>

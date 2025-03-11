@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>LUSH SCENTES</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mukta:300,400,700"> 
+    <link rel="stylesheet" href="fonts/icomoon/style.css">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/magnific-popup.css">
+    <link rel="stylesheet" href="css/jquery-ui.css">
+    <link rel="stylesheet" href="css/owl.carousel.min.css">
+    <link rel="stylesheet" href="css/owl.theme.default.min.css">
+
+
+    <link rel="stylesheet" href="css/aos.css">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.all.min.js"></script>
+    
+
+  </head>
+  
+<style>
+    .product-image-zoom {
+        position: relative;
+        overflow: hidden;
+        cursor: zoom-in;
+    }
+    
+    .thumbnail-image {
+        cursor: pointer;
+        transition: opacity 0.3s;
+    }
+    
+    .thumbnail-image:hover {
+        opacity: 0.8;
+    }
+    
+    .original-price {
+        font-size: 1.1rem;
+        margin-bottom: 0;
+    }
+    
+    .offer-badge {
+        font-size: 0.9rem;
+        padding: 0.3rem 0.6rem;
+    }
+    
+    .cursor-pointer {
+        cursor: pointer;
+    }
+    </style>
+    
+    
+        
+  <body>
+  
+  <div class="site-wrap">
+    
+
+    <div class="site-navbar bg-white py-2">
+
+      <div class="search-wrap">
+        <div class="container">
+          <a href="#" class="search-close js-search-close"><span class="icon-close2"></span></a>
+          <form action="#" method="post">
+            <input type="text" class="form-control" placeholder="Search keyword and hit enter...">
+          </form>  
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="logo">
+            <div class="site-logo">
+              <a href="/" class="js-logo-clone">LUSH SCENTES</a>
+            </div>
+          </div>
+          <div class="main-nav d-none d-lg-block">
+            <nav class="site-navigation text-right text-md-center" role="navigation">
+              <ul class="site-menu js-clone-nav d-none d-lg-block">
+                <li class="has-children ">
+                  <a href="/">Home</a>
+                  <ul class="dropdown">
+                    <li><a href="#">Menu One</a></li>
+                    <li><a href="#">Menu Two</a></li>
+                    <li><a href="#">Menu Three</a></li>
+                    <li class="has-children">
+                      <a href="#">Sub Menu</a>
+                      <ul class="dropdown">
+                        <li><a href="#">Menu One</a></li>
+                        <li><a href="#">Menu Two</a></li>
+                        <li><a href="#">Menu Three</a></li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+                
+                <li class="active"><a href="/shop">Shop</a></li>
+                <!-- <li><a href="#">Catalogue</a></li>
+                <li><a href="#">New Arrivals</a></li>
+                <li><a href="contact.html">Contact</a></li> -->
+              </ul>
+            </nav>
+          </div>
+          <div class="icons">
+            <a href="#" class="icons-btn d-inline-block js-search-open"><span class="icon-search"></span></a>
+            <a href="/userProfile" class="icons-btn d-inline-block js-profile-open">
+              <span class="icon-user"></span>
+          </a>
+            <a href="#" class="icons-btn d-inline-block"><span class="icon-heart-o"></span></a>
+            <a href="/cart" class="icons-btn d-inline-block bag">
+              <span class="icon-shopping-bag"></span>
+              <!-- <span class="number"></span> -->
+            </a>
+            <a href="#" class="site-menu-toggle js-menu-toggle ml-3 d-inline-block d-lg-none"><span class="icon-menu"></span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+   
+
+    <div class="bg-light py-3">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12 mb-0"><a href="/">Home</a> <span class="mx-2 mb-0">/</span> <a href="/shop">Shop</a> <span class="mx-2 mb-0">/</span> <strong class="text-black">Product Details</strong></div>
+        </div>
+      </div>
+    </div>  
+
+    <div class="site-section">
+      <div class="container">
+        <div class="row">
+            
+          <div class="col-md-6">
+            <div class="item-entry">
+                
+              <div class="product-image-zoom">
+                <% if (product.productImage && product.productImage.length > 0) { %>
+                  <% if (product.productImage[0].startsWith('http')) { %>
+                   
+                    <img src="<%= product.productImage[0] %>" alt="<%= product.productName %>" class="img-fluid main-image">
+                <% } else { %>
+                  <img src="/uploads/product-image/<%= product.productImage[0] %>" alt="<%= product.productName %>" class="img-fluid main-image">
+                  <% } %>
+                  <% } else { %>
+                    <img src="/images/placeholder.jpg" alt="Product image not available" class="img-fluid main-image">
+                    <% } %>
+              </div>
+                
+                
+              <div class="product-thumbnails mt-4">
+                <div class="row">
+                  <% if (product.productImage && product.productImage.length > 0) { %>
+                    <% product.productImage.forEach((image, index) => { %>
+                     
+                    <div class="col-3">
+                      <% if (image.startsWith('http')) { %>
+                        <img src="<%= image %>" 
+                        alt="Thumbnail <%= index + 1 %>" 
+                        class="img-fluid thumbnail-image cursor-pointer"
+                        onclick="changeMainImage(this.src)">
+                        <% } else { %>
+                          <img src="/uploads/product-image/<%= image %>" 
+                    alt="Thumbnail <%= index + 1 %>" 
+                    class="img-fluid thumbnail-image cursor-pointer"
+                    onclick="changeMainImage(this.src)">
+              <% } %>
+                    </div>
+                  <% }); %>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            
+             
+           
+            <h2 class="text-black"><%=product.productName  %></h2>
+            <p><%=product.description  %></p>
+            <p class="mb-4"><%= category.description %></p>
+            
+            <!-- Default prices will be replaced by the selected variant price -->
+            <div id="price-display">
+              <h3>
+                <% if (product.variants && product.variants.length > 0) { 
+                  const defaultVariant = product.variants[0]; %>
+                  <strong class="item-price">
+                    <% if (defaultVariant.salesPrice) { %>
+                      <del>₹<%=defaultVariant.regularPrice %></del> ₹<%=defaultVariant.salesPrice %>
+                    <% } else { %>
+                      ₹<%=defaultVariant.regularPrice %>
+                    <% } %>
+                  </strong>
+                <% } else { %>
+                  <strong class="item-price"><del>₹<%=product.regularPrice %></del> ₹<%=product.salesPrice %></strong>
+                <% } %>
+              </h3>
+            </div>
+    
+            <div class="row mt-3">
+              <div class="col-md-12">
+                <h5 style="color: black;"><strong>Reviews</strong></h5>
+                <p>⭐ 4.5 (Based on 120 reviews)</p>
+              </div>
+            </div>
+        
+            <div class="product-variants mt-4">
+              <h5 class="mb-3">Product Variants</h5>
+              
+              <% if (product.variants && product.variants.length > 0) { %>
+                <div class="variant-selection mb-4">
+                 
+                  <div class="form-group">
+                    <label for="size-selector">Size</label>
+                    <select id="size-selector" class="form-control">
+                      <option value="">Select Size</option>
+                      <% product.variants.forEach(data => { %>
+                        <option 
+                          value="<%=data.size%>" 
+                          data-regular-price="<%=data.regularPrice%>" 
+                          data-sales-price="<%=data.salesPrice || data.regularPrice%>" 
+                          data-quantity="<%=data.quantity%>">
+                          <%=data.size%>
+                        </option>
+                      <% }); %>
+                    </select>
+                  </div>
+                  
+                  <!-- Quantity Input -->
+                  <div class="form-group mt-3">
+                    <label for="quantity">Quantity</label>
+                    <div class="input-group" style="max-width: 150px;">
+                      <div class="input-group-prepend">
+                        <button class="btn btn-outline-primary js-btn-minus" type="button">&minus;</button>
+                      </div>
+                      <input type="text" id="quantity" class="form-control text-center" value="1" min="1" placeholder="Enter quantity" aria-label="Quantity" aria-describedby="button-addon1">
+                      <div class="input-group-append">
+                        <button class="btn btn-outline-primary js-btn-plus" type="button">&plus;</button>
+                      </div>
+                    </div>
+                    <p id="variant-stock" class="text-muted mt-2">Select a size to see available stock</p>
+                  </div>
+                </div>
+                
+              <% } %>
+            </div>
+            
+            <p>
+              <button 
+                class="buy-now btn btn-sm height-auto px-4 py-3 btn-primary" 
+                onclick="handleAddToCart('<%=product._id%>')">
+                Add To Cart
+              </button>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <div class="site-section block-3 site-blocks-2">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-7 site-section-heading text-center pt-4">
+            <h2>Related  Products</h2>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 block-3">
+            <div class="nonloop-block-3 owl-carousel">
+  <% relatedProduct.forEach(product => { %>
+    <div class="item">
+      <div class="item-entry">
+        <a href="/productDetailsPage?id=<%= product._id %>" class="product-item md-height bg-gray d-block">
+          <img src="<%= product.productImage[0] %>" alt="Image" class="img-fluid">
+        </a>
+        <h2 class="item-title">
+          <a href="/productDetailsPage?id=<%= product._id %>"><%=product.productName %></a>
+        </h2>
+        <% if(product.variants && product.variants.length > 0) { %>
+          <strong class="item-price">
+            <del>₹<%= product.variants[0].regularPrice %></del> 
+            ₹<%= product.variants[0].salesPrice || product.variants[0].regularPrice %>
+          </strong>
+        <% } %>
+        <div class="star-rating">
+          <span class="icon-star2 text-warning"></span>
+          <span class="icon-star2 text-warning"></span>
+          <span class="icon-star2 text-warning"></span>
+          <span class="icon-star2 text-warning"></span>
+          <span class="icon-star2 text-warning"></span>
+        </div>
+      </div>
+    </div>
+  <% }) %>
+</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="site-footer custom-border-top">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 col-lg-3 mb-4 mb-lg-0">
+            <h3 class="footer-heading mb-4">Promo</h3>
+            <a href="#" class="block-6">
+              <img src="images/about_1.jpg" alt="Image placeholder" class="img-fluid rounded mb-4">
+              <h3 class="font-weight-light  mb-0">Finding Your Perfect Scentes This Summer</h3>
+              <p>Promo from  July 15 &mdash; 25, 2019</p>
+            </a>
+          </div>
+          <div class="col-lg-5 ml-auto mb-5 mb-lg-0">
+            <div class="row">
+              <div class="col-md-12">
+                <h3 class="footer-heading mb-4">Quick Links</h3>
+              </div>
+              <div class="col-md-6 col-lg-4">
+                <ul class="list-unstyled">
+                  <li><a href="#">Sell online</a></li>
+                  <li><a href="#">Features</a></li>
+                  <li><a href="#">Shopping cart</a></li>
+                  <li><a href="#">Store builder</a></li>
+                </ul>
+              </div>
+              <div class="col-md-6 col-lg-4">
+                <ul class="list-unstyled">
+                  <li><a href="#">Mobile commerce</a></li>
+                  <li><a href="#">Dropshipping</a></li>
+                  <li><a href="#">Website development</a></li>
+                </ul>
+              </div>
+              <div class="col-md-6 col-lg-4">
+                <ul class="list-unstyled">
+                  <li><a href="#">Point of sale</a></li>
+                  <li><a href="#">Hardware</a></li>
+                  <li><a href="#">Software</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-6 col-lg-3">
+            <div class="block-5 mb-5">
+              <h3 class="footer-heading mb-4">Contact Info</h3>
+              <ul class="list-unstyled">
+                <li class="address">203 Fake St. Mountain View, San Francisco, California, USA</li>
+                <li class="phone"><a href="tel://23923929210">+2 392 3929 210</a></li>
+                <li class="email">emailaddress@domain.com</li>
+              </ul>
+            </div>
+
+            <div class="block-7">
+              <form action="#" method="post">
+                <label for="email_subscribe" class="footer-heading">Subscribe</label>
+                <div class="form-group">
+                  <input type="text" class="form-control py-4" id="email_subscribe" placeholder="Email">
+                  <input type="submit" class="btn btn-sm btn-primary" value="Send">
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="row pt-5 mt-5 text-center">
+          <div class="col-md-12">
+            <p>
+            Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0.
+            Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="icon-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank" class="text-primary">Colorlib</a>
+            Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0.
+             </p>
+          </div>
+          
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="js/jquery-3.3.1.min.js"></script>
+  <script src="js/jquery-ui.js"></script>
+  <script src="js/popper.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/owl.carousel.min.js"></script>
+  <script src="js/jquery.magnific-popup.min.js"></script>
+  <script src="js/aos.js"></script>
+
+  <script src="js/main.js"></script>
+    
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-zoom/1.7.21/jquery.zoom.min.js"></script>
+
+
+<script>
+  $(document).ready(function() {
+    // Image zoom functionality
+    if ($('.product-image-zoom').length) {
+        $('.product-image-zoom').zoom({
+            magnify: 1.5
+        });
+    }
+
+    // Quantity buttons functionality
+    $('.js-btn-minus').click(function(e) {
+        e.preventDefault();
+        var input = $(this).closest('.input-group').find('input');
+        var value = parseInt(input.val());
+        if (value > 1) {
+            input.val(value - 1);
+        }
+    });
+
+    $('.js-btn-plus').click(function(e) {
+        e.preventDefault();
+        var input = $(this).closest('.input-group').find('input');
+        var value = parseInt(input.val());
+        var max = parseInt(input.attr('max'));
+        if (value < max) {
+            input.val(value + 1);
+        }
+    });
+
+    // Size selector change event
+    $('#size-selector').change(function() {
+        updatePriceAndStock($(this));
+    });
+
+    // Set default values if a size is already selected
+    if ($('#size-selector').val()) {
+        updatePriceAndStock($('#size-selector'));
+    }
+});
+
+function updatePriceAndStock(sizeSelector) {
+    const selectedOption = sizeSelector.find('option:selected');
+    
+    if (!selectedOption.val()) {
+        $('#variant-stock').text('Select a size to see available stock');
+        return;
+    }
+    
+    const regularPrice = selectedOption.data('regular-price');
+    const salesPrice = selectedOption.data('sales-price');
+    const quantity = selectedOption.data('quantity');
+    
+    // Update price display
+    if (salesPrice && salesPrice !== regularPrice) {
+        $('#price-display').html(`
+            <h3>
+                <strong class="item-price">
+                    <del>₹${regularPrice}</del> ₹${salesPrice}
+                </strong>
+            </h3>
+        `);
+    } else {
+        $('#price-display').html(`
+            <h3>
+                <strong class="item-price">₹${regularPrice}</strong>
+            </h3>
+        `);
+    }
+    
+    // Update stock information
+    $('#variant-stock').text(`Available Stock: ${quantity}`);
+    $('#quantity').attr('max', quantity);
+    
+    // If current quantity exceeds available stock, adjust it
+    const currentQty = parseInt($('#quantity').val());
+    if (currentQty > quantity) {
+        $('#quantity').val(quantity);
+    }
+}
+
+function changeMainImage(src) {
+    // Just update the src attribute - works the same for Cloudinary or local images
+    $('.main-image').attr('src', src);
+    
+    // If you're using zoom functionality, you may need to reinitialize it
+    if ($('.product-image-zoom').length) {
+        $('.product-image-zoom').trigger('zoom.destroy'); // Destroy existing zoom
+        $('.product-image-zoom').zoom({                  // Re-initialize zoom
+            magnify: 1.5
+        });
+    }
+}
+async function handleAddToCart(productId) {
+        try {
+            const sizeSelect  = document.getElementById('size-selector');
+            const quantityInput = document.getElementById('quantity');
+
+            if (!sizeSelect.value) {
+                await Swal.fire({
+                    title: 'Selection Required',
+                    text: 'Please select an size',
+                    icon: 'warning',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
+            const quantity = parseInt(quantityInput.value);
+            if (isNaN(quantity) || quantity < 1) {
+                await Swal.fire({
+                    title: 'Invalid Quantity',
+                    text: 'Please enter a valid quantity',
+                    icon: 'warning',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
+            const payload = {
+                productId: productId,
+                variant: {
+                  size: sizeSelect.value,
+                    quantity: quantity
+                }
+            };
+
+            const response = await fetch('/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to add to cart');
+            }
+
+            if (data.cart) {
+                const cartCount = data.cart.items.reduce((sum, item) => sum + item.variant.quantity, 0);
+                const cartCountElement = document.querySelector('.bag .number');
+                if (cartCountElement) {
+                    cartCountElement.textContent = cartCount;
+                }
+            }
+
+            await Swal.fire({
+                title: 'Success!',
+                text: data.message || 'Product added to cart successfully!',
+                icon: 'success',
+                confirmButtonColor: '#3085d6'
+            });
+
+        } catch (error) {
+            console.error('Error:', error);
+            await Swal.fire({
+                title: 'Error!',
+                text: error.message || 'Error adding to cart',
+                icon: 'error',
+                confirmButtonColor: '#3085d6'
+            });
+        }
+    }
+
+    function showAlert(message, type = 'error') {
+        const options = {
+            title: type === 'error' ? 'Error!' : 'Success!',
+            text: message,
+            icon: type,
+            confirmButtonColor: '#3085d6'
+        };
+        
+        Swal.fire(options);
+    }
+
+    function handleSizeChange(productId) {
+        const sizeSelector = document.getElementById('size-selector');
+        const quantityInput = document.getElementById('quantity');
+        const stockDisplay = document.getElementById('variant-stock');
+        
+        if (!sizeSelector || !quantityInput || !stockDisplay) return;
+        
+        const selectedSize = sizeSelector.value;
+        
+        fetch(`/api/products/${productId}/stock?size=${selectedSize}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.stock !== undefined) {
+                    stockDisplay.textContent = `Available Stock: ${data.stock}`;
+                    quantityInput.max = data.stock;
+                    quantityInput.value = Math.min(quantityInput.value, data.stock);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching stock:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Error checking stock availability',
+                    icon: 'error',
+                    confirmButtonColor: '#3085d6'
+                });
+            });
+    }
+
+function updateStockDisplay(productId) {
+    const sizeSelector = document.getElementById('size-selector');
+    const quantityInput = document.getElementById('quantity');
+    const stockDisplay = document.getElementById('variant-stock');
+    
+    if (!sizeSelector || !stockDisplay) return;
+    
+    const selectedSize = sizeSelector.value;
+    if (!selectedSize) {
+        stockDisplay.textContent = "Please select an Size";
+        return;
+    }
+    
+    console.log(`Fetching stock from: /api/products/${productId}/stock?size=${selectedSize}`);
+
+
+    fetch(`/productDetailsPage/${productId}/stock?size=${selectedSize}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.stock !== undefined) {
+                stockDisplay.textContent = `Available Stock: ${data.stock}`;
+                if (quantityInput) {
+                    quantityInput.setAttribute('max', data.stock);
+                    if (parseInt(quantityInput.value) > data.stock) {
+                        quantityInput.value = data.stock;
+                    }
+                }
+            } else {
+                stockDisplay.textContent = data.message || "Error fetching stock";
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching stock:', error);
+            stockDisplay.textContent = "Error checking stock";
+        });
+}
+document.addEventListener('DOMContentLoaded', function() {
+    const sizeSelector = document.getElementById('size-selector');
+    if (sizeSelector) {
+        sizeSelector.addEventListener('change', function() {
+            updateStockDisplay('<%=product._id%>');
+        });
+        
+        if (sizeSelector.value) {
+            updateStockDisplay('<%=product._id%>');
+        }
+    }
+});
+
+</script>
+
+
+

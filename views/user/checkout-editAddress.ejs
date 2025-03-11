@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Address</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="checkbox"] {
+            margin-left: 10px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #c74275;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #c74275;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .input-error {
+            border-color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Address</h1>
+        <form id="editAddressForm" action="/edit-address/<%= address._id %>" method="POST" novalidate>
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" value="<%= address.name %>" required>
+                <small class="error-message" id="nameError"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="city">City:</label>
+                <input type="text" id="city" name="city" value="<%= address.city %>" required>
+                <small class="error-message" id="cityError"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="landMark">Landmark:</label>
+                <input type="text" id="landMark" name="landMark" value="<%= address.landMark %>" required>
+                <small class="error-message" id="landMarkError"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="state">State:</label>
+                <input type="text" id="state" name="state" value="<%= address.state %>" required>
+                <small class="error-message" id="stateError"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="pincode">Pincode:</label>
+                <input type="text" id="pincode" name="pincode" value="<%= address.pincode %>" required>
+                <small class="error-message" id="pincodeError"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="phoneNumber">Phone Number:</label>
+                <input type="text" id="phoneNumber" name="phoneNumber" value="<%= address.phoneNumber %>" required>
+                <small class="error-message" id="phoneNumberError"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="altPhone">Alternate Phone:</label>
+                <input type="text" id="altPhone" name="altPhone" value="<%= address.altPhone %>">
+                <small class="error-message" id="altPhoneError"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="addressType">Address Type:</label>
+                <input type="text" id="addressType" name="addressType" value="<%= address.addressType %>" required>
+                <small class="error-message" id="addressTypeError"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="default">Set as Default Address:</label>
+                <input type="checkbox" id="default" name="default" <%= address.default ? 'checked' : '' %>>
+            </div>
+
+            <button type="submit" class="btn">Save Changes</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('editAddressForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let isValid = true;
+
+            document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+            document.querySelectorAll('input').forEach(el => el.classList.remove('input-error'));
+
+            const name = document.getElementById('name');
+            if (name.value.trim().length < 3 || name.value.trim().length > 50) {
+                document.getElementById('nameError').textContent = 'Name must be between 3 and 50 characters.';
+                name.classList.add('input-error');
+                isValid = false;
+            }
+
+            const city = document.getElementById('city');
+            if (city.value.trim().length < 3 || city.value.trim().length > 50) {
+                document.getElementById('cityError').textContent = 'City must be between 3 and 50 characters.';
+                city.classList.add('input-error');
+                isValid = false;
+            }
+
+            const landMark = document.getElementById('landMark');
+            if (landMark.value.trim().length < 3 || landMark.value.trim().length > 100) {
+                document.getElementById('landMarkError').textContent = 'Landmark must be between 3 and 100 characters.';
+                landMark.classList.add('input-error');
+                isValid = false;
+            }
+
+            const state = document.getElementById('state');
+            if (state.value.trim().length < 3 || state.value.trim().length > 50) {
+                document.getElementById('stateError').textContent = 'State must be between 3 and 50 characters.';
+                state.classList.add('input-error');
+                isValid = false;
+            }
+
+            const pincode = document.getElementById('pincode');
+            if (!/^\d{6}$/.test(pincode.value.trim())) {
+                document.getElementById('pincodeError').textContent = 'Pincode must be a 6-digit number.';
+                pincode.classList.add('input-error');
+                isValid = false;
+            }
+
+            const phoneNumber = document.getElementById('phoneNumber');
+            if (!/^\d{10}$/.test(phoneNumber.value.trim())) {
+                document.getElementById('phoneNumberError').textContent = 'Phone number must be 10 digits.';
+                phoneNumber.classList.add('input-error');
+                isValid = false;
+            }
+
+            const altPhone = document.getElementById('altPhone');
+            if (altPhone.value.trim() && !/^\d{10}$/.test(altPhone.value.trim())) {
+                document.getElementById('altPhoneError').textContent = 'Alternate phone must be 10 digits.';
+                altPhone.classList.add('input-error');
+                isValid = false;
+            }
+
+            const addressType = document.getElementById('addressType');
+            if (addressType.value.trim().length < 3 || addressType.value.trim().length > 20) {
+                document.getElementById('addressTypeError').textContent = 'Address type must be between 3 and 20 characters.';
+                addressType.classList.add('input-error');
+                isValid = false;
+            }
+
+            if (isValid) {
+                this.submit();
+            }
+        });
+
+        document.querySelectorAll('input[required], #altPhone').forEach(input => {
+            input.addEventListener('input', function() {
+                const errorElement = document.getElementById(this.id + 'Error');
+                this.classList.remove('input-error');
+                errorElement.textContent = '';
+            });
+        });
+    </script>
+</body>
+</html>
