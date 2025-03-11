@@ -1,0 +1,428 @@
+<%- include('../../views/partials/user/header') %>
+<style>
+    .wishlist-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 0 20px;
+        padding-top: 100px;
+    }
+
+    .wishlist-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 20px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .wishlist-header h1 {
+        font-size: 24px;
+        color: #333;
+        margin: 0;
+    }
+
+    .wishlist-count {
+        color: #666;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+
+    .wishlist-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 20px 0;
+    }
+
+    .wishlist-item {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 15px;
+        text-align: center;
+        transition: transform 0.2s;
+    }
+
+    .wishlist-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .wishlist-item img {
+        max-width: 100%;
+        height: 180px;
+        margin-bottom: 15px;
+        object-fit: cover;
+    }
+
+    .item-title {
+        font-size: 14px;
+        color: #333;
+        margin: 8px 0;
+    }
+
+    .item-price {
+        font-size: 16px;
+        color: #333;
+        font-weight: 600;
+        margin: 8px 0;
+    }
+
+    .move-to-bag {
+        background: #1286b4;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        width: 100%;
+        margin: 8px 0;
+        transition: background 0.3s;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .move-to-bag:hover {
+        background: #ff2020;
+    }
+
+    .remove-item {
+        color: #2a2828;
+        text-decoration: underline;
+        background: none;
+        border: none;
+        padding: 5px;
+        cursor: pointer;
+        font-size: 12px;
+        border-radius: 4px;
+    }
+
+    .remove-item:hover {
+        color: #ff2020;
+    }
+
+    /* Size Selection Styles */
+    .size-selection {
+        margin: 12px 0;
+        text-align: left;
+    }
+
+    .size-selection label {
+        display: block;
+        margin-bottom: 6px;
+        color: #666;
+        font-size: 12px;
+    }
+
+    .custom-dropdown {
+        position: relative;
+        width: 100%;
+    }
+
+    .dropdown-selected {
+        display: block;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: white;
+        cursor: pointer;
+        font-size: 13px;
+        color: #666;
+    }
+
+    .size-options {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ddd;
+        border-top: none;
+        border-radius: 0 0 4px 4px;
+        z-index: 1000;
+    }
+
+    .dropdown-option {
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 13px;
+        transition: background 0.2s;
+    }
+
+    .dropdown-option:hover {
+        background-color: #f5f5f5;
+    }
+
+    .dropdown-option[data-selected="true"] {
+        background-color: #f0f0f0;
+    }
+
+    .empty-wishlist {
+        text-align: center;
+        padding: 40px 0;
+    }
+
+    .shop-now-btn {
+        display: inline-block;
+        background: #1286b4;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 4px;
+        text-decoration: none;
+        margin-top: .15px;
+        font-weight: 500;
+        transition: background 0.3s;
+    }
+    
+    .shop-now-btn:hover {
+        background: #0d6f95;
+    }
+
+    @media (max-width: 768px) {
+        .wishlist-grid {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+    }
+</style>
+
+<div class="wishlist-container">
+    <div class="wishlist-header">
+        <h1><strong>My Wishlist</strong></h1>
+        <div class="wishlist-count">
+            <%= wishlist ? wishlist.products.length : 0 %> items
+        </div>
+    </div>
+
+    <% if (!wishlist || wishlist.products.length === 0) { %>
+        <div class="empty-wishlist">
+            <h2>Your wishlist is empty</h2>
+            <p>Add items you love to your wishlist. Review them anytime and easily move them to the bag.</p>
+            <a href="/shop" class="shop-now-btn">Continue Shopping</a>
+        </div>
+    <% } else { %>
+        <div class="wishlist-grid">
+            <% wishlist.products.forEach((item, index) => { %>
+                <div class="wishlist-item">
+                    <a href="/product/<%= item.productId._id %>">
+                        <img src="<%= item.productId.productImage[0] %>" 
+                             alt="<%= item.productId.productName %>">
+                    </a>
+                    <h3 class="item-title">
+                        <%= item.productId.productName %>
+                    </h3>
+                    
+                    <% 
+                        // Find the lowest sales price among variants
+                        let minPrice = Infinity;
+                        item.productId.variants.forEach(variant => {
+                            const price = variant.salesPrice || variant.regularPrice;
+                            if (price < minPrice) minPrice = price;
+                        });
+                    %>
+                    
+                    <p class="item-price">₹<%= minPrice.toLocaleString('en-IN') %></p>
+            
+                    <form class="add-to-cart-form" 
+                          onsubmit="return addToCart(event, '<%= item.productId._id %>', '<%= item.productId.productName %>', '<%= index %>')">
+                        <div class="size-selection">
+                            <label for="sizeSelect_<%= index %>">Select Size:</label>
+                            <div class="custom-dropdown" id="sizeDropdown_<%= index %>">
+                                <span class="dropdown-selected" onclick="toggleDropdown('<%= index %>')">-- Choose Size --</span>
+                                <div id="sizeOptions_<%= index %>" class="size-options">
+                                    <% item.productId.variants.forEach(function(variant) { %>
+                                        <% if (variant.quantity > 0) { %>
+                                            <div class="dropdown-option" 
+                                                 data-value="<%= variant.size %>"
+                                                 data-quantity="<%= variant.quantity %>"
+                                                 data-price="<%= variant.salesPrice || variant.regularPrice %>"
+                                                 onclick="selectSize('<%= variant.size %>', '<%= index %>', <%= variant.salesPrice || variant.regularPrice %>)">
+                                                <%= variant.size %> - ₹<%= (variant.salesPrice || variant.regularPrice).toLocaleString('en-IN') %> 
+                                                (<%= variant.quantity %> left)
+                                            </div>
+                                        <% } %>
+                                    <% }); %>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="selectedSize_<%= index %>" name="size" value="">
+                        <input type="hidden" id="selectedPrice_<%= index %>" name="price" value="">
+                        <input type="hidden" id="quantity_<%= index %>" name="quantity" value="1" class="input-number">
+                        <button type="submit" class="move-to-bag">
+                            MOVE TO CART
+                        </button>
+                    </form>
+            
+                    <button class="remove-item" onclick="removeFromWishlist('<%= item.productId._id %>')">
+                        Remove
+                    </button>
+                </div>
+            <% }); %>
+        </div>
+    <% } %>
+</div>
+<!-- Add these before your closing </body> tag or in the head section -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script>
+    function toggleDropdown(index) {
+        const dropdowns = document.querySelectorAll('.size-options');
+        dropdowns.forEach((dropdown, i) => {
+            if (i !== parseInt(index)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        const dropdown = document.getElementById(`sizeOptions_${index}`);
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function selectSize(size, index, price) {
+        const selectedSizeInput = document.getElementById(`selectedSize_${index}`);
+        const selectedPriceInput = document.getElementById(`selectedPrice_${index}`);
+        const dropdownSelected = document.querySelector(`#sizeDropdown_${index} .dropdown-selected`);
+        
+        selectedSizeInput.value = size;
+        selectedPriceInput.value = price;
+        dropdownSelected.innerText = size;
+        
+        document.getElementById(`sizeOptions_${index}`).style.display = 'none';
+    }
+
+    function showToast(message) {
+        Toastify({
+            text: message,
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#1286b4",
+            stopOnFocus: true
+        }).showToast();
+    }
+
+    function addToCart(event, productId, productName, index) {
+        event.preventDefault();
+        
+        const selectedSize = document.getElementById(`selectedSize_${index}`).value;
+        const quantity = document.getElementById(`quantity_${index}`).value;
+        
+        if (!selectedSize) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Size Required',
+                text: 'Please select a size before adding to cart',
+                confirmButtonColor: '#1286b4'
+            });
+            return false;
+        }
+        
+        if (!quantity || quantity <= 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid Quantity',
+                text: 'Please enter a valid quantity',
+                confirmButtonColor: '#1286b4'
+            });
+            return false;
+        }
+        
+        fetch('/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                productId: productId,
+                variant: {
+                    size: selectedSize,
+                    quantity: quantity
+                }
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast(`${productName} added to cart!`);
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: `${productName} has been moved to cart`,
+                    showCancelButton: true,
+                    confirmButtonColor: '#1286b4',
+                    cancelButtonColor: '#ff2020',
+                    confirmButtonText: 'Remove from Wishlist',
+                    cancelButtonText: 'Keep in Wishlist'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        removeFromWishlist(productId);
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed',
+                    text: data.message || 'Failed to add item to cart',
+                    confirmButtonColor: '#1286b4'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Something went wrong. Please try again.',
+                confirmButtonColor: '#1286b4'
+            });
+        });
+        
+        return false;
+    }
+
+    function removeFromWishlist(productId) {
+        fetch('/removeFromWishlist', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                productId: productId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Item removed from wishlist');
+                window.location.reload();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed',
+                    text: data.message || 'Failed to remove item from wishlist',
+                    confirmButtonColor: '#1286b4'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Something went wrong. Please try again.',
+                confirmButtonColor: '#1286b4'
+            });
+        });
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('.custom-dropdown')) {
+            document.querySelectorAll('.size-options').forEach(dropdown => {
+                dropdown.style.display = 'none';
+            });
+        }
+    });
+</script>
+<%-include('../../views/partials/user/footer')%>

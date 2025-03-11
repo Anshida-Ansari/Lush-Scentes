@@ -241,6 +241,40 @@
       color: #666;
       font-size: 16px;
     }
+    .product-image-container {
+  position: relative;
+}
+
+.wishlist-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s, color 0.3s;
+}
+
+.wishlist-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  color: #ff2020; 
+}
+
+.wishlist-btn .icon-heart-o::before {
+  content: "\2661"; 
+  font-size: 18px;
+}
+
+.wishlist-btn.added .icon-heart-o::before {
+  content: "\2665"; 
+  color: #ff2020; 
+}
     </style>
   <div class="site-wrap">
     <div class="shop-container">
@@ -295,36 +329,72 @@
             <p>No products found matching your filters.</p>
           </div>
         <% } else { %>
-        <% for( let i = 0; i < products.length; i++ ) { %>
-          <div class="product-card">
-            <a href="/productDetailsPage?id=<%=products[i]._id%>">
-              <img 
-                src="<%=products[i].productImage[0]%>" 
-                alt="<%=products[i].productName%>" 
-                class="product-image"
-              >
-            </a>
-            <div class="product-info">
-              <a href="/productDetailsPage?id=<%=products[i]._id%>" class="product-name">
-                <%=products[i].productName%>
-              </a>
-              
-              <% 
-                
-                let defaultVariant = products[i].variants.find(v => v.size === '15ml') || products[i].variants[0];
-                let displayPrice = defaultVariant.salesPrice || defaultVariant.regularPrice;
-              %>
-              
-              <div class="product-price">₹<%= displayPrice %></div>
-              <div class="product-size"><%= defaultVariant.size %></div>
+          <% for(let i = 0; i < products.length; i++) { %>
+            <div class="product-card">
+              <div class="product-image-container">
+                <a href="/productDetailsPage?id=<%= products[i]._id %>">
+                  <img 
+                    src="<%= products[i].productImage[0] %>" 
+                    alt="<%= products[i].productName %>" 
+                    class="product-image"
+                  >
+                </a>
+                <!-- Wishlist Icon -->
+                <button 
+                  class="wishlist-btn" 
+                  onclick="addToWishlist('<%= products[i]._id %>', event)"
+                  title="Add to Wishlist"
+                >
+                  <span class="icon-heart-o"></span>
+                </button>
+              </div>
+              <div class="product-info">
+                <a href="/productDetailsPage?id=<%= products[i]._id %>" class="product-name">
+                  <%= products[i].productName %>
+                </a>
+                <% 
+                  let defaultVariant = products[i].variants.find(v => v.size === '15ml') || products[i].variants[0];
+                  let displayPrice = defaultVariant.salesPrice || defaultVariant.regularPrice;
+                %>
+                <div class="product-price">₹<%= displayPrice %></div>
+                <div class="product-size"><%= defaultVariant.size %></div>
+              </div>
             </div>
-          </div>
-        <% } %>
+          <% } %>
         <% } %>
       </div>
       
     </div>
   </div>
-
+  <script>
+    function addToWishlist(productId, event) {
+      event.preventDefault(); 
+  
+      fetch('/addWishlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productId: productId
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          
+          const button = event.target.closest('.wishlist-btn');
+          button.classList.add('added');
+          alert('Product added to wishlist!');
+        } else {
+          alert(data.message || 'Failed to add to wishlist');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Something went wrong. Please try again.');
+      });
+    }
+  </script>
 
 <%-include('../../views/partials/user/footer')%>

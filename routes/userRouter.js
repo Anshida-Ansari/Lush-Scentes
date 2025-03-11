@@ -4,6 +4,7 @@ const productController = require('../controllers/user/productController')
 const profileController = require('../controllers/user/profileController')
 const cartController = require('../controllers/user/cartController')
 const checkoutController = require('../controllers/user/checkoutController')
+const wishlistController = require('../controllers/user/wishlistController')
 const {userAuth,userLogin} = require('../middlewares/userAuth')
 const passport = require('passport')
 const router=express.Router()
@@ -94,4 +95,12 @@ router.get('/thank-you', userAuth, checkoutController.loadThankYouPage);
 router.post('/cancel',userAuth,checkoutController.cancelOrder)
 router.post('/cancel-product',userAuth,checkoutController.cancelProduct)
 router.post('/return-product',userAuth,checkoutController.returnProduct)
+
+
+router.get('/wishlist',userAuth,wishlistController.loadWishlist)
+router.post('/addWishlist',userAuth,wishlistController.addWishlist)
+router.post('/removeFromWishlist',userAuth,wishlistController.removeFromWishlist)
+
+
+
 module.exports=router

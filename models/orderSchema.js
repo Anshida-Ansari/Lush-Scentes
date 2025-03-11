@@ -105,7 +105,6 @@ const orderSchema = new Schema({
     invoiceData: {
         type: Date
     },
-    // Consider removing or repurposing this if redundant with status and orderedItems.returnStatus
     return: {
         type: String,
         enum: ['Not Requested', 'Requested', 'Approved', 'Rejected'],
