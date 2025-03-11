@@ -366,35 +366,141 @@
       
     </div>
   </div>
-  <script>
-    function addToWishlist(productId, event) {
-      event.preventDefault(); 
-  
-      fetch('/addWishlist', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          productId: productId
-        })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          
-          const button = event.target.closest('.wishlist-btn');
-          button.classList.add('added');
-          alert('Product added to wishlist!');
-        } else {
-          alert(data.message || 'Failed to add to wishlist');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Something went wrong. Please try again.');
-      });
-    }
-  </script>
+ 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
+<script>
+  function showToast(message, type = "info") {
+  const colors = {
+    success: { bg: "#4CAF50", text: "#fff" },
+    info: { bg: "#1286b4", text: "#fff" },
+    warning: { bg: "#FF9800", text: "#fff" },
+    error: { bg: "#F44336", text: "#fff" }
+  };
+  
+  const colorScheme = colors[type] || colors.info;
+  
+  const toast = document.createElement("div");
+  toast.className = "custom-toast";
+  toast.innerHTML = `
+    <div class="toast-icon">
+      ${type === "success" ? '<i class="fas fa-check-circle"></i>' : 
+        type === "info" ? '<i class="fas fa-info-circle"></i>' : 
+        type === "warning" ? '<i class="fas fa-exclamation-triangle"></i>' : 
+        '<i class="fas fa-times-circle"></i>'}
+    </div>
+    <div class="toast-message">${message}</div>
+    <div class="toast-close">&times;</div>
+  `;
+  
+  Object.assign(toast.style, {
+    display: "flex",
+    alignItems: "center",
+    position: "fixed",
+    top: "20px",
+    right: "20px",
+    zIndex: "10000",
+    padding: "12px 16px",
+    backgroundColor: colorScheme.bg,
+    color: colorScheme.text,
+    borderRadius: "4px",
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+    minWidth: "250px",
+    maxWidth: "350px",
+    opacity: "0",
+    transform: "translateY(-20px)",
+    transition: "all 0.3s ease-in-out",
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    fontSize: "14px"
+  });
+  
+  const iconStyle = toast.querySelector(".toast-icon").style;
+  Object.assign(iconStyle, {
+    marginRight: "12px",
+    fontSize: "20px"
+  });
+  
+  const messageStyle = toast.querySelector(".toast-message").style;
+  Object.assign(messageStyle, {
+    flex: "1"
+  });
+  
+  const closeStyle = toast.querySelector(".toast-close").style;
+  Object.assign(closeStyle, {
+    marginLeft: "12px",
+    cursor: "pointer",
+    fontSize: "18px",
+    fontWeight: "bold"
+  });
+  
+  toast.querySelector(".toast-close").addEventListener("click", () => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-20px)";
+    setTimeout(() => toast.remove(), 300);
+  });
+  
+  document.body.appendChild(toast);
+  
+  const progressBar = document.createElement("div");
+  progressBar.className = "toast-progress";
+  Object.assign(progressBar.style, {
+    position: "absolute",
+    bottom: "0",
+    left: "0",
+    height: "3px",
+    backgroundColor: "rgba(255, 255, 255, 0.7)",
+    width: "100%",
+    transition: "width 3s linear"
+  });
+  toast.appendChild(progressBar);
+  
+  setTimeout(() => {
+    toast.style.opacity = "1";
+    toast.style.transform = "translateY(0)";
+    progressBar.style.width = "0";
+  }, 10);
+  
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-20px)";
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+function addToWishlist(productId, event) {
+  event.preventDefault();
+  
+  if (!document.querySelector('link[href*="font-awesome"]')) {
+    const fontAwesomeLink = document.createElement('link');
+    fontAwesomeLink.rel = 'stylesheet';
+    fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+    document.head.appendChild(fontAwesomeLink);
+  }
+
+  fetch('/addWishlist', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      productId: productId
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      const button = event.target.closest('.wishlist-btn');
+      button.classList.add('added');
+      showToast('Product added to wishlist!', 'success');
+    } else {
+      showToast(data.message || 'Failed to add to wishlist', 'error');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    showToast('Something went wrong. Please try again.', 'error');
+  });
+}
+</script>
 <%-include('../../views/partials/user/footer')%>

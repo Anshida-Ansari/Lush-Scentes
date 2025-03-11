@@ -1,115 +1,151 @@
 <%- include('../../views/partials/user/header') %>
 <style>
-    .wishlist-container {
-        max-width: 1000px;
-        margin: 40px auto;
-        padding: 0 20px;
-        padding-top: 100px;
+    :root {
+        --primary-color: #3a3a3a;
+        --accent-color: #a67c52;
+        --light-accent: #d4c3b0;
+        --text-dark: #2a2a2a;
+        --text-light: #767676;
+        --background-light: #f9f7f5;
+        --border-color: #e2e2e2;
+        --shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
     }
+
+    body {
+        background-color: var(--background-light);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .wishlist-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 10px;
+    padding-top: 1px;
+}
 
     .wishlist-header {
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 40px;
         padding: 20px 0;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid var(--border-color);
     }
 
     .wishlist-header h1 {
-        font-size: 24px;
-        color: #333;
+        font-size: 32px;
+        color: var(--text-dark);
         margin: 0;
+        font-weight: 600;
+        letter-spacing: 1px;
     }
 
     .wishlist-count {
-        color: #666;
-        font-size: 14px;
-        margin-top: 5px;
+        color: var(--text-light);
+        font-size: 16px;
+        margin-top: 8px;
+        font-weight: 300;
     }
 
     .wishlist-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 20px;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 30px;
         padding: 20px 0;
     }
 
     .wishlist-item {
         background: #fff;
-        border: 1px solid #eee;
-        border-radius: 8px;
-        padding: 15px;
+        border: none;
+        border-radius: 12px;
+        padding: 20px;
         text-align: center;
-        transition: transform 0.2s;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow);
+        position: relative;
+        overflow: hidden;
     }
 
     .wishlist-item:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
     }
 
     .wishlist-item img {
         max-width: 100%;
-        height: 180px;
-        margin-bottom: 15px;
+        height: 220px;
+        margin-bottom: 20px;
         object-fit: cover;
+        border-radius: 8px;
+        transition: transform 0.5s ease;
+    }
+
+    .wishlist-item:hover img {
+        transform: scale(1.05);
     }
 
     .item-title {
-        font-size: 14px;
-        color: #333;
-        margin: 8px 0;
+        font-size: 16px;
+        color: var(--text-dark);
+        margin: 12px 0;
+        font-weight: 500;
     }
 
     .item-price {
-        font-size: 16px;
-        color: #333;
+        font-size: 18px;
+        color: var(--accent-color);
         font-weight: 600;
-        margin: 8px 0;
+        margin: 12px 0;
     }
 
     .move-to-bag {
-        background: #1286b4;
+        background: var(--accent-color);
         color: white;
         border: none;
-        padding: 8px 15px;
-        border-radius: 4px;
+        padding: 12px 20px;
+        border-radius: 8px;
         width: 100%;
-        margin: 8px 0;
-        transition: background 0.3s;
+        margin: 15px 0;
+        transition: all 0.3s;
         cursor: pointer;
         font-size: 14px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .move-to-bag:hover {
-        background: #ff2020;
+        background: var(--primary-color);
+        transform: translateY(-2px);
     }
 
     .remove-item {
-        color: #2a2828;
-        text-decoration: underline;
-        background: none;
+        color: var(--text-light);
+        background: transparent;
         border: none;
-        padding: 5px;
+        padding: 8px;
         cursor: pointer;
-        font-size: 12px;
-        border-radius: 4px;
+        font-size: 13px;
+        transition: all 0.3s;
+        text-decoration: none;
+        margin-top: 5px;
+        display: inline-block;
     }
 
     .remove-item:hover {
-        color: #ff2020;
+        color: #c92466;
     }
 
     /* Size Selection Styles */
     .size-selection {
-        margin: 12px 0;
+        margin: 15px 0;
         text-align: left;
     }
 
     .size-selection label {
         display: block;
-        margin-bottom: 6px;
-        color: #666;
-        font-size: 12px;
+        margin-bottom: 8px;
+        color: var(--text-dark);
+        font-size: 14px;
+        font-weight: 500;
     }
 
     .custom-dropdown {
@@ -119,13 +155,28 @@
 
     .dropdown-selected {
         display: block;
-        padding: 8px 12px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
+        padding: 12px 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
         background-color: white;
         cursor: pointer;
-        font-size: 13px;
-        color: #666;
+        font-size: 14px;
+        color: var(--text-dark);
+        transition: all 0.3s;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .dropdown-selected:hover {
+        border-color: var(--accent-color);
+    }
+
+    .dropdown-selected::after {
+        content: '▼';
+        position: absolute;
+        right: 15px;
+        top: 12px;
+        font-size: 12px;
+        color: var(--accent-color);
     }
 
     .size-options {
@@ -135,59 +186,96 @@
         left: 0;
         right: 0;
         background: white;
-        border: 1px solid #ddd;
+        border: 1px solid var(--border-color);
         border-top: none;
-        border-radius: 0 0 4px 4px;
+        border-radius: 0 0 8px 8px;
         z-index: 1000;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        max-height: 200px;
+        overflow-y: auto;
     }
 
     .dropdown-option {
-        padding: 8px 12px;
+        padding: 12px 15px;
         cursor: pointer;
-        font-size: 13px;
-        transition: background 0.2s;
+        font-size: 14px;
+        transition: all 0.2s;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .dropdown-option:last-child {
+        border-bottom: none;
     }
 
     .dropdown-option:hover {
-        background-color: #f5f5f5;
+        background-color: var(--light-accent);
+        color: var(--primary-color);
     }
 
     .dropdown-option[data-selected="true"] {
-        background-color: #f0f0f0;
+        background-color: var(--light-accent);
+        font-weight: 500;
     }
 
     .empty-wishlist {
         text-align: center;
-        padding: 40px 0;
+        padding: 60px 0;
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+    }
+
+    .empty-wishlist h2 {
+        color: var(--text-dark);
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+
+    .empty-wishlist p {
+        color: var(--text-light);
+        max-width: 500px;
+        margin: 0 auto 25px;
+        line-height: 1.6;
     }
 
     .shop-now-btn {
         display: inline-block;
-        background: #1286b4;
+        background: var(--accent-color);
         color: white;
-        padding: 10px 20px;
-        border-radius: 4px;
+        padding: 12px 25px;
+        border-radius: 8px;
         text-decoration: none;
-        margin-top: .15px;
         font-weight: 500;
-        transition: background 0.3s;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     
     .shop-now-btn:hover {
-        background: #0d6f95;
+        background: var(--primary-color);
+        transform: translateY(-2px);
     }
 
+    /* Responsive adjustments */
     @media (max-width: 768px) {
         .wishlist-grid {
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        
+        .wishlist-item {
+            padding: 15px;
+        }
+        
+        .wishlist-header h1 {
+            font-size: 26px;
         }
     }
 </style>
 
 <div class="wishlist-container">
     <div class="wishlist-header">
-        <h1><strong>My Wishlist</strong></h1>
+        <h1>My Wishlist</h1>
         <div class="wishlist-count">
             <%= wishlist ? wishlist.products.length : 0 %> items
         </div>
@@ -227,7 +315,7 @@
                         <div class="size-selection">
                             <label for="sizeSelect_<%= index %>">Select Size:</label>
                             <div class="custom-dropdown" id="sizeDropdown_<%= index %>">
-                                <span class="dropdown-selected" onclick="toggleDropdown('<%= index %>')">-- Choose Size --</span>
+                                <span class="dropdown-selected" onclick="toggleDropdown('<%= index %>')">Select a Size</span>
                                 <div id="sizeOptions_<%= index %>" class="size-options">
                                     <% item.productId.variants.forEach(function(variant) { %>
                                         <% if (variant.quantity > 0) { %>
@@ -248,22 +336,25 @@
                         <input type="hidden" id="selectedPrice_<%= index %>" name="price" value="">
                         <input type="hidden" id="quantity_<%= index %>" name="quantity" value="1" class="input-number">
                         <button type="submit" class="move-to-bag">
-                            MOVE TO CART
+                            Add to Cart
                         </button>
                     </form>
             
                     <button class="remove-item" onclick="removeFromWishlist('<%= item.productId._id %>')">
-                        Remove
+                        Remove from wishlist
                     </button>
                 </div>
             <% }); %>
         </div>
     <% } %>
 </div>
-<!-- Add these before your closing </body> tag or in the head section -->
+
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 <script>
     function toggleDropdown(index) {
         const dropdowns = document.querySelectorAll('.size-options');
@@ -275,6 +366,11 @@
 
         const dropdown = document.getElementById(`sizeOptions_${index}`);
         dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        
+        // Add animation class if needed
+        if (dropdown.style.display === 'block') {
+            dropdown.classList.add('dropdown-animation');
+        }
     }
 
     function selectSize(size, index, price) {
@@ -286,6 +382,16 @@
         selectedPriceInput.value = price;
         dropdownSelected.innerText = size;
         
+        // Update the dropdown options to show which one is selected
+        const options = document.querySelectorAll(`#sizeOptions_${index} .dropdown-option`);
+        options.forEach(option => {
+            if (option.dataset.value === size) {
+                option.setAttribute('data-selected', 'true');
+            } else {
+                option.setAttribute('data-selected', 'false');
+            }
+        });
+        
         document.getElementById(`sizeOptions_${index}`).style.display = 'none';
     }
 
@@ -296,91 +402,221 @@
             close: true,
             gravity: "top",
             position: "right",
-            backgroundColor: "#1286b4",
-            stopOnFocus: true
+            backgroundColor: "var(--accent-color)",
+            stopOnFocus: true,
+            style: {
+                borderRadius: "8px",
+                boxShadow: "0 3px 10px rgba(0,0,0,0.1)"
+            }
         }).showToast();
     }
 
     function addToCart(event, productId, productName, index) {
-        event.preventDefault();
-        
-        const selectedSize = document.getElementById(`selectedSize_${index}`).value;
-        const quantity = document.getElementById(`quantity_${index}`).value;
-        
-        if (!selectedSize) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Size Required',
-                text: 'Please select a size before adding to cart',
-                confirmButtonColor: '#1286b4'
-            });
-            return false;
-        }
-        
-        if (!quantity || quantity <= 0) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Invalid Quantity',
-                text: 'Please enter a valid quantity',
-                confirmButtonColor: '#1286b4'
-            });
-            return false;
-        }
-        
-        fetch('/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                productId: productId,
-                variant: {
-                    size: selectedSize,
-                    quantity: quantity
-                }
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showToast(`${productName} added to cart!`);
-                
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: `${productName} has been moved to cart`,
-                    showCancelButton: true,
-                    confirmButtonColor: '#1286b4',
-                    cancelButtonColor: '#ff2020',
-                    confirmButtonText: 'Remove from Wishlist',
-                    cancelButtonText: 'Keep in Wishlist'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        removeFromWishlist(productId);
-                    }
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Failed',
-                    text: data.message || 'Failed to add item to cart',
-                    confirmButtonColor: '#1286b4'
-                });
+    event.preventDefault();
+    
+    const selectedSize = document.getElementById(`selectedSize_${index}`).value;
+    const quantity = document.getElementById(`quantity_${index}`).value;
+    
+    if (!selectedSize) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Size Required',
+            text: 'Please select a size before adding to cart',
+            confirmButtonColor: 'var(--accent-color)',
+            customClass: {
+                popup: 'swal-custom-popup',
+                title: 'swal-custom-title',
+                confirmButton: 'swal-custom-confirm'
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Something went wrong. Please try again.',
-                confirmButtonColor: '#1286b4'
-            });
         });
-        
         return false;
     }
+    
+    if (!quantity || quantity <= 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Invalid Quantity',
+            text: 'Please enter a valid quantity',
+            confirmButtonColor: 'var(--accent-color)'
+        });
+        return false;
+    }
+    
+    // Check if Font Awesome is available, if not, load it
+    if (!document.querySelector('link[href*="font-awesome"]')) {
+        const fontAwesomeLink = document.createElement('link');
+        fontAwesomeLink.rel = 'stylesheet';
+        fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+        document.head.appendChild(fontAwesomeLink);
+    }
+    
+    fetch('/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            productId: productId,
+            variant: {
+                size: selectedSize,
+                quantity: quantity
+            }
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show elegant toast notification
+            showToast(`${productName} added to cart!`, 'success');
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Added to Cart',
+                text: `${productName} has been moved to your shopping cart`,
+                showCancelButton: true,
+                confirmButtonColor: 'var(--accent-color)',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Remove from Wishlist',
+                cancelButtonText: 'Keep in Wishlist'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    removeFromWishlist(productId);
+                }
+            });
+        } else {
+            showToast(data.message || 'Failed to add item to cart', 'error');
+            
+            Swal.fire({
+                icon: 'error',
+                title: 'Failed',
+                text: data.message || 'Failed to add item to cart',
+                confirmButtonColor: 'var(--accent-color)'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        
+        showToast('Something went wrong. Please try again.', 'error');
+        
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Something went wrong. Please try again.',
+            confirmButtonColor: 'var(--accent-color)'
+        });
+    });
+    
+    return false;
+}
 
+// Make sure to include the improved showToast function
+function showToast(message, type = "info") {
+    // Define color schemes based on notification type
+    const colors = {
+        success: { bg: "#4CAF50", text: "#fff" },
+        info: { bg: "#1286b4", text: "#fff" },
+        warning: { bg: "#FF9800", text: "#fff" },
+        error: { bg: "#F44336", text: "#fff" }
+    };
+    
+    // Select color scheme based on type
+    const colorScheme = colors[type] || colors.info;
+    
+    // Create toast element
+    const toast = document.createElement("div");
+    toast.className = "custom-toast";
+    toast.innerHTML = `
+        <div class="toast-icon">
+            ${type === "success" ? '<i class="fas fa-check-circle"></i>' : 
+            type === "info" ? '<i class="fas fa-info-circle"></i>' : 
+            type === "warning" ? '<i class="fas fa-exclamation-triangle"></i>' : 
+            '<i class="fas fa-times-circle"></i>'}
+        </div>
+        <div class="toast-message">${message}</div>
+        <div class="toast-close">&times;</div>
+    `;
+    
+    // Apply styles to toast
+    Object.assign(toast.style, {
+        display: "flex",
+        alignItems: "center",
+        position: "fixed",
+        top: "20px",
+        right: "20px",
+        zIndex: "10000",
+        padding: "12px 16px",
+        backgroundColor: colorScheme.bg,
+        color: colorScheme.text,
+        borderRadius: "4px",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+        minWidth: "250px",
+        maxWidth: "350px",
+        opacity: "0",
+        transform: "translateY(-20px)",
+        transition: "all 0.3s ease-in-out",
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        fontSize: "14px"
+    });
+    
+    // Styles for toast components
+    const iconStyle = toast.querySelector(".toast-icon").style;
+    Object.assign(iconStyle, {
+        marginRight: "12px",
+        fontSize: "20px"
+    });
+    
+    const messageStyle = toast.querySelector(".toast-message").style;
+    Object.assign(messageStyle, {
+        flex: "1"
+    });
+    
+    const closeStyle = toast.querySelector(".toast-close").style;
+    Object.assign(closeStyle, {
+        marginLeft: "12px",
+        cursor: "pointer",
+        fontSize: "18px",
+        fontWeight: "bold"
+    });
+    
+    // Add close functionality
+    toast.querySelector(".toast-close").addEventListener("click", () => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(-20px)";
+        setTimeout(() => toast.remove(), 300);
+    });
+    
+    // Add toast to document
+    document.body.appendChild(toast);
+    
+    // Add progress bar
+    const progressBar = document.createElement("div");
+    progressBar.className = "toast-progress";
+    Object.assign(progressBar.style, {
+        position: "absolute",
+        bottom: "0",
+        left: "0",
+        height: "3px",
+        backgroundColor: "rgba(255, 255, 255, 0.7)",
+        width: "100%",
+        transition: "width 3s linear"
+    });
+    toast.appendChild(progressBar);
+    
+    // Show toast with animation
+    setTimeout(() => {
+        toast.style.opacity = "1";
+        toast.style.transform = "translateY(0)";
+        progressBar.style.width = "0";
+    }, 10);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(-20px)";
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
     function removeFromWishlist(productId) {
         fetch('/removeFromWishlist', {
             method: 'POST',
@@ -395,13 +631,30 @@
         .then(data => {
             if (data.success) {
                 showToast('Item removed from wishlist');
-                window.location.reload();
+                
+                
+                const items = document.querySelectorAll('.wishlist-item');
+                items.forEach(item => {
+                    if (item.querySelector('form')) {
+                        const itemId = item.querySelector('form').getAttribute('onsubmit').split("'")[1];
+                        if (itemId === productId) {
+                            item.style.opacity = '0';
+                            item.style.transform = 'scale(0.9)';
+                            item.style.transition = 'all 0.5s ease';
+                        }
+                    }
+                });
+                
+               
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
             } else {
                 Swal.fire({
                     icon: 'error',
                     title: 'Failed',
                     text: data.message || 'Failed to remove item from wishlist',
-                    confirmButtonColor: '#1286b4'
+                    confirmButtonColor: 'var(--accent-color)'
                 });
             }
         })
@@ -411,12 +664,12 @@
                 icon: 'error',
                 title: 'Error',
                 text: 'Something went wrong. Please try again.',
-                confirmButtonColor: '#1286b4'
+                confirmButtonColor: 'var(--accent-color)'
             });
         });
     }
 
-    // Close dropdowns when clicking outside
+   
     document.addEventListener('click', function(event) {
         if (!event.target.closest('.custom-dropdown')) {
             document.querySelectorAll('.size-options').forEach(dropdown => {
@@ -424,5 +677,22 @@
             });
         }
     });
+  
+    document.head.insertAdjacentHTML('beforeend', `
+        <style>
+            .swal-custom-popup {
+                border-radius: 12px;
+                padding: 20px;
+            }
+            .swal-custom-title {
+                font-family: 'Poppins', sans-serif;
+            }
+            .swal-custom-confirm {
+                border-radius: 8px !important;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+        </style>
+    `);
 </script>
 <%-include('../../views/partials/user/footer')%>
