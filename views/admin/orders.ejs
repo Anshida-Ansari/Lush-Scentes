@@ -1,328 +1,258 @@
 <%- include("../../views/partials/admin/header") %>
 
-    <section class="content-main">
-        <div class="content-header">
-            <h2 class="content-title">Orders</h2>
-        </div>
-        <div class="card mb-4">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Customer</th>
-                                <th>Date</th>
-                                <th>Products</th>
-                                <th>Total</th>
-                                <th>Status</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% if (orders && orders.length> 0) { %>
-                                <% orders.forEach(order=> { %>
-                                    <tr>
-                                        <td>#<%= order.orderId %>
-                                        </td>
-                                        <td>
-                                            <%= order.userId.name %>
-                                                <br>
-                                                <span class="text-muted small">
-                                                    <%= order.userId.email %>
-                                                </span>
-                                        </td>
-                                        <td>
-                                            <%= new Date(order.createdOn).toLocaleDateString() %>
-                                                <br>
-                                                <span class="text-muted small">
-                                                    <%= new Date(order.createdOn).toLocaleTimeString([],
-                                                        {hour: '2-digit' , minute:'2-digit'}) %>
-                                                </span>
-                                        </td>
-                                        <td>
-                                            <%= order.orderedItems.length %> items
-                                        </td>
-                                        <td>₹<%= order.finalAmount %>
-                                        </td>
-                                        <td>
-                                            <select onchange="updateOrderStatus(this, '<%= order._id %>')"
-                                                class="status-select">
-                                                <option value="Pending" <%=order.status==='Pending' ? 'selected' : '' %>
-                                                    >Pending</option>
-                                                <option value="Processing" <%=order.status==='Processing' ? 'selected'
-                                                    : '' %>>Processing</option>
-                                                <option value="Shipped" <%=order.status==='Shipped' ? 'selected' : '' %>
-                                                    >Shipped</option>
-                                                <option value="Delivered" <%=order.status==='Delivered' ? 'selected'
-                                                    : '' %>>Delivered</option>
-                                                <option value="Cancelled" <%=order.status==='Cancelled' ? 'selected'
-                                                    : '' %>>Cancelled</option>
-                                            </select>
-                                            <div class="loading-spinner"></div>
-                                        </td>
-                                        <td class="text-end">
-                                            <div class="dropdown">
-                                                <a href="#" data-bs-toggle="dropdown"
-                                                    class="btn btn-light rounded btn-sm font-sm">
-                                                    <i class="material-icons md-more_horiz"></i>
-                                                </a>
-                                                <div class="dropdown-menu">
-                                                    <a class="dropdown-item" href="/admin/order/<%= order._id %>">View
-                                                        details</a>
-
-                                                </div>
+<section class="content-main">
+    <div class="content-header">
+        <h2 class="content-title">Orders</h2>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Products</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (orders && orders.length > 0) { %>
+                            <% orders.forEach(order => { %>
+                                <tr>
+                                    <td>#<%= order.orderId || 'N/A' %></td>
+                                    <td>
+                                        <%= order.userId && order.userId.name ? order.userId.name : 'Unknown' %>
+                                        <br>
+                                        <span class="text-muted small">
+                                            <%= order.userId && order.userId.email ? order.userId.email : 'No email' %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <%= order.createdOn ? new Date(order.createdOn).toLocaleDateString() : 'N/A' %>
+                                        <br>
+                                        <span class="text-muted small">
+                                            <%= order.createdOn ? new Date(order.createdOn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A' %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <%= order.orderedItems ? order.orderedItems.length : 0 %> items
+                                    </td>
+                                    <td>₹<%= order.finalAmount ? order.finalAmount.toFixed(2) : '0.00' %></td>
+                                    <td>
+                                        <select onchange="updateOrderStatus(this, '<%= order._id %>')" class="status-select <%= order.status ? order.status : 'Pending' %>">
+                                            <option value="Pending" <%= order.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                            <option value="Processing" <%= order.status === 'Processing' ? 'selected' : '' %>>Processing</option>
+                                            <option value="Shipped" <%= order.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                                            <option value="Delivered" <%= order.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                            <option value="Cancelled" <%= order.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                        </select>
+                                        <div class="loading-spinner" style="display: none;"></div>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="dropdown">
+                                            <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
+                                                <i class="material-icons md-more_horiz"></i>
+                                            </a>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="/admin/order/<%= order._id %>">View details</a>
                                             </div>
-                                        </td>
-                                    </tr>
-                                    <% }); %>
-                                        <% } else { %>
-                                            <tr>
-                                                <td colspan="7" class="text-center py-4">
-                                                    <div class="text-muted">No orders found</div>
-                                                </td>
-                                            </tr>
-                                            <% } %>
-                        </tbody>
-                    </table>
-                </div>
-
-
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="7" class="text-center py-4">
+                                    <div class="text-muted">No orders found</div>
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <style>
-        /* Table and Status Dropdown Styling */
-        .table {
-            width: 100%;
+<style>
+    /* Table and Status Dropdown Styling */
+    .table {
+        width: 100%;
+    }
+
+    .table td {
+        vertical-align: middle;
+        padding: 10px 8px;
+    }
+
+    .status-select {
+        width: 120px;
+        padding: 6px 30px 6px 10px;
+        border-radius: 4px;
+        font-weight: 600;
+        text-align: left;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M1 4l5 5 5-5' fill='none' stroke='currentColor' stroke-width='1.5'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+    }
+
+    .status-select.Pending {
+        background-color: #fff3cd;
+        border-color: #ffeeba;
+        color: #856404;
+    }
+
+    .status-select.Processing {
+        background-color: #cce5ff;
+        border-color: #b8daff;
+        color: #004085;
+    }
+
+    .status-select.Shipped {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+    }
+
+    .status-select.Delivered {
+        background-color: #d1e7dd;
+        border-color: #badbcc;
+        color: #0f5132;
+    }
+
+    .status-select.Cancelled {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+    }
+
+    .status-select option {
+        padding: 5px;
+    }
+
+    .status-column {
+        width: 150px;
+        text-align: center;
+    }
+
+    .loading-spinner {
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        display: none;
+        margin-left: 10px;
+        vertical-align: middle;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmCancel(orderId) {
+        if (confirm('Are you sure you want to cancel this order?')) {
+            window.location.href = `/admin/order/cancel/${orderId}`;
         }
-    
-        .table td {
-            vertical-align: middle;
-            padding: 10px 8px;
-        }
-    
-        .status-select {
-            width: 120px;
-            padding: 6px 30px 6px 10px;
-            border-radius: 4px;
-            font-weight: 600;
-            text-align: left;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M1 4l5 5 5-5' fill='none' stroke='currentColor' stroke-width='1.5'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
-        }
-    
-        .status-select.Pending {
-            background-color: #fff3cd;
-            border-color: #ffeeba;
-            color: #856404;
-        }
-    
-        .status-select.Processing {
-            background-color: #cce5ff;
-            border-color: #b8daff;
-            color: #004085;
-        }
-    
-        .status-select.Shipped {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
-        }
-    
-        .status-select.Delivered {
-            background-color: #d1e7dd;
-            border-color: #badbcc;
-            color: #0f5132;
-        }
-    
-        .status-select.Cancelled {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
-        }
-    
-        .status-select option {
-            padding: 5px;
-        }
-    
-        .status-column {
-            width: 150px;
-            text-align: center;
-        }
-    </style>
-   <!-- <style>
-        /* Improved Status Dropdown Styles */
-        .status-select {
-            padding: 6px 10px;
-            border-radius: 4px;
-            font-weight: 600;
-            text-align: center;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M1 4l5 5 5-5' fill='none' stroke='currentColor' stroke-width='1.5'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 8px center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-    
-        /* Status-specific styles */
-        .status-select option[value="Pending"] {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-    
-        .status-select option[value="Processing"] {
-            background-color: #cce5ff;
-            color: #004085;
-        }
-    
-        .status-select option[value="Shipped"] {
-            background-color: #d4edda;
-            color: #155724;
-        }
-    
-        .status-select option[value="Delivered"] {
-            background-color: #d1e7dd;
-            color: #0f5132;
-        }
-    
-        .status-select option[value="Cancelled"] {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-    
-        /* Active select styles */
-        .status-select[value="Pending"] {
-            background-color: #fff3cd;
-            border-color: #ffeeba;
-            color: #856404;
-        }
-    
-        .status-select[value="Processing"] {
-            background-color: #cce5ff;
-            border-color: #b8daff;
-            color: #004085;
-        }
-    
-        .status-select[value="Shipped"] {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
-        }
-    
-        .status-select[value="Delivered"] {
-            background-color: #d1e7dd;
-            border-color: #badbcc;
-            color: #0f5132;
-        }
-    
-        .status-select[value="Cancelled"] {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
-        }
-    </style> -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        function confirmCancel(orderId) {
-            if (confirm('Are you sure you want to cancel this order?')) {
-                window.location.href = `/admin/order/cancel/${orderId}`;
+    }
+</script>
+<script>
+    function updateOrderStatus(selectElement, orderId) {
+        const newStatus = selectElement.value;
+        const loadingSpinner = selectElement.closest('tr').querySelector('.loading-spinner');
+
+        // Disable the select to prevent multiple submissions
+        selectElement.disabled = true;
+        loadingSpinner.style.display = 'inline-block';
+
+        fetch(`/admin/updateOrderStatus/${orderId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: newStatus })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the select element's appearance and value
+                selectElement.value = newStatus;
+                selectElement.className = `status-select ${newStatus}`;
+                
+                // Show success message with SweetAlert2
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Status Updated',
+                    text: data.message,
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            } else {
+                // Revert to previous status if update fails
+                selectElement.value = selectElement.dataset.previousStatus;
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Update Failed',
+                    text: data.message || 'Failed to update order status',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
             }
-        }
-    </script>
-    <script>
-   function updateOrderStatus(selectElement, orderId) {
-    const newStatus = selectElement.value;
-    const loadingSpinner = selectElement.closest('tr').querySelector('.loading-spinner');
-
-    // Disable the select to prevent multiple submissions
-    selectElement.disabled = true;
-    loadingSpinner.style.display = 'inline-block';
-
-    fetch(`/admin/updateOrderStatus/${orderId}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ status: newStatus })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Update the select element's appearance and value
-            selectElement.value = newStatus;
-            selectElement.className = `status-select ${newStatus}`;
+        })
+        .catch(error => {
+            console.error('Error updating status:', error);
             
-            // Show success message with SweetAlert2
-            Swal.fire({
-                icon: 'success',
-                title: 'Status Updated',
-                text: data.message,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true
-            });
-        } else {
-            // Revert to previous status if update fails
             selectElement.value = selectElement.dataset.previousStatus;
             
             Swal.fire({
                 icon: 'error',
-                title: 'Update Failed',
-                text: data.message || 'Failed to update order status',
+                title: 'Network Error',
+                text: 'Could not update order status. Please try again.',
                 toast: true,
                 position: 'top-end',
                 showConfirmButton: false,
                 timer: 3000,
                 timerProgressBar: true
             });
-        }
-    })
-    .catch(error => {
-        console.error('Error updating status:', error);
-        
-        selectElement.value = selectElement.dataset.previousStatus;
-        
-        Swal.fire({
-            icon: 'error',
-            title: 'Network Error',
-            text: 'Could not update order status. Please try again.',
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true
+        })
+        .finally(() => {
+            loadingSpinner.style.display = 'none';
+            selectElement.disabled = false;
         });
-    })
-    .finally(() => {
-        loadingSpinner.style.display = 'none';
-        selectElement.disabled = false;
+
+        selectElement.dataset.previousStatus = selectElement.value;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const statusSelects = document.querySelectorAll('.status-select');
+        statusSelects.forEach(select => {
+            select.setAttribute('value', select.value);
+            select.classList.add(select.value);
+            select.dataset.previousStatus = select.value; // Initialize previous status
+        });
     });
+</script>
 
-    selectElement.dataset.previousStatus = selectElement.value;
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const statusSelects = document.querySelectorAll('.status-select');
-    statusSelects.forEach(select => {
-        select.setAttribute('value', select.value);
-        select.classList.add(select.value);
-    });
-});
-    </script>
-
-
-    <%- include("../../views/partials/admin/footer") %>
+<%- include("../../views/partials/admin/footer") %>

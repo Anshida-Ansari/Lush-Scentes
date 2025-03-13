@@ -4,36 +4,78 @@ const Category = require('../../models/categorySchema')
 const User = require('../../models/userSchema')
 const Cart = require('../../models/cartSchema')
 
-const getListOfOrders = async(req,res)=>{
+// const getListOfOrders = async(req,res)=>{
 
-    try {
-           console.log('getting the order list');
+//     try {
+//            console.log('getting the order list');
            
-        const order = await Order.find()
-        .populate('userId','name email')
-        .populate('address')
-        .sort({createdOn:-1})
+//         const order = await Order.find()
+//         .populate('userId','name email')
+//         .populate('address')
+//         .sort({createdOn:-1})
        
-        res.render('orders',{orders:order})
+//         res.render('orders',{orders:order})
 
-        if (!order || order.length === 0) {
-          console.log('No orders found');
-          return res.render('order', { 
-              orders: [],
-              totalPages: 1,
-              currentPage: 1
-          });
-      }
+//         if (!order || order.length === 0) {
+//           console.log('No orders found');
+//           return res.render('order', { 
+//               orders: [],
+//               totalPages: 1,
+//               currentPage: 1
+//           });
+//       }
 
 
+
+//     } catch (error) {
+
+//         console.log('there is an error',error);
+//         res.status(500).send('Server error'); 
+        
+//     }
+// }
+const getListOfOrders = async (req, res) => {
+    try {
+        console.log('Getting the order list');
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10; // Number of orders per page
+        const skip = (page - 1) * limit;
+
+        const orders = await Order.find()
+            .populate('userId', 'name email')
+            .populate('address')
+            .sort({ createdOn: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const totalOrders = await Order.countDocuments();
+        const totalPages = Math.ceil(totalOrders / limit);
+
+        if (!orders || orders.length === 0) {
+            console.log('No orders found');
+            return res.render('orders', {
+                orders: [],
+                totalPages: 1,
+                currentPage: 1
+            });
+        }
+
+        console.log('Orders fetched:', orders.length);
+        console.log('Sample order:', JSON.stringify(orders[0], null, 2)); // Log full order object
+        console.log('Rendering orders template with data:', { totalPages, currentPage: page });
+
+        res.render('orders', {
+            orders,
+            totalPages,
+            currentPage: page
+        });
 
     } catch (error) {
-
-        console.log('there is an error',error);
-        res.status(500).send('Server error'); 
-        
+        console.error('Error in getListOfOrders:', error.stack); // Log full stack trace
+        res.status(500).send('Server error: ' + error.message);
     }
-}
+};
 
 
 const getOrderDetails = async (req, res) => {

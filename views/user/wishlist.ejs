@@ -367,7 +367,7 @@
         const dropdown = document.getElementById(`sizeOptions_${index}`);
         dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
         
-        // Add animation class if needed
+        
         if (dropdown.style.display === 'block') {
             dropdown.classList.add('dropdown-animation');
         }
@@ -382,7 +382,7 @@
         selectedPriceInput.value = price;
         dropdownSelected.innerText = size;
         
-        // Update the dropdown options to show which one is selected
+       
         const options = document.querySelectorAll(`#sizeOptions_${index} .dropdown-option`);
         options.forEach(option => {
             if (option.dataset.value === size) {
@@ -442,7 +442,7 @@
         return false;
     }
     
-    // Check if Font Awesome is available, if not, load it
+    
     if (!document.querySelector('link[href*="font-awesome"]')) {
         const fontAwesomeLink = document.createElement('link');
         fontAwesomeLink.rel = 'stylesheet';
@@ -466,7 +466,7 @@
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Show elegant toast notification
+            
             showToast(`${productName} added to cart!`, 'success');
             
             Swal.fire({
