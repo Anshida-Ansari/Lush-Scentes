@@ -92,6 +92,11 @@ router.get('/edit-address/:id',userAuth,checkoutController.loadcheckoutEditAddre
 router.post('/edit-address/:id', checkoutController.editAddressCheckout);
 router.get('/thank-you', userAuth, checkoutController.loadThankYouPage);
 
+
+router.post('/create-razorpay-order',checkoutController.createRazorpayOrder)
+router.post('/verify-razorpay-payment',checkoutController.verifyRazorpayPayment)
+router.post('/handle-payment-dismissal',checkoutController.handlePaymentDismissal)
+
 router.post('/cancel',userAuth,checkoutController.cancelOrder)
 router.post('/cancel-product',userAuth,checkoutController.cancelProduct)
 router.post('/return-product',userAuth,checkoutController.returnProduct)

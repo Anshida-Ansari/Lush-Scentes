@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const { v4: uuidv4 } = require('uuid');
@@ -55,10 +54,10 @@ const orderSchema = new Schema({
         cancellationReason: { 
             type: String
         },
-        returnReason: { // Added to store the user's reason
+        returnReason: { 
             type: String
         },
-        returnRequestedAt: { // Added to store the request timestamp
+        returnRequestedAt: {
             type: Date
         },
         productImage: {
@@ -90,8 +89,23 @@ const orderSchema = new Schema({
     },
     paymentMethod: {
         type: String,
-        required: true
+        required: true,
+        enum: ['razorpay', 'Cash on Delivery', 'wallet']
     },
+    paymentDetails: {
+        razorpayOrderId: String,
+        razorpayPaymentId: String,
+        razorpaySignature: String,
+        failureReason: String,
+        succeededAt: Date,
+        attempts: [{
+            razorpayOrderId: String,
+            razorpayPaymentId: String,
+            failureReason: String,
+            attemptedAt: Date
+        }]
+    },
+
     status: {
         type: String,
         required: true,
@@ -122,3 +136,4 @@ const orderSchema = new Schema({
 
 const Order = mongoose.model('Order', orderSchema);
 module.exports = Order;
+

@@ -1,10 +1,9 @@
-
 <%-include('../../views/partials/user/header')%>
 
 <!DOCTYPE html>
 <html lang="en">
   
-  <head>
+<head>
     <title>LUSH SCENTES - Checkout</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -22,7 +21,9 @@
     <link rel="stylesheet" href="css/aos.css">
     <link rel="stylesheet" href="css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Razorpay SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     
     <style>
       .address-card {
@@ -53,11 +54,10 @@
         display: inline-block;
       }
     </style>
-  </head>
-  <body>
+</head>
+<body>
   
-  <div class="site-wrap">
-   
+<div class="site-wrap">
     <div class="site-navbar bg-white py-2">
       <!-- ... (navbar code here) ... -->
     </div>
@@ -76,11 +76,9 @@
       </div>
     </div>
     
-    <!-- Wrap the checkout content in a form -->
     <form id="checkoutForm" method="post" action="/checkout">
       <div class="site-section">
         <div class="container">
-          <!-- Returning Customer Alert -->
           <div class="row mb-5">
             <div class="col-md-12">
               <div class="border p-4 rounded" role="alert">
@@ -90,7 +88,6 @@
           </div>
           
           <div class="row">
-            <!-- Delivery Address Selection Column -->
             <div class="col-md-6 mb-5 mb-md-0">
               <h2 class="h3 mb-3 text-black">Select Delivery Address</h2>
               <div class="p-3 p-lg-5 border">
@@ -120,7 +117,6 @@
               </div>
             </div>
             
-            <!-- Order Summary & Payment Column -->
             <div class="col-md-6">
               <div class="row mb-5">
                 <div class="col-md-12">
@@ -166,7 +162,6 @@
                       </tbody>
                     </table>
 
-                    <!-- Place Order Button -->
                     <div class="form-group">
                       <button type="submit" class="btn btn-primary btn-lg btn-block" id="place-order-btn">
                         Place Order
@@ -175,19 +170,19 @@
                   </div>
                 </div>
               </div>
-              <!-- Payment Method Selection -->
+              
               <div class="row mb-5">
                 <div class="col-md-12">
                   <h2 class="h3 mb-3 text-black">Payment Method</h2>
                   <div class="p-3 p-lg-5 border">
                     <div class="form-group">
                       <div class="custom-control custom-radio mb-3">
-                        <input type="radio" id="payment_cod" name="paymentMethod" value="COD" 
+                        <input type="radio" id="payment_cod" name="paymentMethod" value="Cash on Delivery" 
                                class="custom-control-input" required>
                         <label class="custom-control-label" for="payment_cod">Cash on Delivery</label>
                       </div>
                       <div class="custom-control custom-radio mb-3">
-                        <input type="radio" id="payment_wallet" name="paymentMethod" value="Wallet" 
+                        <input type="radio" id="payment_wallet" name="paymentMethod" value="wallet" 
                                class="custom-control-input">
                         <label class="custom-control-label" for="payment_wallet">Wallet</label>
                       </div>
@@ -200,9 +195,6 @@
                   </div>
                 </div>
               </div>
-              
-              
-             
             </div> 
           </div> 
         </div> 
@@ -211,196 +203,264 @@
 
     <footer class="site-footer custom-border-top">
     </footer>
-  </div>
+</div>
 
-  <script src="js/jquery-3.3.1.min.js"></script>
-  <script src="js/jquery-ui.js"></script>
-  <script src="js/popper.min.js"></script>
-  <script src="js/bootstrap.min.js"></script>
-  <script src="js/owl.carousel.min.js"></script>
-  <script src="js/jquery.magnific-popup.min.js"></script>
-  <script src="js/aos.js"></script>
-  <script src="js/main.js"></script>
+<script src="js/jquery-3.3.1.min.js"></script>
+<script src="js/jquery-ui.js"></script>
+<script src="js/popper.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/owl.carousel.min.js"></script>
+<script src="js/jquery.magnific-popup.min.js"></script>
+<script src="js/aos.js"></script>
+<script src="js/main.js"></script>
 
- <!-- <script>
-  document.addEventListener('DOMContentLoaded', () => {
-  const addressCards = document.querySelectorAll('.address-card');
-  addressCards.forEach(card => {
-    const radio = card.querySelector('input[type="radio"]');
-    
-    card.addEventListener('click', () => {
-      addressCards.forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
-      radio.checked = true;
-    });
-    
-    if (radio.checked) {
-      card.classList.add('selected');
-    }
-  });
-  
-  const checkoutForm = document.getElementById('checkoutForm');
-  checkoutForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const deliveryAddressId = document.querySelector('input[name="deliveryAddressId"]:checked')?.value;
-    if (!deliveryAddressId) {
-      alert('Please select a delivery address');
-      return;
-    }
-    
-    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
-    if (!paymentMethod) {
-      alert('Please select a payment method');
-      return;
-    }
-
-    const finalAmount = document.getElementById('final-amount')?.textContent;
-    const amount = finalAmount ? parseFloat(finalAmount.replace('₹', '').trim()) : 0;
-    
-    const submitButton = document.getElementById('place-order-btn');
-    submitButton.disabled = true;
-    submitButton.textContent = 'Processing...';
-    
-    try {
-      const response = await fetch('/place-order', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ 
-          addressId: deliveryAddressId,
-          paymentMethod: paymentMethod,
-          amount: amount
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Server error occurred. Please try again.');
-      }
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        window.location.href = `/thank-you?orderId=${data.orderId}`;
-      } else {
-        throw new Error(data.message || 'Failed to place order.');
-      }
-    } catch (error) {
-      console.error('Error processing order:', error);
-      alert(error.message || 'There was an error processing your order. Please try again.');
-      submitButton.disabled = false;
-      submitButton.textContent = 'Place Order';
-    }
-  });
-});
- </script> -->
- <script>
-  document.addEventListener('DOMContentLoaded', () => {
-  const addressCards = document.querySelectorAll('.address-card');
-  addressCards.forEach(card => {
-    const radio = card.querySelector('input[type="radio"]');
-    
-    card.addEventListener('click', () => {
-      addressCards.forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
-      radio.checked = true;
-    });
-    
-    if (radio.checked) {
-      card.classList.add('selected');
-    }
-  });
-  
-  const checkoutForm = document.getElementById('checkoutForm');
-  checkoutForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const deliveryAddressId = document.querySelector('input[name="deliveryAddressId"]:checked')?.value;
-    if (!deliveryAddressId) {
-      await Swal.fire({
-        icon: 'warning',
-        title: 'Address Required',
-        text: 'Please select a delivery address',
-        confirmButtonColor: '#7971ea'
-      });
-      return;
-    }
-    
-    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
-    if (!paymentMethod) {
-      await Swal.fire({
-        icon: 'warning',
-        title: 'Payment Method Required',
-        text: 'Please select a payment method',
-        confirmButtonColor: '#7971ea'
-      });
-      return;
-    }
-
-    const finalAmount = document.getElementById('final-amount')?.textContent;
-    const amount = finalAmount ? parseFloat(finalAmount.replace('₹', '').trim()) : 0;
-    
-    const submitButton = document.getElementById('place-order-btn');
-    submitButton.disabled = true;
-    submitButton.textContent = 'Processing...';
-    
-    try {
-      // Show loading state
-      Swal.fire({
-        title: 'Processing Order',
-        text: 'Please wait while we process your order...',
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        didOpen: () => {
-          Swal.showLoading();
-        }
-      });
-
-      const response = await fetch('/checkout', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ 
-          addressId: deliveryAddressId,
-          paymentMethod: paymentMethod,
-          amount: amount
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Server error occurred. Please try again.');
-      }
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        await Swal.fire({
-          icon: 'success',
-          title: 'Order Placed Successfully!',
-          text: 'Redirecting to order confirmation...',
-          timer: 2000,
-          showConfirmButton: false
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const addressCards = document.querySelectorAll('.address-card');
+    addressCards.forEach(card => {
+        const radio = card.querySelector('input[type="radio"]');
+        
+        card.addEventListener('click', () => {
+            addressCards.forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            radio.checked = true;
         });
-        window.location.href = `/thank-you?orderId=${data.orderId}`;
-      } else {
-        throw new Error(data.message || 'Failed to place order.');
-      }
-    } catch (error) {
-      console.error('Error processing order:', error);
-      await Swal.fire({
-        icon: 'error',
-        title: 'Order Failed',
-        text: error.message || 'There was an error processing your order. Please try again.',
-        confirmButtonColor: '#7971ea'
-      });
-      submitButton.disabled = false;
-      submitButton.textContent = 'Place Order';
+        
+        if (radio.checked) {
+            card.classList.add('selected');
+        }
+    });
+
+    checkoutForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const selectedAddress = document.querySelector('input[name="deliveryAddressId"]:checked')?.value;
+    if (!selectedAddress) {
+        await Swal.fire({
+            icon: 'warning',
+            title: 'Address Required',
+            text: 'Please select a delivery address',
+            confirmButtonColor: '#7971ea'
+        });
+        return;
     }
-  });
-});   
- </script>  
- <%-include('../../views/partials/user/footer')%>
+
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+    if (!paymentMethod) {
+        await Swal.fire({
+            icon: 'warning',
+            title: 'Payment Method Required',
+            text: 'Please select a payment method',
+            confirmButtonColor: '#7971ea'
+        });
+        return;
+    }
+
+    const finalAmount = document.getElementById('final-amount')?.textContent;
+    const amount = finalAmount ? parseFloat(finalAmount.replace('₹', '').trim()) : 0;
+    
+    const submitButton = document.getElementById('place-order-btn');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Processing...';
+
+    let processingDialog;
+    try {
+        processingDialog = Swal.fire({
+            title: 'Processing Order',
+            text: 'Please wait while we process your order...',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        console.log('Processing payment method:',paymentMethod)
+        if (paymentMethod === 'razorpay') {
+            await handleRazorpayPayment(selectedAddress, amount);
+        } else {
+          console.log('Processing COD order with address:', selectedAddress, 'and payment method:', paymentMethod);
+            const response = await fetch('/checkout', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    selectedAddress, 
+                    paymentMethod
+                })
+            });
+
+            const data = await response.json();
+            if (!data.success) {
+                throw new Error(data.message || 'Failed to place order');
+            }
+
+            await handlePaymentSuccess(data.orderId);
+        }
+
+    } catch (error) {
+        console.error('Error processing order:', error);
+        await Swal.fire({
+            icon: 'error',
+            title: 'Order Failed',
+            text: error.message || 'There was an error processing your order. Please try again.',
+            confirmButtonColor: '#7971ea'
+        });
+    } finally {
+       
+        if (processingDialog) {
+            await Swal.close();
+        }
+        submitButton.disabled = false;
+        submitButton.textContent = 'Place Order';
+    }
+});
+
+    async function handleRazorpayPayment(selectedAddress, amount) {
+        try {
+            const orderResponse = await fetch('/create-razorpay-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    selectedAddress,
+                    amount
+                })
+            });
+
+            const orderData = await orderResponse.json();
+            if (!orderData.success) {
+                throw new Error(orderData.message || 'Failed to create Razorpay order');
+            }
+
+            const options = {
+                key: orderData.razorpayKeyId,
+                amount: orderData.amount,
+                currency: 'INR',
+                name: 'LUSH SCENTES',
+                description: 'Order Payment',
+                order_id: orderData.razorpayOrderId,
+                handler: async function(response) {
+                    await verifyPayment(response, orderData.orderId);
+                },
+                modal: {
+                    ondismiss: async function() {
+                        await handlePaymentDismissal(orderData.orderId, selectedAddress);
+                        await initializeRetryPayment(orderData.orderId, amount, selectedAddress);
+                    }
+                },
+                prefill: {
+                    name: '<%= userAddress.address[0]?.name || "" %>',
+                    email: '<%= userAddress.email || "" %>',
+                    contact: '<%= userAddress.address[0]?.phoneNumber || "" %>'
+                },
+                theme: {
+                    color: '#7971ea'
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+
+            rzp.on('payment.failed', async function(response) {
+                await handlePaymentDismissal(orderData.orderId, selectedAddress, response.error.description);
+                await initializeRetryPayment(orderData.orderId, amount, selectedAddress);
+            });
+
+        } catch (error) {
+            console.error('Razorpay error:', error);
+            await initializeRetryPayment(null, amount, selectedAddress);
+        }
+    }
+
+   
+async function verifyPayment(response, orderId) {
+    try {
+        console.log('Sending verification request:', {
+            orderId,
+            razorpayOrderId: response.razorpay_order_id,
+            razorpayPaymentId: response.razorpay_payment_id,
+            razorpaySignature: response.razorpay_signature
+        });
+
+        const verifyResponse = await fetch('/verify-razorpay-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                orderId,
+                razorpayOrderId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpaySignature: response.razorpay_signature
+            })
+        });
+
+        console.log('Received verification response:', verifyResponse);
+
+        const verifyData = await verifyResponse.json();
+        console.log('Parsed verification data:', verifyData);
+
+        if (verifyData.success) {
+            console.log('Payment verified successfully, calling handlePaymentSuccess...');
+            await handlePaymentSuccess(verifyData.orderId); 
+        } else {
+            throw new Error(verifyData.message || 'Payment verification failed');
+        }
+    } catch (error) {
+        console.error('Verification error:', error);
+        await Swal.fire({
+            icon: 'error',
+            title: 'Payment Verification Failed',
+            text: error.message || 'There was an error verifying your payment. Please try again.',
+            confirmButtonColor: '#7971ea'
+        });
+        await initializeRetryPayment(orderId, amount, selectedAddress);
+    }
+}
+    // Handle Payment Success
+    async function handlePaymentSuccess(orderId) {
+        await Swal.fire({
+            icon: 'success',
+            title: 'Order Placed Successfully!',
+            text: 'Redirecting to order confirmation...',
+            timer: 2000,
+            showConfirmButton: false
+        });
+        window.location.href = `/thank-you?orderId=${orderId}`;
+    }
+
+    
+    async function handlePaymentDismissal(orderId, selectedAddress, reason = 'Payment window closed') {
+        await fetch('/handle-payment-dismissal', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                orderId,
+                selectedAddress,
+                reason
+            })
+        });
+    }
+
+    
+    async function initializeRetryPayment(orderId, amount, selectedAddress) {
+        const result = await Swal.fire({
+            icon: 'error',
+            title: 'Payment Failed',
+            text: 'Would you like to retry the payment?',
+            showCancelButton: true,
+            confirmButtonText: 'Retry Payment',
+            cancelButtonText: 'View Order Details',
+            confirmButtonColor: '#7971ea'
+        });
+
+        if (result.isConfirmed) {
+            await handleRazorpayPayment(selectedAddress, amount);
+        } else if (orderId) {
+            window.location.href = `/order-details?orderId=${orderId}`;
+        }
+    }
+});
+</script>
+
+<%-include('../../views/partials/user/footer')%>
