@@ -4,6 +4,7 @@ const productController = require('../controllers/user/productController')
 const profileController = require('../controllers/user/profileController')
 const cartController = require('../controllers/user/cartController')
 const checkoutController = require('../controllers/user/checkoutController')
+const couponController = require('../controllers/user/couponController')
 const wishlistController = require('../controllers/user/wishlistController')
 const {userAuth,userLogin} = require('../middlewares/userAuth')
 const passport = require('passport')
@@ -105,6 +106,9 @@ router.post('/return-product',userAuth,checkoutController.returnProduct)
 router.get('/wishlist',userAuth,wishlistController.loadWishlist)
 router.post('/addWishlist',userAuth,wishlistController.addWishlist)
 router.post('/removeFromWishlist',userAuth,wishlistController.removeFromWishlist)
+
+router.post("/apply-coupon",userAuth,couponController.applyCoupon)
+router.delete("/remove-coupon",userAuth,couponController.removeCoupon)
 
 
 

@@ -4,42 +4,13 @@ const Category = require('../../models/categorySchema')
 const User = require('../../models/userSchema')
 const Cart = require('../../models/cartSchema')
 
-// const getListOfOrders = async(req,res)=>{
 
-//     try {
-//            console.log('getting the order list');
-           
-//         const order = await Order.find()
-//         .populate('userId','name email')
-//         .populate('address')
-//         .sort({createdOn:-1})
-       
-//         res.render('orders',{orders:order})
-
-//         if (!order || order.length === 0) {
-//           console.log('No orders found');
-//           return res.render('order', { 
-//               orders: [],
-//               totalPages: 1,
-//               currentPage: 1
-//           });
-//       }
-
-
-
-//     } catch (error) {
-
-//         console.log('there is an error',error);
-//         res.status(500).send('Server error'); 
-        
-//     }
-// }
 const getListOfOrders = async (req, res) => {
     try {
         console.log('Getting the order list');
 
         const page = parseInt(req.query.page) || 1;
-        const limit = 10; // Number of orders per page
+        const limit = 10; 
         const skip = (page - 1) * limit;
 
         const orders = await Order.find()
@@ -61,9 +32,7 @@ const getListOfOrders = async (req, res) => {
             });
         }
 
-        console.log('Orders fetched:', orders.length);
-        console.log('Sample order:', JSON.stringify(orders[0], null, 2)); // Log full order object
-        console.log('Rendering orders template with data:', { totalPages, currentPage: page });
+       
 
         res.render('orders', {
             orders,
@@ -72,7 +41,7 @@ const getListOfOrders = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Error in getListOfOrders:', error.stack); // Log full stack trace
+        console.error('Error in getListOfOrders:', error.stack); 
         res.status(500).send('Server error: ' + error.message);
     }
 };
@@ -81,7 +50,7 @@ const getListOfOrders = async (req, res) => {
 const getOrderDetails = async (req, res) => {
   try {
       console.log('Getting order details');
-      const { orderId } = req.params;
+      const { orderId } = req.params
       const order = await Order.findOne({_id: orderId}) 
           .populate('userId', 'name email')
           .populate('address')
@@ -99,32 +68,62 @@ const getOrderDetails = async (req, res) => {
   }
 };
 
-const updateStatus = async(req,res)=>{
+
+const updateStatus = async (req, res) => {
     try {
-        const { orderId } = req.params;
-        const { status } = req.body;
-    
-    const order = await Order.findOne({ _id:orderId });
-    
-    if (!order) {
-      return res.status(404).json({ success: false, message: 'Order not found' });
-    }
-    
-    order.status = status;
-    if (status === 'Delivered') {
-      order.invoiceData = new Date();
-    }
-    
-    await order.save();
-    
-    res.json({ success: true, message: 'Order status updated successfully' });
-        
-    } catch (error) {
-        console.error('Error updating order status:', error);
-        res.status(500).json({ success: false, message: 'Server error' });
+      const { orderId } = req.params;
+      const { status } = req.body;
+  
+     
+      const order = await Order.findOne({ _id: orderId });
+      if (!order) {
+        return res.status(404).json({ success: false, message: 'Order not found' });
       }
-        
+  
+    
+      const currentStatus = order.status;
+  
+   
+      if (currentStatus === 'Delivered') {
+        return res.status(400).json({
+          success: false,
+          message: 'Delivered orders cannot be changed to another status',
+        });
+      }
+  
+      if (currentStatus === 'Shipped' && (status === 'Pending' || status === 'Processing')) {
+        return res.status(400).json({
+          success: false,
+          message: 'Shipped orders cannot be changed to Pending or Processing',
+        });
+      }
+  
+      if (currentStatus === 'Cancelled') {
+        return res.status(400).json({
+          success: false,
+          message: 'Cancelled orders cannot be changed to another status',
+        });
+      }
+  
+     
+      order.status = status;
+  
+      
+      if (status === 'Delivered') {
+        order.invoiceData = new Date();
+      }
+  
+      await order.save();
+  
+      res.json({
+        success: true,
+        message: 'Order status updated successfully',
+      });
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      res.status(500).json({ success: false, message: 'Server error' });
     }
+  };
 
 
 const approveReturn = async (req, res) => {

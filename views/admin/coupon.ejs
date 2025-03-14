@@ -1,4 +1,5 @@
 <%- include("../../views/partials/admin/header") %>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 <body>
     <div class="content-main">
@@ -229,9 +230,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Set minimum date for expiry date inputs to tomorrow
+           
             const today = new Date();
             const tomorrow = new Date(today);
             tomorrow.setDate(tomorrow.getDate() + 1);
@@ -240,13 +242,13 @@
             document.getElementById('expiryDate').min = tomorrowFormatted;
             document.getElementById('editExpiryDate').min = tomorrowFormatted;
             
-            // Form validation for new coupon
+          
             const addCouponForm = document.getElementById('addCouponForm');
             const nameInput = document.querySelector('input[name="name"]');
             const offerPriceInput = document.querySelector('input[name="offerPrice"]');
             const minimumPriceInput = document.querySelector('input[name="minimumPrice"]');
             
-            // Coupon code validation (alphanumeric only)
+            
             nameInput.addEventListener('input', function() {
                 this.value = this.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
                 if (this.value.length > 50) {
@@ -254,11 +256,11 @@
                 }
             });
             
-            // Form submission handler
+           
             addCouponForm.addEventListener('submit', async function(event) {
                 event.preventDefault();
                 
-                // Validate coupon code
+                
                 const name = nameInput.value.trim();
                 if (!name || name.length < 3 || name.length > 50) {
                     Swal.fire({
@@ -269,7 +271,7 @@
                     return;
                 }
                 
-                // Validate discount amount
+                
                 const offerPrice = parseFloat(offerPriceInput.value);
                 if (isNaN(offerPrice) || offerPrice <= 0 || offerPrice > 10000) {
                     Swal.fire({
@@ -280,7 +282,7 @@
                     return;
                 }
                 
-                // Validate minimum purchase amount
+              
                 const minimumPrice = parseFloat(minimumPriceInput.value);
                 if (isNaN(minimumPrice) || minimumPrice <= 0 || minimumPrice > 100000) {
                     Swal.fire({
@@ -291,7 +293,7 @@
                     return;
                 }
                 
-                // Ensure discount is less than minimum purchase
+               
                 if (offerPrice >= minimumPrice) {
                     Swal.fire({
                         title: 'Error!',
@@ -301,7 +303,6 @@
                     return;
                 }
                 
-                // Create form data object
                 const formData = new FormData(this);
                 const couponData = {
                     name: formData.get('name').toUpperCase(),
@@ -345,7 +346,6 @@
                 }
             });
             
-            // Filter buttons functionality
             document.getElementById('showAllBtn').addEventListener('click', function() {
                 document.querySelectorAll('.coupon-row').forEach(row => {
                     row.style.display = '';
@@ -394,7 +394,6 @@
             }
         });
         
-        // Edit coupon modal functions
         function openEditModal(couponId, name, offerPrice, minimumPrice, expireOn, isActive) {
             document.getElementById('editCouponId').value = couponId;
             document.getElementById('editCouponName').value = name;
@@ -414,7 +413,6 @@
             const expireOn = document.getElementById('editExpiryDate').value;
             const isActive = document.getElementById('editActiveStatus').checked;
             
-            // Validation
             if (isNaN(offerPrice) || offerPrice <= 0 || offerPrice > 10000) {
                 Swal.fire({
                     title: 'Error!',

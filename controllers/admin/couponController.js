@@ -2,7 +2,6 @@ const User = require('../../models/userSchema')
 const Order = require('../../models/orderSchema')
 const Coupon = require('../../models/couponShema')
 
-
 const loadCoupon = async(req,res)=>{
     try {
         if(!req.session.admin){
@@ -38,6 +37,7 @@ const loadCoupon = async(req,res)=>{
         });
     }
 }
+
 
 const createCoupon = async(req,res)=>{
     try {

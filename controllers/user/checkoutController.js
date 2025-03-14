@@ -3,6 +3,7 @@ const Cart = require('../../models/cartSchema');
 const User = require('../../models/userSchema');
 const Product = require('../../models/productSchema');
 const Address = require('../../models/addressShema.js')
+const Coupon = require('../../models/couponShema.js')
 const Razorpay = require('razorpay')
 const crypto = require('crypto')
 const mongoose = require('mongoose')
@@ -15,12 +16,19 @@ const razorpayInstance = new Razorpay({
     key_secret:process.env.RAZORPAY_KEY_SECRET
 })
 
+
+
 const loadCheckoutPage = async (req, res) => {
     try {
         const userId = req.session.user;
-        console.log("userid", userId);
+        console.log("User ID from session:", userId);
 
+        if (!userId) {
+            console.log("No user session found, redirecting to login");
+            return res.redirect('/login');
+        }
 
+       
         const cart = await Cart.findOne({ userId })
             .populate({
                 path: 'items.productId',
@@ -28,39 +36,57 @@ const loadCheckoutPage = async (req, res) => {
             });
 
         if (!cart || cart.items.length === 0) {
+            console.log("Cart is empty or not found, redirecting to cart");
             return res.redirect('/cart');
         }
 
+      
         const user = await User.findById(userId);
+        if (!user) {
+            console.log("User not found, rendering error");
+            return res.status(404).render('error', { message: 'User not found' });
+        }
 
+       
         const totals = {
-            subtotal: cart.items.reduce((sum, item) => sum + item.totalPrice, 0),
+            subtotal: cart.items.reduce((sum, item) => sum + (item.totalPrice || 0), 0),
             discount: 0,
-            finalAmount: cart.items.reduce((sum, item) => sum + item.totalPrice, 0)
+            finalAmount: cart.items.reduce((sum, item) => sum + (item.totalPrice || 0), 0)
         };
 
+        
         const address = await Address.findOne({ userID: userId });
-        console.log("The ADDRESS", address);
+        console.log("Fetched Address:", address);
 
+       
+        const coupons = await Coupon.find({
+            isList: true,
+            expireOn: { $gt: new Date() },
+            userId: { $ne: userId } 
+        });
+        console.log("Fetched Coupons:", coupons);
+
+       
         res.render('checkout', {
             cart,
-            userAddress: address,
+            userAddress: address || {},
             totals,
-            user
+            user,
+            coupons 
         });
 
     } catch (error) {
         console.error('Error loading checkout page:', error);
-        res.status(500).render('error', { message: 'Error loading checkout page: ' + error.message });
+        res.status(500).render('error', {
+            message: 'Error loading checkout page: ' + (error.message || 'Unknown error')
+        });
     }
 };
-
-
 
 const processCheckout = async (req, res) => {
     try {
         const userId = req.session.user;
-        const { selectedAddress, paymentMethod } = req.body;
+        const { selectedAddress, paymentMethod ,couponCode} = req.body;
 
         if (!userId) {
             return res.status(401).json({
@@ -75,6 +101,7 @@ const processCheckout = async (req, res) => {
                 message: 'Address and payment method are required'
             });
         }
+        
 
         const cart = await Cart.findOne({ userId })
             .populate({
@@ -135,7 +162,17 @@ const processCheckout = async (req, res) => {
 
         const totalPrice = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
         const discount = 0;
-        const finalAmount = totalPrice + discount;
+        if (couponCode) {
+            const coupon = await Coupon.findOne({ name: couponCode, isList: true });
+            if (coupon && !coupon.userId.includes(userId) && totalPrice >= coupon.minimumPrice) {
+              discount = Math.min(coupon.offerPrice, totalPrice);
+              await Coupon.updateOne(
+                { _id: coupon._id },
+                { $push: { userId: userId } }
+              );
+            }
+          }
+        const finalAmount = totalPrice - discount;
 
         const { v4: uuidv4 } = require('uuid');  
         const order = new Order({
@@ -161,6 +198,8 @@ const processCheckout = async (req, res) => {
             totalPrice,
             discount,
             finalAmount,
+            couponApplied: !!couponCode,
+            couponCode: couponCode || null,
             address: selectedAddress,
             paymentMethod,
             status: 'Pending',
@@ -516,6 +555,8 @@ const cancelProduct = async (req, res) => {
 
 const returnProduct = async (req, res) => {
     try {
+        console.log('there is some error');
+        
         const { orderId, productId, reason } = req.body;
 
         const order = await Order.findOne({ orderId });
@@ -577,7 +618,7 @@ const returnProduct = async (req, res) => {
 
 const createRazorpayOrder = async (req, res) => {
     try {
-        const { selectedAddress, orderId } = req.body;
+        const { selectedAddress, orderId,couponCode } = req.body;
         const userId = req.session.user;
 
         if (!userId) {
@@ -642,6 +683,16 @@ const createRazorpayOrder = async (req, res) => {
         
         const totalPrice = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
         let discountAmount = 0;
+        if (couponCode) {
+            const coupon = await Coupon.findOne({ name: couponCode, isList: true });
+            if (coupon && !coupon.userId.includes(userId) && totalPrice >= coupon.minimumPrice) {
+              discountAmount = Math.min(coupon.offerPrice, totalPrice);
+              await Coupon.updateOne(
+                { _id: coupon._id },
+                { $push: { userId: userId } }
+              );
+            }
+          }
 
         
         const finalAmount = totalPrice - discountAmount;
@@ -673,6 +724,9 @@ const createRazorpayOrder = async (req, res) => {
             totalPrice,
             discount: discountAmount,
             finalAmount,
+            finalAmount,
+            couponApplied: !!couponCode,
+            couponCode: couponCode || null,
             address: selectedAddress,
             paymentMethod: 'razorpay',
             status: 'Pending',

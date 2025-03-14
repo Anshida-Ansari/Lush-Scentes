@@ -1,156 +1,250 @@
 <%- include("../partials/admin/header") %>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-md-10 p-4">
+            <h1 class="mb-4 text">Order Details</h1>
 
-   
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-10 p-4">
-                <h1 class="mb-4">Order Details</h1>
-                
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Order ID: <%= order.orderId %></h5>
-                        <p class="card-text">Total Amount: ₹<%= order.finalAmount %></p>
-                        <p class="card-text">Status: <%= order.status %></p>
-                        <p class="card-text">Order Date: <%= order.createdOn.toLocaleString() %></p>
-                        
-                        <h6 class="mt-4">Items:</h6>
-                        <ul class="list-group">
-                            <% order.orderedItems.forEach(item => { %>
-                                <li class="list-group-item">
-                                    <%= item.name %> - ₹<%= item.price %> (Qty: <%= item.variant.quantity %>)
-                                    <p class="text-muted">Cancel Status: <%= item.cancelStatus || 'completed' %></p>
-                                    <p class="text-muted">Return Status: <%= item.returnStatus || 'Not Requested' %></p>
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">Order ID: <%= order.orderId %></h5>
+                </div>
+                <div class="card-body">
+                    <!-- Order Summary -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p class="card-text"><strong>Total Amount:</strong> ₹<%= order.finalAmount.toFixed(2) %></p>
+                            <p class="card-text"><strong>Payment Method:</strong> <%= order.paymentMethod || 'N/A' %></p>
+                            <p class="card-text"><strong>Status:</strong> <span class="badge bg-<%= order.status === 'Delivered' ? 'success' : order.status === 'Cancelled' ? 'danger' : order.status === 'Processing' ? 'warning' : 'info' %>"><%= order.status %></p>
+                            <p class="card-text"><strong>Order Date:</strong> <%= order.createdOn ? new Date(order.createdOn).toLocaleString() : 'N/A' %></p>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Shipping Address -->
+                            <% if (order.address && order.address.address && order.address.address.length > 0) { %>
+                                <% const defaultAddress = order.address.address.find(addr => addr.default) || order.address.address[0]; %>
+                                <p class="card-text"><strong>Shipping Address:</strong></p>
+                                <address class="mb-0">
+                                    <%= defaultAddress.name %><br>
+                                    <%= defaultAddress.city %>, <%= defaultAddress.state %> - <%= defaultAddress.pincode %><br>
+                                    Landmark: <%= defaultAddress.landMark %><br>
+                                    Phone: <%= defaultAddress.phoneNumber %>
+                                </address>
+                            <% } else { %>
+                                <p class="card-text"><strong>Shipping Address:</strong> N/A</p>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <!-- Items Section -->
+                    <h6 class="mt-4">Items:</h6>
+                    <div class="list-group">
+                        <% order.orderedItems.forEach(item => { %>
+                            <div class="list-group-item d-flex align-items-start mb-3 shadow-sm">
+                                <!-- Product Image -->
+                                <img src="<%= item.productImage[0] %>" alt="<%= item.name %>" class="img-thumbnail me-3" style="width: 100px; height: 100px; object-fit: cover;">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1"><%= item.name %></h6>
+                                    <p class="text-muted mb-1">Price: ₹<%= item.price.toFixed(2) %> (Qty: <%= item.variant.quantity %>)</p>
+                                    <p class="text-muted mb-1">Size: <%= item.variant.size %></p>
+                                    <p class="text-muted mb-1">Cancel Status: <%= item.cancelStatus || 'Completed' %></p>
+                                    <p class="text-muted mb-1">Return Status: <%= item.returnStatus || 'Not Requested' %></p>
                                     <% if (item.returnStatus && item.returnStatus !== 'Not Requested') { %>
-                                        <p><strong>Return Reason:</strong> <%= item.returnReason || 'No reason provided' %></p>
-                                        <p><strong>Requested At:</strong> <%= item.returnRequestedAt ? item.returnRequestedAt.toLocaleString() : 'N/A' %></p>
+                                        <p class="mb-1"><strong>Return Reason:</strong> <%= item.returnReason || 'No reason provided' %></p>
+                                        <p class="mb-1"><strong>Requested At:</strong> <%= item.returnRequestedAt ? new Date(item.returnRequestedAt).toLocaleString() : 'N/A' %></p>
                                     <% } %>
                                     <% if (item.returnStatus === 'Requested') { %>
-                                        <button class="btn btn-success btn-sm me-2" 
-                                                onclick="approveReturn('<%= order._id %>', '<%= item._id %>')">
-                                            Approve
-                                        </button>
-                                        <button class="btn btn-danger btn-sm" 
-                                                onclick="rejectReturn('<%= order._id %>', '<%= item._id %>')">
-                                            Reject
-                                        </button>
+                                        <div class="mt-2">
+                                            <button class="btn btn-success btn-sm me-2" onclick="approveReturn('<%= order._id %>', '<%= item._id %>')">
+                                                Approve
+                                            </button>
+                                            <button class="btn btn-danger btn-sm" onclick="rejectReturn('<%= order._id %>', '<%= item._id %>')">
+                                                Reject
+                                            </button>
+                                        </div>
                                     <% } %>
-                                </li>
-                            <% }) %>
-                        </ul>
+                                </div>
+                            </div>
+                        <% }) %>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    
-    <script>
-    window.approveReturn = function(orderId, productId) {
-        console.log('Fetching:', '/admin/approve-return', { orderId, productId });
-        Swal.fire({
-            title: 'Approve Return',
-            text: 'Are you sure you want to approve this return?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, Approve',
-            confirmButtonColor: '#28a745',
-            cancelButtonText: 'Cancel',
-            showLoaderOnConfirm: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch('/admin/approve-return', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ orderId, productId })
-                })
-                .then(response => {
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            title: 'Approved',
-                            text: data.message,
-                            icon: 'success'
-                        }).then(() => location.reload());
-                    } else {
-                        Swal.fire({
-                            title: 'Error',
-                            text: data.message || 'Failed to approve return',
-                            icon: 'error'
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'An error occurred while processing your request.',
-                        icon: 'error'
-                    });
-                });
-            }
-        });
-    };
 
-    window.rejectReturn = function(orderId, productId) {
-        console.log('Fetching:', '/admin/reject-return', { orderId, productId });
-        Swal.fire({
-            title: 'Reject Return',
-            text: 'Are you sure you want to reject this return?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, Reject',
-            confirmButtonColor: '#dc3545',
-            cancelButtonText: 'Cancel',
-            showLoaderOnConfirm: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch('/admin/reject-return', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ orderId, productId })
-                })
-                .then(response => {
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire({
-                            title: 'Rejected',
-                            text: data.message,
-                            icon: 'success'
-                        }).then(() => location.reload());
-                    } else {
+    <script>
+        window.approveReturn = function(orderId, productId) {
+            console.log('Fetching:', '/admin/approve-return', { orderId, productId });
+            Swal.fire({
+                title: 'Approve Return',
+                text: 'Are you sure you want to approve this return?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Approve',
+                confirmButtonColor: '#28a745',
+                cancelButtonText: 'Cancel',
+                showLoaderOnConfirm: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/admin/approve-return', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ orderId, productId })
+                    })
+                    .then(response => {
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Approved',
+                                text: data.message,
+                                icon: 'success'
+                            }).then(() => location.reload());
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: data.message || 'Failed to approve return',
+                                icon: 'error'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
                         Swal.fire({
                             title: 'Error',
-                            text: data.message || 'Failed to reject return',
+                            text: 'An error occurred while processing your request.',
                             icon: 'error'
                         });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'An error occurred while processing your request.',
-                        icon: 'error'
                     });
-                });
-            }
-        });
-    };
-</script>
-    
+                }
+            });
+        };
+
+        window.rejectReturn = function(orderId, productId) {
+            console.log('Fetching:', '/admin/reject-return', { orderId, productId });
+            Swal.fire({
+                title: 'Reject Return',
+                text: 'Are you sure you want to reject this return?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Reject',
+                confirmButtonColor: '#dc3545',
+                cancelButtonText: 'Cancel',
+                showLoaderOnConfirm: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/admin/reject-return', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ orderId, productId })
+                    })
+                    .then(response => {
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Rejected',
+                                text: data.message,
+                                icon: 'success'
+                            }).then(() => location.reload());
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: data.message || 'Failed to reject return',
+                                icon: 'error'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'An error occurred while processing your request.',
+                            icon: 'error'
+                        });
+                    });
+                }
+            });
+        };
+    </script>
+
     <%- include("../partials/admin/footer") %>
+
+    <style>
+        .card {
+            border: none;
+            border-radius: 0.5rem;
+        }
+
+        .card-header {
+            border-bottom: none;
+            padding: 1rem 1.5rem;
+        }
+
+        .card-title {
+            margin-bottom: 0;
+        }
+
+        .card-text {
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .badge {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+            border-radius: 0.25rem;
+        }
+
+        address {
+            font-style: normal;
+            line-height: 1.5;
+            margin-bottom: 0;
+            padding-left: 1rem;
+            border-left: 2px solid #f1f4f8;
+            background-color: #ffffff;
+            border-radius: 0.25rem;
+        }
+
+        .list-group-item {
+            border: none;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .list-group-item:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .img-thumbnail {
+            border: none;
+            border-radius: 0.25rem;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .text-muted {
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .col-md-6 {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
