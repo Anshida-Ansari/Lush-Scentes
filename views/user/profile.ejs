@@ -455,6 +455,22 @@
                 width: 100%;
                 height: 200px;
             }
+
+            .address-card {
+                border: 1px solid #e0e0e0;
+                background-color: #f8f9fa;
+                border-radius: 8px;
+                font-size: 0.9rem;
+            }
+
+            .address-card p {
+                margin-bottom: 0.5rem;
+            }
+
+            .address-card strong {
+                color: #333;
+                font-weight: 600;
+            }
         }
     </style>
 
@@ -493,12 +509,18 @@
                 <div class="side-nav p-3">
                     <h5 class="mb-3">Account Settings</h5>
                     <div class="nav flex-column">
-                        <a class="nav-link active" onclick="showContent('profile')"><i class="fas fa-user me-2"></i> Profile</a>
-                        <a class="nav-link" onclick="showContent('address')"><i class="fas fa-map-marker-alt me-2"></i> Address</a>
-                        <a class="nav-link" onclick="showContent('orders')"><i class="fas fa-shopping-bag me-2"></i> Orders</a>
-                        <a class="nav-link" onclick="showContent('wallet')"><i class="fas fa-wallet me-2"></i> Wallet Status</a>
-                        <a class="nav-link" onclick="showContent('wallet-history')"><i class="fas fa-clock me-2"></i> Wallet History</a>
-                        <a class="nav-link" onclick="showContent('refferal')"><i class="fas fa-user-plus me-2"></i> Referral</a>
+                        <a class="nav-link active" onclick="showContent('profile')"><i class="fas fa-user me-2"></i>
+                            Profile</a>
+                        <a class="nav-link" onclick="showContent('address')"><i class="fas fa-map-marker-alt me-2"></i>
+                            Address</a>
+                        <a class="nav-link" onclick="showContent('orders')"><i class="fas fa-shopping-bag me-2"></i>
+                            Orders</a>
+                        <a class="nav-link" onclick="showContent('wallet')"><i class="fas fa-wallet me-2"></i> Wallet
+                            Status</a>
+                        <a class="nav-link" onclick="showContent('wallet-history')"><i class="fas fa-clock me-2"></i>
+                            Wallet History</a>
+                        <a class="nav-link" onclick="showContent('refferal')"><i class="fas fa-user-plus me-2"></i>
+                            Referral</a>
                         <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
                     </div>
                 </div>
@@ -507,37 +529,6 @@
 
             <div class="col-md-9">
 
-                <!-- <div id="dashboard" class="content-section active">
-                    <div class="profile-card bg-white p-4 rounded">
-                        <h4 class="mb-4">Dashboard</h4>
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <div class="card bg-light">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Total Orders</h5>
-                                        <p class="card-text h3">12</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="card bg-light">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Wishlist Items</h5>
-                                        <p class="card-text h3">5</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="card bg-light">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Wallet Balance</h5>
-                                        <p class="card-text h3">$250</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
 
 
                 <div id="profile" class="content-section active">
@@ -664,113 +655,161 @@
                                                         <%= order.status || 'Processing' %>
                                                     </span>
                                                 </div>
-                                                <div class="col-md-3">
+                                                <div class="col-md-3 d-flex justify-content-end gap-2">
                                                     <button class="btn btn-sm btn-outline-primary"
                                                         data-bs-toggle="collapse"
                                                         data-bs-target="#orderDetails<%= order._id %>">
                                                         View Details
                                                     </button>
-
-
+                                                    <a href="/download-invoice/<%= order.orderId %>"
+                                                        class="btn btn-sm btn-outline-secondary" target="_blank">
+                                                        Download Invoice
+                                                    </a>
                                                 </div>
                                             </div>
 
                                             <div class="collapse mt-3" id="orderDetails<%= order._id %>">
                                                 <div class="card card-body">
-                                                    <h6>Order Items:</h6>
-                                                    <% if (order.orderedItems && order.orderedItems.length> 0) { %>
-                                                        <% order.orderedItems.forEach(product=> { %>
-                                                            <div
-                                                                class="d-flex justify-content-between align-items-center mb-2">
-                                                                <div class="d-flex align-items-center">
-                                                                    <% if (product.productImage &&
-                                                                        product.productImage.length> 0) { %>
-                                                                        <img src="<%= product.productImage[0] %>"
-                                                                            alt="<%= product.name %>"
-                                                                            style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
-                                                                        <% } else { %>
-                                                                            <img src="/images/placeholder.jpg"
-                                                                                alt="<%= product.name %>"
-                                                                                style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
-                                                                            <% } %>
-                                                                                <div>
-                                                                                    <p class="mb-0">
-                                                                                        <%= product.name
-                                                                                            || 'Product Name Not Available'
-                                                                                            %>
-                                                                                    </p>
-                                                                                    <small class="text-muted">Quantity:
-                                                                                        <%= product.variant.quantity ||
-                                                                                            1 %></small>
-                                                                                    <small
-                                                                                        class="text-muted d-block">Status:
-                                                                                        <%= product.status ||
-                                                                                            order.status %></small>
-                                                                                </div>
-                                                                </div>
-                                                                <div class="d-flex align-items-center">
-                                                                    <p class="mb-0 me-3">₹<%= product.price ?
-                                                                            product.price.toFixed(2) : '0.00' %>
+                                                    <h6 class="mb-3">Shipping Address:</h6>
+                                                    <% if (order.addressDetails) { %>
+                                                        <div class="address-card p-3 mb-3 bg-light rounded">
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <p class="mb-1"><strong>Name:</strong>
+                                                                        <%= order.addressDetails.name %>
                                                                     </p>
-
-
-                                                                    <% if ((order.status==='Delivered' ) &&
-                                                                        (product.cancelStatus !=='Cancelled' ) &&
-                                                                        (product.returnStatus==='Not Requested' ||
-                                                                        product.returnStatus===undefined)) { %>
-                                                                        <button class="btn btn-warning btn-sm"
-                                                                            onclick="openReturnModal('<%= order.orderId %>', '<%= product._id %>', '<%= product.name %>')">
-                                                                            Return Product
-                                                                        </button>
+                                                                    <p class="mb-1"><strong>Landmark:</strong>
+                                                                        <%= order.addressDetails.landMark %>
+                                                                    </p>
+                                                                    <p class="mb-1"><strong>City, State -
+                                                                            Pincode:</strong>
+                                                                        <%= order.addressDetails.city %>, <%=
+                                                                                order.addressDetails.state %> - <%=
+                                                                                    order.addressDetails.pincode %>
+                                                                    </p>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <p class="mb-1"><strong>Phone:</strong>
+                                                                        <%= order.addressDetails.phoneNumber %>
+                                                                    </p>
+                                                                    <% if (order.addressDetails.altPhone) { %>
+                                                                        <p class="mb-1"><strong>Alt Phone:</strong>
+                                                                            <%= order.addressDetails.altPhone %>
+                                                                        </p>
                                                                         <% } %>
-
-                                                                            <!-- Cancel Product Button (Only shown if product/order status is Pending or Processing) -->
-                                                                            <!-- Inside the order item loop -->
-                                                                            <% if ((product.status==='Pending' ||
-                                                                                product.status==='Processing' ||
-                                                                                (order.status==='Pending' ||
-                                                                                order.status==='Processing' ) &&
-                                                                                !product.status) &&
-                                                                                (!product.cancelStatus ||
-                                                                                product.cancelStatus !=='Cancelled' )) {
-                                                                                %>
-                                                                                <button class="btn btn-danger btn-sm"
-                                                                                onclick="openCancelProductModal('<%= order.orderId %>', '<%= product._id %>', '<%= encodeURIComponent(product.name).replace(/'/g, '\\\'').replace(/"/g, '\\\"') %>')">
-                                                                                    Cancel Product
-                                                                                </button>
-                                                                                <% } %>
                                                                 </div>
                                                             </div>
-                                                            <% }); %>
-                                                                <% } else { %>
-                                                                    <p>No items found in this order.</p>
-                                                                    <% } %>
+                                                        </div>
+                                                        <% } else { %>
+                                                            <p class="text-muted">Address not available</p>
+                                                            <% } %>
+                                                                <hr>
 
-                                                                        <hr>
-                                                                        <div class="d-flex justify-content-between">
-                                                                            <strong>Total:</strong>
-                                                                            <strong>₹<%= order.finalAmount ?
-                                                                                    order.finalAmount.toFixed(2)
-                                                                                    : '0.00' %></strong>
-                                                                        </div>
+                                                                <h6>Order Items:</h6>
+                                                                <% if (order.orderedItems && order.orderedItems.length>
+                                                                    0) { %>
+                                                                    <% order.orderedItems.forEach(product=> { %>
+                                                                        <div
+                                                                            class="d-flex justify-content-between align-items-center mb-2">
+                                                                            <div class="d-flex align-items-center">
+                                                                                <% if (product.productImage &&
+                                                                                    product.productImage.length> 0) { %>
+                                                                                    <img src="<%= product.productImage[0] %>"
+                                                                                        alt="<%= product.name %>"
+                                                                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
+                                                                                    <% } else { %>
+                                                                                        <img src="/images/placeholder.jpg"
+                                                                                            alt="<%= product.name %>"
+                                                                                            style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
+                                                                                        <% } %>
+                                                                                            <div>
+                                                                                                <p class="mb-0">
+                                                                                                    <%= product.name
+                                                                                                        || 'Product Name Not Available'
+                                                                                                        %>
+                                                                                                </p>
+                                                                                                <small
+                                                                                                    class="text-muted">Quantity:
+                                                                                                    <%= product.variant.quantity
+                                                                                                        || 1 %></small>
+                                                                                                <small
+                                                                                                    class="text-muted d-block">Status:
+                                                                                                    <%= product.status
+                                                                                                        || order.status
+                                                                                                        %></small>
+                                                                                            </div>
+                                                                            </div>
+                                                                            <div class="d-flex align-items-center">
+                                                                                <p class="mb-0 me-3">₹<%= product.price
+                                                                                        ? product.price.toFixed(2)
+                                                                                        : '0.00' %>
+                                                                                </p>
 
-                                                                        <div class="mt-3">
-                                                                            <% if (order.status==='Pending' ||
-                                                                                order.status==='Processing' ) { %>
-                                                                                <button class="btn btn-danger btn-sm"
-                                                                                    onclick="openCancelModal('<%= order.orderId %>')">
-                                                                                    Cancel Order
-                                                                                </button>
-                                                                                <% } else { %>
-                                                                                    <span
-                                                                                        class="badge <%= order.status === 'Cancelled' ? 'bg-danger' : (order.status === 'Delivered' ? 'bg-success' : 'bg-secondary') %>">
-                                                                                        <%= order.status %>
-                                                                                    </span>
+                                                                                <% if ((order.status==='Delivered' ) &&
+                                                                                    (product.cancelStatus !=='Cancelled'
+                                                                                    ) &&
+                                                                                    (product.returnStatus==='Not Requested'
+                                                                                    ||
+                                                                                    product.returnStatus===undefined)) {
+                                                                                    %>
+                                                                                    <button
+                                                                                        class="btn btn-warning btn-sm"
+                                                                                        onclick="openReturnModal('<%= order.orderId %>', '<%= product._id %>', '<%= product.name %>')">
+                                                                                        Return Product
+                                                                                    </button>
                                                                                     <% } %>
 
-
+                                                                                        <% if
+                                                                                            ((product.status==='Pending'
+                                                                                            ||
+                                                                                            product.status==='Processing'
+                                                                                            || (order.status==='Pending'
+                                                                                            ||
+                                                                                            order.status==='Processing'
+                                                                                            ) && !product.status) &&
+                                                                                            (!product.cancelStatus ||
+                                                                                            product.cancelStatus
+                                                                                            !=='Cancelled' )) { %>
+                                                                                            <button
+                                                                                                class="btn btn-danger btn-sm"
+                                                                                                onclick="openCancelProductModal('<%= order.orderId %>', '<%= product._id %>', '<%= encodeURIComponent(product.name).replace(/'/g, '\\\'').replace(/"
+                                                                                                /g, '\\\"' ) %>')">
+                                                                                                Cancel Product
+                                                                                            </button>
+                                                                                            <% } %>
+                                                                            </div>
                                                                         </div>
+                                                                        <% }); %>
+                                                                            <% } else { %>
+                                                                                <p>No items found in this order.</p>
+                                                                                <% } %>
 
+                                                                                    <hr>
+                                                                                    <div
+                                                                                        class="d-flex justify-content-between">
+                                                                                        <strong>Total:</strong>
+                                                                                        <strong>₹<%= order.finalAmount ?
+                                                                                                order.finalAmount.toFixed(2)
+                                                                                                : '0.00' %></strong>
+                                                                                    </div>
+
+                                                                                    <div class="mt-3">
+                                                                                        <% if (order.status==='Pending'
+                                                                                            ||
+                                                                                            order.status==='Processing'
+                                                                                            ) { %>
+                                                                                            <button
+                                                                                                class="btn btn-danger btn-sm"
+                                                                                                onclick="openCancelModal('<%= order.orderId %>')">
+                                                                                                Cancel Order
+                                                                                            </button>
+                                                                                            <% } else { %>
+                                                                                                <span
+                                                                                                    class="badge <%= order.status === 'Cancelled' ? 'bg-danger' : (order.status === 'Delivered' ? 'bg-success' : 'bg-secondary') %>">
+                                                                                                    <%= order.status %>
+                                                                                                </span>
+                                                                                                <% } %>
+                                                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -783,59 +822,102 @@
                                             <% } %>
                         </div>
 
+                        <!-- Pagination Controls -->
+                        <% if (pagination.totalPages> 1) { %>
+                            <nav aria-label="Order pagination">
+                                <ul class="pagination justify-content-center mt-4">
+                                    <!-- Previous Button -->
+                                    <li class="page-item <%= pagination.page === 1 ? 'disabled' : '' %>">
+                                        <a class="page-link"
+                                            href="?page=<%= pagination.page - 1 %>&limit=<%= pagination.limit %>"
+                                            aria-label="Previous">
+                                            <span aria-hidden="true">&laquo; Previous</span>
+                                        </a>
+                                    </li>
+
+
+                                    <% for (let i=1; i <=pagination.totalPages; i++) { %>
+                                        <li class="page-item <%= pagination.page === i ? 'active' : '' %>">
+                                            <a class="page-link" href="?page=<%= i %>&limit=<%= pagination.limit %>">
+                                                <%= i %>
+                                            </a>
+                                        </li>
+                                        <% } %>
+
+
+                                            <li
+                                                class="page-item <%= pagination.page === pagination.totalPages ? 'disabled' : '' %>">
+                                                <a class="page-link"
+                                                    href="?page=<%= pagination.page + 1 %>&limit=<%= pagination.limit %>"
+                                                    aria-label="Next">
+                                                    <span aria-hidden="true">Next &raquo;</span>
+                                                </a>
+                                            </li>
+                                </ul>
+                            </nav>
+                            <% } %>
                     </div>
                 </div>
                 <div id="wallet" class="content-section">
-    <div class="profile-card bg-white p-4 rounded">
-        <h4 class="mb-4">Wallet Status</h4>
-        <div class="text-center py-4">
-            <div class="mb-4">
-                <i class="fas fa-wallet fa-3x text-primary"></i>
-            </div>
-            <h3 class="mb-2">₹<%= user.wallet %></h3>
-            <p class="text-muted">Current Balance</p>
-        </div>
-    </div>
-</div>
+                    <div class="profile-card bg-white p-4 rounded">
+                        <h4 class="mb-4">Wallet Status</h4>
+                        <div class="text-center py-4">
+                            <div class="mb-4">
+                                <i class="fas fa-wallet fa-3x text-primary"></i>
+                            </div>
+                            <h3 class="mb-2">₹<%= user.wallet %>
+                            </h3>
+                            <p class="text-muted">Current Balance</p>
+                        </div>
+                    </div>
+                </div>
 
-<div id="wallet-history" class="content-section">
-    <div class="profile-card bg-white p-4 rounded">
-        <h4 class="mb-4">Transaction History</h4>
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Transaction ID</th>
-                        <th>Date</th>
-                        <th>Type</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% if (user.walletHistory && user.walletHistory.length > 0) { %>
-                        <% user.walletHistory.forEach(transaction => { %>
-                            <tr>
-                                <td><%= transaction.transactionId %></td>
-                                <td><%= new Date(transaction.date).toLocaleDateString() %></td>
-                                <td><span class="badge <%= transaction.type === 'credit' ? 'bg-success' : 'bg-danger' %>"><%= transaction.type.toUpperCase() %></span></td>
-                                <td>₹<%= transaction.amount %></td>
-                                <td><span class="badge bg-success">Completed</span></td>
-                            </tr>
-                        <% }) %>
-                    <% } else { %>
-                        <tr>
-                            <td class="text-center text-muted" colspan="5">
-                                <i class="fas fa-history fa-3x mb-3"></i>
-                                <h6>No transactions found</h6>
-                            </td>
-                        </tr>
-                    <% } %>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+                <div id="wallet-history" class="content-section">
+                    <div class="profile-card bg-white p-4 rounded">
+                        <h4 class="mb-4">Transaction History</h4>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Transaction ID</th>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (user.walletHistory && user.walletHistory.length> 0) { %>
+                                        <% user.walletHistory.forEach(transaction=> { %>
+                                            <tr>
+                                                <td>
+                                                    <%= transaction.transactionId %>
+                                                </td>
+                                                <td>
+                                                    <%= new Date(transaction.date).toLocaleDateString() %>
+                                                </td>
+                                                <td><span
+                                                        class="badge <%= transaction.type === 'credit' ? 'bg-success' : 'bg-danger' %>">
+                                                        <%= transaction.type.toUpperCase() %>
+                                                    </span></td>
+                                                <td>₹<%= transaction.amount %>
+                                                </td>
+                                                <td><span class="badge bg-success">Completed</span></td>
+                                            </tr>
+                                            <% }) %>
+                                                <% } else { %>
+                                                    <tr>
+                                                        <td class="text-center text-muted" colspan="5">
+                                                            <i class="fas fa-history fa-3x mb-3"></i>
+                                                            <h6>No transactions found</h6>
+                                                        </td>
+                                                    </tr>
+                                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -889,7 +971,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 
-  
+
 
     <script>
         window.openCancelModal = function (orderId) {
@@ -1284,6 +1366,6 @@
 
 
 
-  </body>
+</body>
 
 </html>

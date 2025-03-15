@@ -429,9 +429,10 @@
       <div class="divider"></div>
       
       <div class="buttons">
-        <a href="/shop" class="btn btn-outline">
-          <i class="fas fa-arrow-right"></i> Continue Shopping
-        </a>
+        <div class="action-buttons">
+          <a href="/shop" class="btn btn-secondary">Continue Shopping</a>
+          <a href="/download-invoice/<%= order.orderId %>" class="btn btn-primary">Download Invoice</a>
+      </div>
       </div>
     </div>
   </main>

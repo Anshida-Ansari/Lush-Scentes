@@ -185,52 +185,60 @@ const resetPassword = async (req, res) => {
         });
     }
 };
-// const userProfile = async (req, res) => {
-//     try {
-//         console.log('Session user:', req.session.user);
-//         const userId = req.session.user._id; 
-       
-//         const userData = await User.findById(userId);
-//         if (!userData) throw new Error('User not found');
-//         const addressData = await Address.findOne({ userID: userId });
-//         const orders = await Order.find({ userId: userId }).sort({ createdOn: -1 });
-//         const product = await Product.findOne();
 
-//         res.render('profile', {
-//             user: userData,
-//             userAddress: addressData,
-//             orders: orders,
-//         });
-//     } catch (error) {
-//         console.error('Error for retrieve profile data', error);
-//         res.status(500).send('Internal Server Error: ' + error.message); // Temporary to see the error
-//     }
-// };
+
+
 const userProfile = async (req, res) => {
     try {
         console.log('Session user:', req.session.user);
         const userId = req.session.user._id;
-        
-        // Pagination parameters
-        const page = parseInt(req.query.page) || 1; // Current page (default: 1)
-        const limit = parseInt(req.query.limit) || 5; // Orders per page (default: 5)
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 3;
         const skip = (page - 1) * limit;
-        
+
         const userData = await User.findById(userId);
         if (!userData) throw new Error('User not found');
-        
+
         const addressData = await Address.findOne({ userID: userId });
-        
-        // Get total count for pagination
+
         const totalOrders = await Order.countDocuments({ userId: userId });
         const totalPages = Math.ceil(totalOrders / limit);
-        
-        // Fetch paginated orders
+
         const orders = await Order.find({ userId: userId })
             .sort({ createdOn: -1 })
             .skip(skip)
-            .limit(limit);
-        
+            .limit(limit)
+            .populate({
+                path: 'orderedItems.product',
+                select: 'productName productImage variants',
+            })
+            .lean();
+
+        for (let order of orders) {
+            const addressDoc = await Address.findOne({ userID: userId });
+            if (addressDoc && addressDoc.address && addressDoc.address.length > 0) {
+                const selectedAddress = addressDoc.address.find(addr => addr._id.toString() === order.address.toString());
+                if (selectedAddress) {
+                    order.addressDetails = {
+                        name: selectedAddress.name,
+                        landMark: selectedAddress.landMark,
+                        city: selectedAddress.city,
+                        state: selectedAddress.state,
+                        pincode: selectedAddress.pincode,
+                        phoneNumber: selectedAddress.phoneNumber,
+                        altPhone: selectedAddress.altPhone
+                    };
+                } else {
+                    console.log(`No matching address found for order ${order._id} with address ID ${order.address}`);
+                    order.addressDetails = null;
+                }
+            } else {
+                console.log(`No address document found for user ${userId}`);
+                order.addressDetails = null;
+            }
+        }
+
         res.render('profile', {
             user: userData,
             userAddress: addressData,
@@ -247,6 +255,7 @@ const userProfile = async (req, res) => {
         res.status(500).send('Internal Server Error: ' + error.message);
     }
 };
+
 const changePassWord = async (req, res) => {
     try {
 

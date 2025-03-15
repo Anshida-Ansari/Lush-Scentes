@@ -4,6 +4,8 @@ const User = require('../../models/userSchema');
 const Product = require('../../models/productSchema');
 const Address = require('../../models/addressShema.js')
 const Coupon = require('../../models/couponShema.js')
+const PDFDocument = require('pdfkit')
+const fs = require('fs')
 const Razorpay = require('razorpay')
 const crypto = require('crypto')
 const mongoose = require('mongoose')
@@ -984,6 +986,302 @@ const handlePaymentDismissal = async (req, res) => {
     }
 };
 
+// const downloadInvoice = async(req,res)=>{
+//     try {
+//         const orderId = req.params.orderId;
+
+//         // Fetch the order with populated product and user data
+//         const order = await Order.findOne({ orderId })
+//             .populate({
+//                 path: 'orderedItems.product',
+//                 select: 'productName variants',
+//             })
+//             .populate({
+//                 path: 'userId',
+//                 select: 'name', 
+//             })
+//             .lean();
+
+//         if (!order) return res.status(404).send('Order not found');
+
+//         // Extract user address (assuming address is an object in the User schema)
+//         const user = order.userId;
+//         if (!user || !user.address) return res.status(404).send('Address not found');
+
+//         // Initialize PDF document
+//         const doc = new PDFDocument({
+//             margin: 50,
+//             size: 'A4',
+//             bufferPages: true,
+//         });
+
+//         res.setHeader('Content-Type', 'application/pdf');
+//         res.setHeader('Content-Disposition', `attachment; filename=invoice-${orderId}.pdf`);
+//         doc.pipe(res);
+
+//         // Header with "LUSH SCENTES" branding
+//         doc.fontSize(24)
+//             .text('LUSH SCENTES', 50, 50, { align: 'left' })
+//             .fontSize(10)
+//             .text('www.lushscentes.com', 50, 80, { align: 'left' }) // Replace with your actual website
+//             .text('support@lushscentes.com', 50, 95, { align: 'left' }) // Replace with your actual email
+//             .text('+91 98765 43210', 50, 110, { align: 'left' }); // Replace with your actual phone number
+
+//         doc.fontSize(20)
+//             .text('INVOICE', 300, 50, { align: 'right', width: 250 })
+//             .fontSize(10)
+//             .text(`Invoice No: ${orderId}`, 300, 80, { align: 'right', width: 250 })
+//             .text(`Date: ${new Date().toLocaleDateString()}`, 300, 95, { align: 'right', width: 250 })
+//             .text(`Order Date: ${new Date(order.createdOn).toLocaleDateString()}`, 300, 110, { align: 'right', width: 250 });
+
+//         doc.moveTo(50, 140).lineTo(550, 140).stroke();
+
+//         // Bill To Section (using user address)
+//         doc.fontSize(14)
+//             .text('Bill To:', 50, 170)
+//             .fontSize(10)
+//             .text(user.name || 'Customer', 50, 190)
+//             .text(user.address.addressLine1 || '', 50, 205)
+//             .text(user.address.addressLine2 || '', 50, 220)
+//             .text(`${user.address.city || ''}, ${user.address.state || ''} - ${user.address.pincode || ''}`, 50, 235)
+//             .text(`Phone: ${user.address.phone || 'N/A'}`, 50, 250);
+
+//         // Items Table
+//         const tableTop = 300;
+//         const tableHeaders = {
+//             item: { x: 50, width: 200 },   // Reduced width to fit size column
+//             size: { x: 250, width: 50 },   // Added size column
+//             qty: { x: 300, width: 70 },
+//             price: { x: 370, width: 90 },
+//             amount: { x: 460, width: 90 },
+//         };
+
+//         doc.rect(50, tableTop - 10, 500, 25).fill('#f6f6f6');
+//         doc.fillColor('black')
+//             .fontSize(10)
+//             .text('Item Description', tableHeaders.item.x, tableTop)
+//             .text('Size', tableHeaders.size.x, tableTop, { width: tableHeaders.size.width, align: 'center' })
+//             .text('Qty', tableHeaders.qty.x, tableTop, { width: tableHeaders.qty.width, align: 'center' })
+//             .text('Unit Price', tableHeaders.price.x, tableTop, { width: tableHeaders.price.width, align: 'right' })
+//             .text('Amount', tableHeaders.amount.x, tableTop, { width: tableHeaders.amount.width, align: 'right' });
+
+//         let yPosition = tableTop + 30;
+//         let subtotal = 0;
+
+//         order.orderedItems.forEach((item) => {
+//             const price = item.variant.salesPrice || item.variant.regularPrice; // Use salesPrice if available
+//             const amount = item.variant.quantity * price;
+//             subtotal += amount;
+
+//             doc.text(item.product.productName, tableHeaders.item.x, yPosition, { width: tableHeaders.item.width })
+//                 .text(item.variant.size, tableHeaders.size.x, yPosition, { width: tableHeaders.size.width, align: 'center' })
+//                 .text(item.variant.quantity.toString(), tableHeaders.qty.x, yPosition, { width: tableHeaders.qty.width, align: 'center' })
+//                 .text(`₹${price.toFixed(2)}`, tableHeaders.price.x, yPosition, { width: tableHeaders.price.width, align: 'right' })
+//                 .text(`₹${amount.toFixed(2)}`, tableHeaders.amount.x, yPosition, { width: tableHeaders.amount.width, align: 'right' });
+
+//             yPosition += 25;
+//         });
+
+//         doc.moveTo(50, yPosition).lineTo(550, yPosition).stroke();
+//         yPosition += 20;
+
+//         // Summary Section
+//         const summaryX = 370;
+//         const summaryWidth = 180;
+
+//         doc.text('Subtotal:', summaryX, yPosition, { width: 90, align: 'right' })
+//             .text(`₹${subtotal.toFixed(2)}`, summaryX + 90, yPosition, { width: 90, align: 'right' });
+
+//         if (order.discount > 0) {
+//             yPosition += 20;
+//             doc.text('Discount:', summaryX, yPosition, { width: 90, align: 'right' })
+//                 .text(`-₹${order.discount.toFixed(2)}`, summaryX + 90, yPosition, { width: 90, align: 'right' });
+//         }
+
+//         if (order.couponApplied && order.couponCode) {
+//             yPosition += 20;
+//             doc.text(`Coupon (${order.couponCode}):`, summaryX, yPosition, { width: 90, align: 'right' });
+//         }
+
+//         yPosition += 25;
+//         doc.rect(summaryX - 10, yPosition - 5, summaryWidth, 25).fill('#f6f6f6');
+//         doc.fillColor('black')
+//             .fontSize(12)
+//             .text('Total:', summaryX, yPosition, { width: 90, align: 'right' })
+//             .text(`₹${order.finalAmount.toFixed(2)}`, summaryX + 90, yPosition, { width: 90, align: 'right' });
+
+//         yPosition += 50;
+//         doc.fontSize(10)
+//             .text('Payment Information', 50, yPosition)
+//             .text(`Method: ${order.paymentMethod}`, 50, yPosition + 15)
+//             .text(`Status: ${order.status === 'Delivered' ? 'Paid' : order.status}`, 50, yPosition + 30);
+
+//         doc.fontSize(10)
+//             .text('Thank you for shopping with LUSH SCENTES!', 50, doc.page.height - 100, { align: 'center' })
+//             .fontSize(8)
+//             .text('Terms & Conditions:', 50, doc.page.height - 80)
+//             .text('1. All prices are in INR and include GST where applicable.', 50, doc.page.height - 70)
+//             .text('2. This is a computer-generated invoice and requires no signature.', 50, doc.page.height - 60);
+
+//         doc.end();
+//     } catch (error) {
+//         console.error('Error generating invoice:', error);
+//         res.status(500).send('Error generating invoice');
+//     }
+
+// }
+const downloadInvoice = async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+
+        // Fetch the order with populated product and user data
+        const order = await Order.findOne({ orderId })
+            .populate({
+                path: 'orderedItems.product',
+                select: 'productName variants',
+            })
+            .populate({
+                path: 'userId',
+                select: 'name', // We only need the user's name here
+            })
+            .lean();
+
+        if (!order) return res.status(404).send('Order not found');
+
+        // Fetch the address from the Address model using userId and order.address
+        const addressDoc = await Address.findOne({ userID: order.userId });
+        if (!addressDoc || !addressDoc.address || addressDoc.address.length === 0) {
+            return res.status(404).send('Address not found');
+        }
+
+        // Find the specific address matching the order.address ObjectId
+        const selectedAddress = addressDoc.address.find(addr => addr._id.toString() === order.address.toString());
+        if (!selectedAddress) return res.status(404).send('Specific address not found');
+
+        // Initialize PDF document
+        const doc = new PDFDocument({
+            margin: 50,
+            size: 'A4',
+            bufferPages: true,
+        });
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=invoice-${orderId}.pdf`);
+        doc.pipe(res);
+
+        // Header with "LUSH SCENTES" branding
+        doc.fontSize(24)
+            .text('LUSH SCENTES', 50, 50, { align: 'left' })
+            .fontSize(10)
+            .text('www.lushscentes.com', 50, 80, { align: 'left' }) // Replace with your actual website
+            .text('support@lushscentes.com', 50, 95, { align: 'left' }) // Replace with your actual email
+            .text('+91 98765 43210', 50, 110, { align: 'left' }); // Replace with your actual phone number
+
+        doc.fontSize(20)
+            .text('INVOICE', 300, 50, { align: 'right', width: 250 })
+            .fontSize(10)
+            .text(`Invoice No: ${orderId}`, 300, 80, { align: 'right', width: 250 })
+            .text(`Date: ${new Date().toLocaleDateString()}`, 300, 95, { align: 'right', width: 250 })
+            .text(`Order Date: ${new Date(order.createdOn).toLocaleDateString()}`, 300, 110, { align: 'right', width: 250 });
+
+        doc.moveTo(50, 140).lineTo(550, 140).stroke();
+
+        // Bill To Section (using selected address from Address model)
+        doc.fontSize(14)
+            .text('Bill To:', 50, 170)
+            .fontSize(10)
+            .text(selectedAddress.name || order.userId.name || 'Customer', 50, 190)
+            .text(selectedAddress.landMark || '', 50, 205) // Using landMark as address line 1
+            .text(`${selectedAddress.city}, ${selectedAddress.state} - ${selectedAddress.pincode}`, 50, 220)
+            .text(`Phone: ${selectedAddress.phoneNumber || 'N/A'}`, 50, 235)
+            .text(`Alt Phone: ${selectedAddress.altPhone || 'N/A'}`, 50, 250);
+
+        // Items Table
+        const tableTop = 300;
+        const tableHeaders = {
+            item: { x: 50, width: 200 },
+            size: { x: 250, width: 50 },
+            qty: { x: 300, width: 70 },
+            price: { x: 370, width: 90 },
+            amount: { x: 460, width: 90 },
+        };
+
+        doc.rect(50, tableTop - 10, 500, 25).fill('#f6f6f6');
+        doc.fillColor('black')
+            .fontSize(10)
+            .text('Item Description', tableHeaders.item.x, tableTop)
+            .text('Size', tableHeaders.size.x, tableTop, { width: tableHeaders.size.width, align: 'center' })
+            .text('Qty', tableHeaders.qty.x, tableTop, { width: tableHeaders.qty.width, align: 'center' })
+            .text('Unit Price', tableHeaders.price.x, tableTop, { width: tableHeaders.price.width, align: 'right' })
+            .text('Amount', tableHeaders.amount.x, tableTop, { width: tableHeaders.amount.width, align: 'right' });
+
+        let yPosition = tableTop + 30;
+        let subtotal = 0;
+
+        order.orderedItems.forEach((item) => {
+            const price = item.variant.salesPrice || item.variant.regularPrice;
+            const amount = item.variant.quantity * price;
+            subtotal += amount;
+
+            doc.text(item.product.productName, tableHeaders.item.x, yPosition, { width: tableHeaders.item.width })
+                .text(item.variant.size, tableHeaders.size.x, yPosition, { width: tableHeaders.size.width, align: 'center' })
+                .text(item.variant.quantity.toString(), tableHeaders.qty.x, yPosition, { width: tableHeaders.qty.width, align: 'center' })
+                .text(`₹${price.toFixed(2)}`, tableHeaders.price.x, yPosition, { width: tableHeaders.price.width, align: 'right' })
+                .text(`₹${amount.toFixed(2)}`, tableHeaders.amount.x, yPosition, { width: tableHeaders.amount.width, align: 'right' });
+
+            yPosition += 25;
+        });
+
+        doc.moveTo(50, yPosition).lineTo(550, yPosition).stroke();
+        yPosition += 20;
+
+        // Summary Section
+        const summaryX = 370;
+        const summaryWidth = 180;
+
+        doc.text('Subtotal:', summaryX, yPosition, { width: 90, align: 'right' })
+            .text(`₹${subtotal.toFixed(2)}`, summaryX + 90, yPosition, { width: 90, align: 'right' });
+
+        if (order.discount > 0) {
+            yPosition += 20;
+            doc.text('Discount:', summaryX, yPosition, { width: 90, align: 'right' })
+                .text(`-₹${order.discount.toFixed(2)}`, summaryX + 90, yPosition, { width: 90, align: 'right' });
+        }
+
+        if (order.couponApplied && order.couponCode) {
+            yPosition += 20;
+            doc.text(`Coupon (${order.couponCode}):`, summaryX, yPosition, { width: 90, align: 'right' });
+        }
+
+        yPosition += 25;
+        doc.rect(summaryX - 10, yPosition - 5, summaryWidth, 25).fill('#f6f6f6');
+        doc.fillColor('black')
+            .fontSize(12)
+            .text('Total:', summaryX, yPosition, { width: 90, align: 'right' })
+            .text(`₹${order.finalAmount.toFixed(2)}`, summaryX + 90, yPosition, { width: 90, align: 'right' });
+
+        // Payment Information
+        yPosition += 50;
+        doc.fontSize(10)
+            .text('Payment Information', 50, yPosition)
+            .text(`Method: ${order.paymentMethod}`, 50, yPosition + 15)
+            .text(`Status: ${order.status === 'Delivered' ? 'Paid' : order.status}`, 50, yPosition + 30);
+
+        // Footer
+        doc.fontSize(10)
+            .text('Thank you for shopping with LUSH SCENTES!', 50, doc.page.height - 100, { align: 'center' })
+            .fontSize(8)
+            .text('Terms & Conditions:', 50, doc.page.height - 80)
+            .text('1. All prices are in INR and include GST where applicable.', 50, doc.page.height - 70)
+            .text('2. This is a computer-generated invoice and requires no signature.', 50, doc.page.height - 60);
+
+        doc.end();
+    } catch (error) {
+        console.error('Error generating invoice:', error);
+        res.status(500).send('Error generating invoice');
+    }
+};
+
 
 
 module.exports = {
@@ -999,6 +1297,7 @@ module.exports = {
     returnProduct,
     createRazorpayOrder,
     handlePaymentDismissal,
-    verifyRazorpayPayment
+    verifyRazorpayPayment,
+    downloadInvoice
    
 };

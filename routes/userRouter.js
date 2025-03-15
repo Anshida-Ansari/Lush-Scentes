@@ -92,6 +92,8 @@ router.post('/add-checkout-address',userAuth,checkoutController.addressPost)
 router.get('/edit-address/:id',userAuth,checkoutController.loadcheckoutEditAddress)
 router.post('/edit-address/:id', checkoutController.editAddressCheckout);
 router.get('/thank-you', userAuth, checkoutController.loadThankYouPage);
+router.get('/download-invoice/:orderId',userAuth,checkoutController.downloadInvoice);
+
 
 
 router.post('/create-razorpay-order',checkoutController.createRazorpayOrder)
