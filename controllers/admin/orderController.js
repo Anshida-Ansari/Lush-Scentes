@@ -126,79 +126,110 @@ const updateStatus = async (req, res) => {
   };
 
 
-const approveReturn = async (req, res) => {
-  try {
-      const { orderId, productId } = req.body;
-
-      const order = await Order.findOne({ _id: orderId });
-      if (!order) {
-          return res.status(400).json({ success: false, message: 'Order is not found' });
-      }
-
-      const itemIndex = order.orderedItems.findIndex(
-          item => item._id.toString() === productId
-      );
-
-      if (itemIndex === -1) {
-          return res.status(404).json({ 
-              success: false, 
-              message: 'Product not found in this order' 
-          });
-      }
-
-      const item = order.orderedItems[itemIndex];
-
-      if (item.returnStatus !== 'Requested') {
-          return res.status(400).json({ 
-              success: false, 
-              message: 'No active return request found for this product' 
-          });
-      }
-
-      order.orderedItems[itemIndex].returnStatus = 'Approved';
-
-      try {
-          const product = await Product.findById(item.product);
-          if (product) {
-              const variantIndex = product.variants.findIndex(
-                  v => v.size === item.variant.size
-              );
-              if (variantIndex !== -1) {
-                  product.variants[variantIndex].quantity += item.variant.quantity;
-                  product.totalStock += item.variant.quantity;
-                  await product.save();
-              }
-          }
-      } catch (error) {
-          console.error(`Error updating stock for product ${item.product}: ${error.message}`);
-      }
-
-      
-      const allItemsProcessed = order.orderedItems.every(item => 
-          item.cancelStatus === 'Cancelled' || 
-          item.returnStatus === 'Approved' || 
-          item.returnStatus === 'Rejected' || 
-          (item.returnStatus === 'Not Requested' && !item.cancelStatus)
-      );
-      if (allItemsProcessed) {
-          order.status = order.orderedItems.some(item => item.returnStatus === 'Approved') ? 'Returned' : 'Delivered';
-      }
-
-      await order.save();
-
-      return res.status(200).json({ 
-          success: true, 
-          message: 'Return request approved successfully'
-      });
-
-  } catch (error) {
-      console.error(`Error approving return: ${error.message}`);
-      return res.status(500).json({ 
-          success: false, 
-          message: 'Error approving return'
-      });
-  }
-};
+  const approveReturn = async (req, res) => {
+    try {
+        const { orderId, productId } = req.body;
+        const userId = req.session.user; 
+  
+        const order = await Order.findOne({ _id: orderId });
+        if (!order) {
+            return res.status(400).json({ success: false, message: 'Order is not found' });
+        }
+  
+        const itemIndex = order.orderedItems.findIndex(
+            item => item._id.toString() === productId
+        );
+  
+        if (itemIndex === -1) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Product not found in this order' 
+            });
+        }
+  
+        const item = order.orderedItems[itemIndex];
+  
+        if (item.returnStatus !== 'Requested') {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'No active return request found for this product' 
+            });
+        }
+  
+        const refundAmount = item.price * item.variant.quantity;
+  
+        order.orderedItems[itemIndex].returnStatus = 'Approved';
+  
+        try {
+            const product = await Product.findById(item.product);
+            if (product) {
+                const variantIndex = product.variants.findIndex(
+                    v => v.size === item.variant.size
+                );
+                if (variantIndex !== -1) {
+                    product.variants[variantIndex].quantity += item.variant.quantity;
+                    product.totalStock += item.variant.quantity;
+                    await product.save();
+                }
+            }
+        } catch (error) {
+            console.error(`Error updating stock for product ${item.product}: ${error.message}`);
+        }
+  
+        const allItemsProcessed = order.orderedItems.every(item => 
+            item.cancelStatus === 'Cancelled' || 
+            item.returnStatus === 'Approved' || 
+            item.returnStatus === 'Rejected' || 
+            (item.returnStatus === 'Not Requested' && !item.cancelStatus)
+        );
+        if (allItemsProcessed) {
+            order.status = order.orderedItems.some(item => item.returnStatus === 'Approved') 
+                ? 'Returned' 
+                : 'Delivered';
+        }
+  
+        let currentWalletBalance = 0;
+        if (order.paymentMethod !== 'Cash on Delivery') {
+            const user = await User.findById(userId);
+            if (!user) {
+                return res.status(404).json({ 
+                    success: false, 
+                    message: 'User not found' 
+                });
+            }
+            user.wallet = (parseFloat(user.wallet) || 0) + refundAmount;
+            user.walletHistory.push({
+                transactionId: `TXN${Date.now()}`,
+                type: 'credit',
+                amount: refundAmount,
+                date: new Date(),
+            });
+            await user.save();
+            currentWalletBalance = user.wallet;
+        }
+  
+        await order.save();
+  
+        return res.status(200).json({ 
+            success: true, 
+            message: 'Return request approved successfully',
+            refundAmount: refundAmount,
+            currentWalletBalance: currentWalletBalance,
+            order: {
+                status: order.status,
+                finalAmount: order.finalAmount
+            }
+        });
+  
+    } catch (error) {
+        console.error(`Error approving return: ${error.message}`);
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Error approving return',
+            error: error.message
+        });
+    }
+  };
 
 const rejectReturn = async (req, res) => {
   try {

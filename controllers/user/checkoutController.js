@@ -414,11 +414,15 @@ const editAddressCheckout = async (req,res)=>{
 }
 
 const cancelOrder = async (req,res) =>{
+    console.log("reached cancelorder")
     try {
 
         const { orderId , reason} = req.body
+        const userId = req.session.user;
+
 
         const order = await Order.findOne({ orderId }).populate('orderedItems.product')
+        console.log("ordercancle",order)
         
         if(!order){
             return res.status(404).json({success: false , message: 'Order is not found'})
@@ -430,6 +434,9 @@ const cancelOrder = async (req,res) =>{
                 message: 'Cannot cancel order.Order status must be Pending or Processing '
             })
         }
+
+        let refundAmount = order.finalAmount
+        console.log("cancel prduct",refundAmount)
 
         order.status = 'Cancelled'
         order.cancellationReason = reason || 'No reason provided';
@@ -448,14 +455,36 @@ const cancelOrder = async (req,res) =>{
                 }
             }
         }
-            
+        
+        let currentWalletBalance = 0;
+        if (order.paymentMethod !== 'Cash on Delivery') {
+console.log("order cancel reashced aller")
+            const user = await User.findById(userId);
+            user.wallet = (parseFloat(user.wallet) || 0) + refundAmount;            user.walletHistory.push({
+                transactionId: `TXN${Date.now()}`,
+                type: 'credit',
+                amount: refundAmount,
+                date: new Date(),
+            });
+            await user.save();
+            currentWalletBalance = user.wallet;
+            console.log('jfalsjdf',currentWalletBalance)
+        }
+
         
     
 
         await order.save()
         return res.status(200).json({
             success: true,
-            message: 'Order cancelled successfully'
+            message: 'Order cancelled successfully',
+            refundDetails: {
+                itemPrice: order.finalAmount,
+            },
+            orderTotals: {
+                finalAmount: order.finalAmount
+            },
+            currentWalletBalance
         })
 
 
@@ -476,6 +505,7 @@ const cancelOrder = async (req,res) =>{
 
 const cancelProduct = async (req, res) => {
     try {
+        const userId = req.session.user
         const { orderId, productId, reason } = req.body;
 
         const order = await Order.findOne({ orderId }).populate('orderedItems.product');
@@ -500,8 +530,9 @@ const cancelProduct = async (req, res) => {
                 message: 'Product can only be cancelled when order is Pending or Processing' 
             });
         }
-
+        
         const item = order.orderedItems[itemIndex];
+        const refundAmount = item.price * item.variant.quantity;
         item.cancelStatus = 'Cancelled';
         item.cancellationReason = reason || 'No reason provided';
         item.cancelledAt = new Date();
@@ -528,6 +559,21 @@ const cancelProduct = async (req, res) => {
             order.finalAmount = order.orderedItems
                 .filter(item => item.cancelStatus !== 'Cancelled')
                 .reduce((sum, item) => sum + (item.price * item.variant.quantity), 0);
+        }
+
+        let currentWalletBalance = 0;
+        if (order.paymentMethod !== 'Cash on Delivery') {
+        console.log("order cancel reashced aller")
+            const user = await User.findById(userId);
+            user.wallet = (parseFloat(user.wallet) || 0) + refundAmount;            user.walletHistory.push({
+                transactionId: `TXN${Date.now()}`,
+                type: 'credit',
+                amount: refundAmount,
+                date: new Date(),
+            });
+            await user.save();
+            currentWalletBalance = user.wallet;
+            console.log('jfalsjdf',currentWalletBalance)
         }
 
         await order.save();
