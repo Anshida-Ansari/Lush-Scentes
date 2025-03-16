@@ -12,6 +12,11 @@
     .form-select, .form-control {
         margin-bottom: 10px;
     }
+    .error-message {
+        color: red;
+        font-size: 0.9em;
+        display: none;
+    }
 </style>
 
 <section class="content-main">
@@ -40,7 +45,7 @@
 
     <div class="card">
         <div class="card-body">
-            <form action="/admin/dashboard" method="GET">
+            <form action="/admin/dashboard" method="GET" id="filterForm" onsubmit="return validateForm(event)">
                 <div class="row">
                     <div class="col-md-3">
                         <label class="form-label">Filter:</label>
@@ -55,10 +60,12 @@
                     <div class="col-md-3" id="startDateDiv" <%= selectedFilter !== 'custom' ? 'style="display:none"' : '' %>>
                         <label class="form-label">Start Date:</label>
                         <input type="date" name="startDate" class="form-control" value="<%= startDate %>">
+                        <div id="startDateError" class="error-message"></div>
                     </div>
                     <div class="col-md-3" id="endDateDiv" <%= selectedFilter !== 'custom' ? 'style="display:none"' : '' %>>
                         <label class="form-label">End Date:</label>
                         <input type="date" name="endDate" class="form-control" value="<%= endDate %>">
+                        <div id="endDateError" class="error-message"></div>
                     </div>
                     <div class="col-md-3 d-flex align-items-end">
                         <button type="submit" class="btn btn-primary">Apply Filter</button>
@@ -128,7 +135,7 @@
                                     <% order.orderedItems.forEach(item => { %>
                                         <div>
                                             <%= item.product?.productName || 'N/A' %> 
-                                            (Qty: <%= item.quantity %>)
+                                            (Qty: <%= item.variant?.quantity || 0 %>)
                                         </div>
                                     <% }) %>
                                 </td>
@@ -159,6 +166,7 @@
     </div>
 </section>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function toggleDateInputs(select) {
         const startDateDiv = document.getElementById('startDateDiv');
@@ -166,6 +174,61 @@
         const isCustom = select.value === 'custom';
         startDateDiv.style.display = isCustom ? 'block' : 'none';
         endDateDiv.style.display = isCustom ? 'block' : 'none';
+    }
+
+    function validateForm(event) {
+        event.preventDefault(); 
+
+        const filter = document.querySelector('select[name="filter"]').value;
+        const startDateInput = document.querySelector('input[name="startDate"]');
+        const endDateInput = document.querySelector('input[name="endDate"]');
+        const startDateError = document.getElementById('startDateError');
+        const endDateError = document.getElementById('endDateError');
+
+        startDateError.style.display = 'none';
+        endDateError.style.display = 'none';
+        startDateError.textContent = '';
+        endDateError.textContent = '';
+
+        if (filter !== 'custom') {
+            event.target.submit(); 
+            return true;
+        }
+
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+        const today = new Date().toISOString().split('T')[0]; 
+
+        if (!startDate) {
+            startDateError.textContent = 'Start date is required.';
+            startDateError.style.display = 'block';
+            return false;
+        }
+        if (!endDate) {
+            endDateError.textContent = 'End date is required.';
+            endDateError.style.display = 'block';
+            return false;
+        }
+
+        if (new Date(endDate) < new Date(startDate)) {
+            endDateError.textContent = 'End date cannot be before start date.';
+            endDateError.style.display = 'block';
+            return false;
+        }
+
+        if (startDate > today) {
+            startDateError.textContent = 'Start date cannot be in the future.';
+            startDateError.style.display = 'block';
+            return false;
+        }
+        if (endDate > today) {
+            endDateError.textContent = 'End date cannot be in the future.';
+            endDateError.style.display = 'block';
+            return false;
+        }
+
+        event.target.submit();
+        return true;
     }
 </script>
 
