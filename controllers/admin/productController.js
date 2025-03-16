@@ -113,8 +113,10 @@ const getAllProducts = async (req, res) => {
       ],
     })
       .populate('category')
+      .sort({ createdAt: -1 })
       .limit(limit)
       .skip((page - 1) * limit);
+      
 
     const totalProducts = await Product.countDocuments({
       $or: [
