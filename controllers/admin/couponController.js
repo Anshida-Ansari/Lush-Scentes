@@ -1,6 +1,9 @@
 const User = require('../../models/userSchema')
 const Order = require('../../models/orderSchema')
 const Coupon = require('../../models/couponShema')
+const Category = require('../../models/categorySchema')
+const Product = require('../../models/productSchema')
+
 
 const loadCoupon = async(req,res)=>{
     try {

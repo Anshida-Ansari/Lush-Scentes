@@ -16,7 +16,12 @@ router.get('/pageerror', adminController.pageerror)
 router.get('/login',isLogin,adminController.loadLogin)
 router.post('/login',isLogin,adminController.login)
 
-router.get('/dashboard', isAuthenticated, adminController.loadDashboard)
+router.get('/dashboard', isAuthenticated, adminController.loadDashboard);
+router.get('/dashboard/analytics', isAuthenticated, adminController.getAnalyticsData);
+router.get('/dashboard/top-performers', isAuthenticated, adminController.getTopPerformers);
+router.get('/sales-report', isAuthenticated, adminController.generateSalesReport);
+router.get('/download/excel', isAuthenticated, adminController.downloadExcelReport);
+router.get('/download/pdf', isAuthenticated, adminController.downloadPDFReport);
 
 router.get('/logout', adminController.logout)
 

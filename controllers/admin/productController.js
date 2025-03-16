@@ -1,6 +1,5 @@
 const Product = require('../../models/productSchema')
 const Category = require('../../models/categorySchema')
-const Brand = require('../../models/bannerSchema')
 const User = require('../../models/userSchema')
 const fs = require('fs')
 const path = require('path')

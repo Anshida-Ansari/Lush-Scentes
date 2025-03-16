@@ -1,10 +1,172 @@
 <%- include("../../views/partials/admin/header") %>
+<style>
+    .card {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    .table-responsive {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .form-select, .form-control {
+        margin-bottom: 10px;
+    }
+</style>
+
 <section class="content-main">
     <div class="content-header">
         <div>
-            <h2 class="content-title card-title">Dashboard </h2>
+            <h2 class="content-title card-title">Dashboard</h2>
+            <p>Sales Report and Overview</p>
         </div>
-       
+        <div>
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="downloadReportDropdown" 
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    Download Report
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="downloadReportDropdown">
+                    <li><a class="dropdown-item" 
+                          href="/admin/download/excel?filter=<%= selectedFilter %>&startDate=<%= startDate %>&endDate=<%= endDate %>">
+                          Export Excel</a></li>
+                    <li><a class="dropdown-item" 
+                          href="/admin/download/pdf?filter=<%= selectedFilter %>&startDate=<%= startDate %>&endDate=<%= endDate %>">
+                          Export PDF</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form action="/admin/dashboard" method="GET">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label class="form-label">Filter:</label>
+                        <select name="filter" class="form-select" onchange="toggleDateInputs(this)">
+                            <option value="daily" <%= selectedFilter === 'daily' ? 'selected' : '' %>>Daily</option>
+                            <option value="weekly" <%= selectedFilter === 'weekly' ? 'selected' : '' %>>Weekly</option>
+                            <option value="monthly" <%= selectedFilter === 'monthly' ? 'selected' : '' %>>Monthly</option>
+                            <option value="yearly" <%= selectedFilter === 'yearly' ? 'selected' : '' %>>Yearly</option>
+                            <option value="custom" <%= selectedFilter === 'custom' ? 'selected' : '' %>>Custom</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3" id="startDateDiv" <%= selectedFilter !== 'custom' ? 'style="display:none"' : '' %>>
+                        <label class="form-label">Start Date:</label>
+                        <input type="date" name="startDate" class="form-control" value="<%= startDate %>">
+                    </div>
+                    <div class="col-md-3" id="endDateDiv" <%= selectedFilter !== 'custom' ? 'style="display:none"' : '' %>>
+                        <label class="form-label">End Date:</label>
+                        <input type="date" name="endDate" class="form-control" value="<%= endDate %>">
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary">Apply Filter</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6>Total Sales</h6>
+                    <h4>₹<%= totalSales.toFixed(2) %></h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6>Total Orders</h6>
+                    <h4><%= totalOrders %></h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6>Total Discount</h6>
+                    <h4>₹<%= totalDiscount.toFixed(2) %></h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6>Total Users</h6>
+                    <h4><%= totalUsers %></h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h4>Sales Details</h4>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Products</th>
+                            <th>Total Price</th>
+                            <th>Discount</th>
+                            <th>Final Amount</th>
+                            <th>Coupon</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% orders.forEach(order => { %>
+                            <tr>
+                                <td><%= order.orderId %></td>
+                                <td><%= order.createdOn.toLocaleDateString() %></td>
+                                <td>
+                                    <% order.orderedItems.forEach(item => { %>
+                                        <div>
+                                            <%= item.product?.productName || 'N/A' %> 
+                                            (Qty: <%= item.quantity %>)
+                                        </div>
+                                    <% }) %>
+                                </td>
+                                <td>₹<%= order.totalPrice.toFixed(2) %></td>
+                                <td>₹<%= order.discount.toFixed(2) %></td>
+                                <td>₹<%= order.finalAmount.toFixed(2) %></td>
+                                <td><%= order.couponCode || 'N/A' %></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+
+            <% if (totalPages > 1) { %>
+                <nav class="mt-3">
+                    <ul class="pagination justify-content-center">
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                            <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                <a class="page-link" href="/admin/dashboard?page=<%= i %>&filter=<%= selectedFilter %>&startDate=<%= startDate %>&endDate=<%= endDate %>">
+                                    <%= i %>
+                                </a>
+                            </li>
+                        <% } %>
+                    </ul>
+                </nav>
+            <% } %>
+        </div>
     </div>
 </section>
+
+<script>
+    function toggleDateInputs(select) {
+        const startDateDiv = document.getElementById('startDateDiv');
+        const endDateDiv = document.getElementById('endDateDiv');
+        const isCustom = select.value === 'custom';
+        startDateDiv.style.display = isCustom ? 'block' : 'none';
+        endDateDiv.style.display = isCustom ? 'block' : 'none';
+    }
+</script>
+
 <%- include("../../views/partials/admin/footer") %>
