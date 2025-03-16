@@ -270,11 +270,26 @@ h4 {
             </div>
     
             <div class="row mt-3">
-              <div class="col-md-12">
-                <h5 style="color: black;"><strong>Reviews</strong></h5>
-                <p>⭐ 4.5 (Based on 120 reviews)</p>
-              </div>
-            </div>
+  <div class="col-md-12">
+    <h5 style="color: black;"><strong>Reviews</strong></h5>
+    <p>
+      <% if (averageRating > 0) { %>
+        <% for (let i = 0; i < 5; i++) { %>
+          <% if (i < Math.floor(averageRating)) { %>
+            <span class="icon-star2 text-warning"></span>
+          <% } else if (i < averageRating && i >= Math.floor(averageRating)) { %>
+            <span class="icon-star-half text-warning"></span> <!-- Assuming you have a half-star icon -->
+          <% } else { %>
+            <span class="icon-star-o text-muted"></span>
+          <% } %>
+        <% } %>
+        (<%= averageRating %> based on <%= product.reviews.length %> review<%= product.reviews.length !== 1 ? 's' : '' %>)
+      <% } else { %>
+        No reviews yet.
+      <% } %>
+    </p>
+  </div>
+</div>
         
             <div class="product-variants mt-4">
               <h5 class="mb-3">Product Variants</h5>
@@ -569,7 +584,54 @@ h4 {
               icon: 'success',
               confirmButtonColor: '#3085d6',
             }).then(() => {
-              location.reload();
+              // Update the rating display
+              const averageRatingElement = $('.reviews-rating');
+              if (averageRatingElement.length) {
+                let stars = '';
+                for (let i = 0; i < 5; i++) {
+                  if (i < Math.floor(response.averageRating)) {
+                    stars += '<span class="icon-star2 text-warning"></span>';
+                  } else if (i < response.averageRating && i >= Math.floor(response.averageRating)) {
+                    stars += '<span class="icon-star-half text-warning"></span>'; // Half-star
+                  } else {
+                    stars += '<span class="icon-star-o text-muted"></span>';
+                  }
+                }
+                averageRatingElement.html(`${stars} (${response.averageRating} based on ${parseInt(averageRatingElement.text().match(/\d+/) || 0) + 1} reviews)`);
+              }
+
+              // Add the new review to the reviews list
+              const reviewsList = $('.reviews-list');
+              if (reviewsList.length) {
+                const newReviewHtml = `
+                  <div class="review-card mb-4 p-3 border rounded">
+                    <div class="d-flex justify-content-between">
+                      <div class="reviewer-info">
+                        <h6 class="mb-0 fw-bold">${response.newReview.name}</h6>
+                        <small class="text-muted">${response.newReview.email}</small>
+                      </div>
+                      <div class="review-date">
+                        <small class="text-muted">${new Date().toLocaleDateString()}</small>
+                      </div>
+                    </div>
+                    <div class="rating-stars my-2">
+                      ${Array(response.newReview.rating).fill('<i class="icon-star2 text-warning"></i>').join('')}${Array(5 - response.newReview.rating).fill('<i class="icon-star-o text-muted"></i>').join('')}
+                    </div>
+                    <p class="review-text mb-0">${response.newReview.review}</p>
+                  </div>
+                `;
+                reviewsList.append(newReviewHtml);
+
+                // Update the review count badge
+                const badge = $('.badge.bg-primary');
+                if (badge.length) {
+                  const currentCount = parseInt(badge.text()) || 0;
+                  badge.text(`${currentCount + 1} Review${currentCount + 1 > 1 ? 's' : ''}`);
+                }
+              }
+
+              // Clear the form
+              $('#reviewForm')[0].reset();
             });
           } else {
             Swal.fire({
