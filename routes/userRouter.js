@@ -47,6 +47,7 @@ async (req,res)=>{
 
 router.get('/productDetailsPage', productController.productDetails)
 router.get('/productDetailsPage/:id/stock',productController.getProductStock)
+router.post('/productDetailsPage/review',productController.submitReview)
 
 router.get('/login',userLogin,userControllers.loadLogin)
 router.post('/login',userLogin,userControllers.login)

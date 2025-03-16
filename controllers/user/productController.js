@@ -86,8 +86,52 @@ const getProductStock = async (req, res) => {
 };
 
 
+const submitReview = async(req,res)=>{
+    try {
+
+        const userId = req.session.user
+        if(!userId){
+            return res.status(404).json({
+                success: false, 
+                message: 'Please log in to submit a review'
+            })
+        }
+
+        const {productId,review,rating} = req.body
+        const user = await User.findById(userId)
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+          }
+
+          const product = await Product.findById(productId);
+          if (!product) {
+              return res.status(404).json({ success: false, message: 'Product not found' });
+            }
+
+            const newReview = {
+                user: userId,
+                name: user.name, 
+                email: user.email, 
+                review,
+                rating: parseInt(rating),
+              };
+          
+              product.reviews.push(newReview);
+              await product.save();
+          
+              res.status(200).json({ success: true, message: 'Review submitted successfully' });
+        
+    } catch (error) {
+        console.error('Error submitting review:', error);
+    res.status(500).json({ success: false, message: 'Error submitting review' });
+  
+        
+    }
+}
+
 module.exports = {
     productDetails,
     getProductStock,
+    submitReview
 };
 

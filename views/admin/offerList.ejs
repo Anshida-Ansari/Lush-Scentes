@@ -4,6 +4,11 @@
 
 <style>
 
+.btn-sm.btn-primary, .btn-sm.btn-danger {
+    min-width: 70px;
+    white-space: nowrap;
+    display: inline-block;
+}
 .pagination-container {
     padding: 15px 0;
 }
@@ -69,14 +74,14 @@
                                 <td><%= new Date(offer.endDate).toLocaleDateString() %></td>
                                 <td>
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-sm btn-primary" style="width: 70px;" onclick="editOffer('<%= JSON.stringify(offer) %>')">
+                                        <button class="btn btn-sm btn-primary" onclick="editOffer('<%= JSON.stringify(offer) %>')">
                                             Edit
                                         </button>
-                                        <button class="btn btn-sm btn-danger" style="width: 70px;" onclick="removeOffer('<%= offer._id %>')">
+                                        <button class="btn btn-sm btn-danger" onclick="removeOffer('<%= offer._id %>')">
                                             Remove
                                         </button>
                                     </div>
-                                </td>
+                                </td>                     
                             </tr>
                         <% }); %>
                     </tbody>

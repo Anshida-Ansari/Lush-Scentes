@@ -39,7 +39,7 @@ const productSchema = new Schema({
       quantity: {
         type: Number,
         required: true,
-        min: 0
+        min: 0,
       },
       regularPrice: {
         type: Number,
@@ -48,13 +48,47 @@ const productSchema = new Schema({
       salesPrice: {
         type: Number,
       },
-
-    }
+    },
   ],
   totalStock: {
     type: Number,
-    default: 0
-  }
+    default: 0,
+  },
+  rating: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 5, // Assuming this is an average rating
+  },
+  reviews: [{
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    name: { // Optional if you fetch from User, but keep for display consistency
+      type: String,
+      required: true,
+    },
+    email: { // Optional if you fetch from User
+      type: String,
+      required: true,
+    },
+    rating: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5,
+    },
+    review: {
+      type: String,
+      required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+  }],
 }, { timestamps: true });
 
 const Product = mongoose.model('Product', productSchema);
