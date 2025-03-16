@@ -28,75 +28,210 @@ const getProductAddPage = async (req, res) => {
 };
 
 
-const addProducts = async (req, res) => {
-  try {
-    const products = req.body;
+// const addProducts = async (req, res) => {
+//   try {
+//     const products = req.body;
 
  
-    if (!req.files || !req.files.productImages || req.files.productImages.length < 3) {
-      return res.status(400).json({ success: false, error: 'At least 3 product images are required' });
-    }
+//     if (!req.files || !req.files.productImages || req.files.productImages.length < 3) {
+//       return res.status(400).json({ success: false, error: 'At least 3 product images are required' });
+//     }
 
  
-    const productExists = await Product.findOne({ productName: products.productName });
-    if (productExists) {
-      return res.status(400).json({ success: false, error: 'Product already exists, please try with another name' });
-    }
+//     const productExists = await Product.findOne({ productName: products.productName });
+//     if (productExists) {
+//       return res.status(400).json({ success: false, error: 'Product already exists, please try with another name' });
+//     }
 
     
-    const categoryId = await Category.findOne({ name: products.category });
+//     const categoryId = await Category.findOne({ name: products.category });
+//     if (!categoryId) {
+//       return res.status(400).json({ success: false, error: 'Invalid category name' });
+//     }
+
+   
+//     const variants = JSON.parse(products.variants).map((variant) => ({
+//       size: variant.size,
+//       quantity: variant.quantity,
+//       regularPrice: variant.regularPrice,
+//       salesPrice: variant.salesPrice,
+//     }));
+
+//     const totalStock = variants.reduce((sum, variant) => sum + variant.quantity, 0);
+
+    
+//     const imagePaths = [];
+//     for (const file of req.files.productImages) {
+//       const b64 = Buffer.from(file.buffer).toString('base64');
+//       const dataURI = `data:${file.mimetype};base64,${b64}`;
+//       try {
+//         const result = await cloudinary.handleUpload(dataURI);
+//         imagePaths.push(result.secure_url);
+//         console.log(`Upload to Cloudinary:`, result.secure_url);
+//       } catch (error) {
+//         console.error(`Error uploading to Cloudinary:`, error);
+//         return res.status(500).json({ success: false, error: 'Failed to upload image to Cloudinary' });
+//       }
+//     }
+
+//     if (imagePaths.length < 3) {
+//       return res.status(400).json({ success: false, error: 'Failed to upload at least 3 images' });
+//     }
+
+//     const newProduct = new Product({
+//       productName: products.productName,
+//       description: products.description,
+//       category: categoryId._id,
+//       productImage: imagePaths,
+//       variants: variants,
+//       totalStock: totalStock,
+//       status: 'Available',
+//     });
+
+//     await newProduct.save();
+//     console.log('Product saved:', newProduct);
+
+//     return res.status(200).json({ success: true, message: 'Product added successfully', redirectUrl: '/admin/products' });
+//   } catch (error) {
+//     console.error('Error saving product:', error);
+//     return res.status(500).json({ success: false, error: 'Server error while saving product' });
+//   }
+// };
+
+const addProducts = async (req, res) => {
+  try {
+    const { productName, description, category, variants } = req.body;
+
+    // Server-side validation
+    if (!productName || !description || !category || !variants) {
+      return res.status(400).json({ success: false, error: 'All fields (Product Name, Description, Category, Variants) are required' });
+    }
+
+    if (!/^[a-zA-Z0-9\s]{3,100}$/.test(productName.trim())) {
+      return res.status(400).json({
+        success: false,
+        error: 'Product name must be 3-100 characters long and contain only alphanumeric characters and spaces',
+      });
+    }
+
+    if (description.trim().length < 10 || description.trim().length > 1000) {
+      return res.status(400).json({
+        success: false,
+        error: 'Description must be between 10 and 1000 characters',
+      });
+    }
+
+    const categoryId = await Category.findOne({ name: category });
     if (!categoryId) {
       return res.status(400).json({ success: false, error: 'Invalid category name' });
     }
 
-   
-    const variants = JSON.parse(products.variants).map((variant) => ({
-      size: variant.size,
-      quantity: variant.quantity,
-      regularPrice: variant.regularPrice,
-      salesPrice: variant.salesPrice,
-    }));
+    let parsedVariants;
+    try {
+      parsedVariants = JSON.parse(variants);
+      if (!Array.isArray(parsedVariants) || parsedVariants.length === 0) {
+        throw new Error('Variants must be a non-empty array');
+      }
+    } catch (e) {
+      return res.status(400).json({ success: false, error: 'Invalid variants format' });
+    }
 
-    const totalStock = variants.reduce((sum, variant) => sum + variant.quantity, 0);
+    const variantsArray = parsedVariants.map((variant) => {
+      const quantity = parseInt(variant.quantity);
+      const regularPrice = parseFloat(variant.regularPrice);
+      const salesPrice = variant.salesPrice ? parseFloat(variant.salesPrice) : null;
 
-    
+      if (!['15ml', '50ml', '100ml'].includes(variant.size)) {
+        throw new Error(`Invalid size: ${variant.size}`);
+      }
+      if (isNaN(quantity) || quantity < 0) {
+        throw new Error('Quantity must be a non-negative number');
+      }
+      if (isNaN(regularPrice) || regularPrice <= 0) {
+        throw new Error('Regular price must be a positive number');
+      }
+      if (salesPrice !== null && (isNaN(salesPrice) || salesPrice < 0 || salesPrice >= regularPrice)) {
+        throw new Error('Sales price must be a positive number less than regular price');
+      }
+
+      return {
+        size: variant.size,
+        quantity,
+        regularPrice,
+        salesPrice,
+      };
+    });
+
+    const totalStock = variantsArray.reduce((sum, variant) => sum + variant.quantity, 0);
+    if (totalStock === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Total stock across all variants must be greater than 0',
+      });
+    }
+
+    // Validate images
+    if (!req.files || !req.files.productImages || req.files.productImages.length < 3) {
+      return res.status(400).json({
+        success: false,
+        error: 'At least 3 product images are required',
+      });
+    }
+
+    // Upload images to Cloudinary
     const imagePaths = [];
     for (const file of req.files.productImages) {
       const b64 = Buffer.from(file.buffer).toString('base64');
       const dataURI = `data:${file.mimetype};base64,${b64}`;
-      try {
-        const result = await cloudinary.handleUpload(dataURI);
-        imagePaths.push(result.secure_url);
-        console.log(`Upload to Cloudinary:`, result.secure_url);
-      } catch (error) {
-        console.error(`Error uploading to Cloudinary:`, error);
-        return res.status(500).json({ success: false, error: 'Failed to upload image to Cloudinary' });
-      }
+      const result = await handleUpload(dataURI);
+      imagePaths.push(result.secure_url);
+      console.log(`Upload to Cloudinary:`, result.secure_url);
     }
 
     if (imagePaths.length < 3) {
-      return res.status(400).json({ success: false, error: 'Failed to upload at least 3 images' });
+      return res.status(400).json({
+        success: false,
+        error: 'Failed to upload at least 3 images to Cloudinary',
+      });
     }
 
+    // Check for existing product
+    const productExists = await Product.findOne({ productName: productName.trim() });
+    if (productExists) {
+      return res.status(400).json({
+        success: false,
+        error: 'Product already exists, please try with another name',
+      });
+    }
+
+    // Create new product
     const newProduct = new Product({
-      productName: products.productName,
-      description: products.description,
+      productName: productName.trim(),
+      description: description.trim(),
       category: categoryId._id,
       productImage: imagePaths,
-      variants: variants,
-      totalStock: totalStock,
-      status: 'Available',
+      variants: variantsArray,
+      totalStock,
+      status: totalStock > 0 ? 'Available' : 'Out of stock',
     });
 
     await newProduct.save();
     console.log('Product saved:', newProduct);
 
-    return res.status(200).json({ success: true, message: 'Product added successfully', redirectUrl: '/admin/products' });
+    return res.status(200).json({
+      success: true,
+      message: 'Product added successfully',
+      redirectUrl: '/admin/products',
+    });
   } catch (error) {
     console.error('Error saving product:', error);
-    return res.status(500).json({ success: false, error: 'Server error while saving product' });
+    return res.status(500).json({
+      success: false,
+      error: error.message || 'Server error while saving product',
+    });
   }
 };
+
 const getAllProducts = async (req, res) => {
   try {
     const search = req.query.search || "";
@@ -320,6 +455,21 @@ const deleteSingleImage = async (req, res) => {
     return res.status(500).json({ status: false, error: 'Server error' });
   }
 };
+const softDeleteProduct = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ success: false, error: 'Product not found' });
+    }
+    product.isDeleted = true;
+    await product.save();
+    return res.status(200).json({ success: true, message: 'Product soft deleted' });
+  } catch (error) {
+    console.error('Error soft deleting product:', error);
+    return res.status(500).json({ success: false, error: 'Server error' });
+  }
+};
 module.exports = {
   getProductAddPage,
   addProducts,
@@ -328,6 +478,7 @@ module.exports = {
   unblockProduct,
   getEditProduct,
   editProduct,
-  deleteSingleImage
+  deleteSingleImage,
+  softDeleteProduct
 
 } 

@@ -39,6 +39,7 @@ router.post('/editCategory/:id', isAuthenticated, categoryController.editCategor
 
 router.get('/addProducts', isAuthenticated, productController.getProductAddPage)
 router.post('/addProducts', isAuthenticated, upload.fields([{name: 'productImages', maxCount: 4}]), productController.addProducts);
+router.put('/soft-delete/:productId', isAuthenticated, productController.softDeleteProduct)
 
 router.get('/product', isAuthenticated, productController.getAllProducts)
 router.get('/blockProduct', isAuthenticated, productController.blockProduct)

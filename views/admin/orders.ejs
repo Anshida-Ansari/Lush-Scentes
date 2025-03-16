@@ -46,7 +46,7 @@
                                         <select onchange="updateOrderStatus(this, '<%= order._id %>')" class="status-select <%= order.status ? order.status : 'Pending' %>">
                                             <option value="Pending" <%= order.status === 'Pending' ? 'selected' : '' %>>Pending</option>
                                             <option value="Processing" <%= order.status === 'Processing' ? 'selected' : '' %>>Processing</option>
-                                            <option value="Shipped" <%= order.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                                            <option value="="Shipped" <%= order.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
                                             <option value="Delivered" <%= order.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
                                             <option value="Cancelled" <%= order.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
                                         </select>
@@ -74,12 +74,100 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination Controls -->
+            <% if (totalPages > 1) { %>
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <!-- First Button -->
+                        <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                            <a class="page-link" href="?page=1" aria-label="First">
+                                <span aria-hidden="true">««</span>
+                            </a>
+                        </li>
+            
+                        <!-- Previous Button -->
+                        <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                            <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                                <span aria-hidden="true">«</span>
+                            </a>
+                        </li>
+            
+                        <!-- Page Numbers (Show 3 pages at a time) -->
+                        <% 
+                            // Determine the start and end page numbers to display
+                            const maxPagesToShow = 3;
+                            let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+                            let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+            
+                            // Adjust startPage if endPage is at the totalPages limit
+                            if (endPage === totalPages) {
+                                startPage = Math.max(1, endPage - maxPagesToShow + 1);
+                            }
+                        %>
+                        <% for(let i = startPage; i <= endPage; i++) { %>
+                            <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                            </li>
+                        <% } %>
+            
+                        <!-- Next Button -->
+                        <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                            <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+                                <span aria-hidden="true">»</span>
+                            </a>
+                        </li>
+            
+                        <!-- Last Button -->
+                        <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                            <a class="page-link" href="?page=<%= totalPages %>" aria-label="Last">
+                                <span aria-hidden="true">»»</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            <% } %>
         </div>
     </div>
 </section>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
     /* Table and Status Dropdown Styling */
+    .pagination .page-link {
+    color: #007bff;
+    border-radius: 4px;
+    margin: 0 2px;
+    padding: 6px 12px;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #fff;
+    border-color: #dee2e6;
+}
+    .pagination .page-link {
+        color: #007bff;
+        border-radius: 4px;
+        margin: 0 2px;
+    }
+    .pagination .page-item.active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+    }
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        pointer-events: none;
+        background-color: #fff;
+        border-color: #dee2e6;
+    }
     .table {
         width: 100%;
     }

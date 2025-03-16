@@ -2,21 +2,112 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6 mt-60">
-            <form method="post" action="/admin/editCategory/<%=category._id%>">
-                <div class="d-grid text-end mt-30 col-md-5">
-                    <button class="btn btn-primary" type="submit">Update category</button>
-                </div>
-                <div class="mb-4 mt-30">
-                    <label for="product_name" class="form-label">Name</label>
-                    <input type="text" name="categoryName" value="<%=category.name%>" class="form-control border" />
-                </div>
-                
-                <div class="mb-4">
-                    <label class="form-label">Description</label>
-                    <textarea name="description" class="form-control border"><%=category.description%></textarea>
-                </div>
-            </form>
+            <% if (category && category._id) { %>
+                <form method="post" action="/admin/editCategory/<%= category._id %>" onsubmit="return handleEditFormSubmit(event)">
+                    <div class="d-grid text-end mt-30 col-md-5">
+                        <button class="btn btn-primary" type="submit">Update category</button>
+                    </div>
+                    <div class="mb-4 mt-30">
+                        <label for="product_name" class="form-label">Name</label>
+                        <input type="text" name="categoryName" value="<%= category.name || '' %>" class="form-control border" />
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control border"><%= category.description || '' %></textarea>
+                    </div>
+                </form>
+            <% } else { %>
+                <p>Error: Category not found or invalid. <a href="/admin/category">Return to Category List</a></p>
+                <script>
+                    console.log("Category object:", <%= JSON.stringify(category) %>);
+                </script>
+            <% } %>
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+<script>
+    function handleEditFormSubmit(event) {
+        event.preventDefault();
+
+        console.log("Form submission triggered");
+
+        // Get the form element
+        const form = event.target;
+
+        // Use querySelector within the form context to target the correct elements
+        const categoryNameElement = form.querySelector('input[name="categoryName"]');
+        const descriptionElement = form.querySelector('textarea[name="description"]');
+
+        console.log("Category Name Element:", categoryNameElement);
+        console.log("Description Element:", descriptionElement);
+
+        // Check if elements exist before accessing their values
+        if (!categoryNameElement || !descriptionElement) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Form Error',
+                text: 'Form fields not found. Please check the form structure.'
+            });
+            return false;
+        }
+
+        // Safely access value properties
+        const categoryName = (categoryNameElement.value || '').trim();
+        const description = (descriptionElement.value || '').trim();
+
+        console.log("Category Name:", categoryName);
+        console.log("Description:", description);
+
+        // Client-side validation
+        if (!categoryName || !description) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing Fields',
+                text: 'Name and Description are required'
+            });
+            return false;
+        }
+
+        // Send the fetch request
+        fetch(`/admin/editCategory/<%= category._id || '' %>`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ categoryName, description })
+        })
+        .then(response => {
+            console.log("Response Status:", response.status);
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw new Error(err.error || 'Unknown error');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Success Data:", data);
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: data.message || 'Category updated successfully'
+            }).then(() => {
+                window.location.href = '/admin/category';
+            });
+        })
+        .catch(error => {
+            console.error("Error:", error.message);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'An error occurred while updating the category'
+            });
+        });
+
+        return false;
+    }
+</script>
+
 <%- include("../../views/partials/admin/footer") %>

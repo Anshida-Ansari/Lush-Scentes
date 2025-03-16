@@ -1,6 +1,6 @@
  const User = require('../../models/userSchema');
 
-const customerInfo = async (req, res) => {
+ const customerInfo = async (req, res) => {
     try {
         let search = '';
         if (req.query.search) {
@@ -14,32 +14,32 @@ const customerInfo = async (req, res) => {
 
         const limit = 3;
 
-       
         const userData = await User.find({
             isAdmin: false,
             $or: [
-                { name: { $regex: '.*' + search + '.*', $options: 'i' } }, 
+                { name: { $regex: '.*' + search + '.*', $options: 'i' } },
                 { email: { $regex: '.*' + search + '.*', $options: 'i' } },
+                { phone: { $regex: '.*' + search + '.*', $options: 'i' } } 
             ],
         })
         .limit(limit)
         .skip((page - 1) * limit)
         .exec();
 
-       
         const count = await User.countDocuments({
             isAdmin: false,
             $or: [
                 { name: { $regex: '.*' + search + '.*', $options: 'i' } },
                 { email: { $regex: '.*' + search + '.*', $options: 'i' } },
+                { phone: { $regex: '.*' + search + '.*', $options: 'i' } } 
             ],
         });
 
-       
         res.render('customer', { 
             data: userData, 
             totalPages: Math.ceil(count / limit), 
-            currentPage: page 
+            currentPage: page,
+            req: req 
         });
 
         delete req.session.message;
@@ -49,7 +49,6 @@ const customerInfo = async (req, res) => {
         res.status(500).send("Server Error");
     }
 };
-
 
 const customerBlocked = async (req, res) => {
     try {

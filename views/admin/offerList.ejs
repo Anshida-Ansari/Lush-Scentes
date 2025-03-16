@@ -3,29 +3,30 @@
 <!--  -->
 
 <style>
+    .btn-sm.btn-primary,
+    .btn-sm.btn-danger {
+        min-width: 70px;
+        white-space: nowrap;
+        display: inline-block;
+    }
 
-.btn-sm.btn-primary, .btn-sm.btn-danger {
-    min-width: 70px;
-    white-space: nowrap;
-    display: inline-block;
-}
-.pagination-container {
-    padding: 15px 0;
-}
+    .pagination-container {
+        padding: 15px 0;
+    }
 
-.pagination-container a {
-    text-decoration: none;
-    margin: 0 5px;
-}
+    .pagination-container a {
+        text-decoration: none;
+        margin: 0 5px;
+    }
 
-.current-page {
-    font-weight: bold;
-    padding: 5px 10px;
-}
+    .current-page {
+        font-weight: bold;
+        padding: 5px 10px;
+    }
 
-.pagination-container a:hover {
-    text-decoration: underline;
-}
+    .pagination-container a:hover {
+        text-decoration: underline;
+    }
 </style>
 <br>
 <div class="main-content container py-4">
@@ -59,7 +60,6 @@
                             <tr>
                                 <td><%= offer.name %></td>
                                 <td><%= offer.type.charAt(0).toUpperCase() + offer.type.slice(1) %></td>
-                               
                                 <td><%= offer.discount %>%</td>
                                 <td>
                                     <% if (offer.type === 'product') { %>
@@ -81,7 +81,7 @@
                                             Remove
                                         </button>
                                     </div>
-                                </td>                     
+                                </td>
                             </tr>
                         <% }); %>
                     </tbody>
@@ -128,14 +128,6 @@
                         <label for="editOfferName" class="form-label">Offer Name</label>
                         <input type="text" class="form-control" id="editOfferName" required>
                     </div> -->
-                    <div class="mb-3"> 
-                        <label for="editOfferType" class="form-label">Type</label>
-                        <select class="form-control" id="editOfferType" required>
-                            <option value="product">Product</option>
-                            <option value="category">Category</option>
-                            <option value="referral">Referral</option>
-                        </select>
-                    </div>
                     <div class="mb-3">
                         <label for="editOfferDiscount" class="form-label">Discount (%)</label>
                         <input type="number" class="form-control" id="editOfferDiscount" required>
@@ -161,85 +153,84 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-function editOffer(offerData) {
-    const offer = JSON.parse(offerData);
-    
-    document.getElementById('editOfferId').value = offer._id;
-    document.getElementById('editOfferType').value = offer.type;
-    // document.getElementById('editOfferName').value = offer.name;
-    // document.getElementById('editOfferType').value = offer.type;
-    document.getElementById('editOfferDiscount').value = offer.discount;
-    document.getElementById('editOfferStartDate').value = new Date(offer.startDate).toISOString().split('T')[0];
-    document.getElementById('editOfferEndDate').value = new Date(offer.endDate).toISOString().split('T')[0];
-    
-    
-    const modal = new bootstrap.Modal(document.getElementById('editOfferModal'));
-    modal.show();
-}
+    function editOffer(offerData) {
+        const offer = JSON.parse(offerData);
+        
+        document.getElementById('editOfferId').value = offer._id;
+        // Removed editOfferType assignment
+        // document.getElementById('editOfferType').value = offer.type;
+        // document.getElementById('editOfferName').value = offer.name;
+        document.getElementById('editOfferDiscount').value = offer.discount;
+        document.getElementById('editOfferStartDate').value = new Date(offer.startDate).toISOString().split('T')[0];
+        document.getElementById('editOfferEndDate').value = new Date(offer.endDate).toISOString().split('T')[0];
+        
+        const modal = new bootstrap.Modal(document.getElementById('editOfferModal'));
+        modal.show();
+    }
 
-function updateOffer() {
-    const offerId = document.getElementById('editOfferId').value;
-    const updatedOffer = {
-        discount: document.getElementById('editOfferDiscount').value,
-        startDate: document.getElementById('editOfferStartDate').value,
-        endDate: document.getElementById('editOfferEndDate').value
-    };
+    function updateOffer() {
+        const offerId = document.getElementById('editOfferId').value;
+        const updatedOffer = {
+            discount: document.getElementById('editOfferDiscount').value,
+            startDate: document.getElementById('editOfferStartDate').value,
+            endDate: document.getElementById('editOfferEndDate').value
+        };
 
-    fetch(`/admin/offer-update/${offerId}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updatedOffer)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            Swal.fire('Updated!', 'Offer has been updated successfully.', 'success');
-            setTimeout(() => location.reload(), 1500);
-        } else {
-            Swal.fire('Error!', data.message || 'Something went wrong!', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        Swal.fire('Error!', 'Something went wrong!', 'error');
-    });
-}
+        fetch(`/admin/offer-update/${offerId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedOffer)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire('Updated!', 'Offer has been updated successfully.', 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                Swal.fire('Error!', data.message || 'Something went wrong!', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire('Error!', 'Something went wrong!', 'error');
+        });
+    }
 
-function removeOffer(offerId) {
-    console.log(offerId);
-    
-    Swal.fire({
-        title: 'Are you sure?',
-        text: 'You won\'t be able to revert this!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch(`/admin/offer-remove/${offerId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire('Deleted!', data.message, 'success');
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    Swal.fire('Error!', data.message, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire('Error!', 'Something went wrong!', 'error');
-            });
-        }
-    });
-}
+    function removeOffer(offerId) {
+        console.log(offerId);
+        
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won\'t be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/admin/offer-remove/${offerId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire('Deleted!', data.message, 'success');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        Swal.fire('Error!', data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire('Error!', 'Something went wrong!', 'error');
+                });
+            }
+        });
+    }
 </script>

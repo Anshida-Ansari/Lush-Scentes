@@ -462,7 +462,8 @@ const cancelOrder = async (req,res) =>{
         if (order.paymentMethod !== 'Cash on Delivery') {
 console.log("order cancel reashced aller")
             const user = await User.findById(userId);
-            user.wallet = (parseFloat(user.wallet) || 0) + refundAmount;            user.walletHistory.push({
+            user.wallet = (parseFloat(user.wallet) || 0) + refundAmount;        
+                user.walletHistory.push({
                 transactionId: `TXN${Date.now()}`,
                 type: 'credit',
                 amount: refundAmount,

@@ -10,7 +10,7 @@ const getListOfOrders = async (req, res) => {
         console.log('Getting the order list');
 
         const page = parseInt(req.query.page) || 1;
-        const limit = 10; 
+        const limit = 6; 
         const skip = (page - 1) * limit;
 
         const orders = await Order.find()
@@ -32,8 +32,6 @@ const getListOfOrders = async (req, res) => {
             });
         }
 
-       
-
         res.render('orders', {
             orders,
             totalPages,
@@ -45,7 +43,6 @@ const getListOfOrders = async (req, res) => {
         res.status(500).send('Server error: ' + error.message);
     }
 };
-
 
 const getOrderDetails = async (req, res) => {
   try {

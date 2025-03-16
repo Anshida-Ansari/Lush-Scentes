@@ -23,6 +23,10 @@ const productSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  isDeleted: { // Added for soft delete
+    type: Boolean,
+    default: false,
+  },
   status: {
     type: String,
     enum: ['Available', 'Out of stock', 'Discontinued'],

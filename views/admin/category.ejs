@@ -41,26 +41,24 @@
             border-color: #0056b3;
         }
 
-        .pagination-container {
-            text-align: center;
-        }
-
-        .pagination {
-            display: inline-block;
-        }
-
-        .pagination a,
-        .pagination .current-page {
-            display: inline-block;
-            padding: 5px 10px;
+        .pagination .page-link {
+            color: #007bff;
+            border-radius: 4px;
             margin: 0 2px;
-            border: 1px solid #ddd;
-            text-decoration: none;
-            color: #333;
+            padding: 6px 12px;
         }
 
-        .pagination a:hover {
-            background-color: #f5f5f5;
+        .pagination .page-item.active .page-link {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: white;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+            pointer-events: none;
+            background-color: #fff;
+            border-color: #dee2e6;
         }
 
         .error-message {
@@ -89,13 +87,15 @@
         </div>
         <header class="card-header text-center mb-20">
             <form action="/admin/category/" method="get" class="d-inline">
-                <div class="input-group input-group-sm border border-1 border-grey rounded-pill"
-                    style="width: 500px; margin-left: 230px">
-                    <input type="text" class="form-control border-0 rounded-pill mt-3"
-                        placeholder="Search categories" name="search" />
+                <div class="input-group input-group-sm border border-1 border-grey rounded-pill" style="width: 500px; margin-left: 230px">
+                    <input type="text" class="form-control border-0 rounded-pill mt-3" placeholder="Search categories" name="search" value="<%= req.query.search || '' %>" />
                     <button class="btn" type="submit">Search</button>
                 </div>
             </form>
+            <!-- Add a Clear Search button -->
+            <% if (req.query.search) { %>
+                <a href="/admin/category/" class="btn btn-sm btn-secondary ms-2">Clear Search</a>
+            <% } %>
         </header>
         <div class="card">
             <div class="card-body">
@@ -104,20 +104,16 @@
                         <form method="post" action="/admin/addCategory" onsubmit="return handleFormSubmit(event)">
                             <div class="mb-4">
                                 <label for="product_name" class="form-label">Name</label>
-                                <input type="text" name="name" placeholder="Type here" class="form-control"
-                                    id="product_name" />
+                                <input type="text" name="name" placeholder="Type here" class="form-control" id="product_name" />
                                 <div id="name-error" class="error-message"></div>
                             </div>
                             <div class="mb-4">
                                 <label class="form-label">Description</label>
-                                <textarea placeholder="Type here" name="description" class="form-control"
-                                    id="descriptionId"></textarea>
+                                <textarea placeholder="Type here" name="description" class="form-control" id="descriptionId"></textarea>
                                 <div id="description-error" class="error-message"></div>
                             </div>
                             <div class="d-grid">
-                                <button class="btn btn-primary" type="submit">
-                                    Create category
-                                </button>
+                                <button class="btn btn-primary" type="submit">Create category</button>
                             </div>
                         </form>
                     </div>
@@ -130,27 +126,19 @@
                                         <th>Name</th>
                                         <th>Description</th>
                                         <th>Status</th>
-                                       
                                         <th class="text-start">Edit</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% cat.reverse().forEach((category, index) => { %>
+                                    <% cat.forEach((category, index) => { %>
                                     <tr>
                                         <td></td>
-                                        <td class="text-start">
-                                            <%= category.name %>
-                                        </td>
-                                        <td class="text-start">
-                                            <%= category.description %>
-                                        </td>
-                                       
-                                        
-                                       
+                                        <td class="text-start"><%= category.name %></td>
+                                        <td class="text-start"><%= category.description %></td>
                                         <td class="text-start">
                                             <% if(!category.isListed) { %>
                                             <button class="btn btn-success" style="width: 70px">
-                                                <a href="/admin/listCategory?id=<%=category._id%>" class="text-white" >List</a>
+                                                <a href="/admin/listCategory?id=<%=category._id%>" class="text-white">List</a>
                                             </button>
                                             <% } else { %>
                                             <button class="btn btn-danger" style="width: 70px">
@@ -165,7 +153,6 @@
                                     <% }) %>
                                 </tbody>
                             </table>
-                            
                         </div>
                     </div>
                 </div>
@@ -174,12 +161,50 @@
         <div class="container mt-3">
             <nav aria-label="Page navigation">
                 <ul class="pagination justify-content-center mb-20" style="margin-right: 200px;">
-                    <% for(let i = 1; i <= totalPages; i++) { %>
-                    <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
-                        <a class="page-link" href="?page=<%= i %>">
-                            <%= i %>
-                        </a>
-                    </li>
+                    <% if (totalPages > 1) { %>
+                        <!-- First Button -->
+                        <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                            <a class="page-link" href="?page=1&search=<%= encodeURIComponent(req.query.search || '') %>" aria-label="First">
+                                <span aria-hidden="true">««</span>
+                            </a>
+                        </li>
+
+                        <!-- Previous Button -->
+                        <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                            <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= encodeURIComponent(req.query.search || '') %>" aria-label="Previous">
+                                <span aria-hidden="true">«</span>
+                            </a>
+                        </li>
+
+                        <!-- Page Numbers (Show 3 pages at a time) -->
+                        <% 
+                            const maxPagesToShow = 3;
+                            let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+                            let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+                            if (endPage === totalPages) {
+                                startPage = Math.max(1, endPage - maxPagesToShow + 1);
+                            }
+                        %>
+                        <% for(let i = startPage; i <= endPage; i++) { %>
+                            <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                <a class="page-link" href="?page=<%= i %>&search=<%= encodeURIComponent(req.query.search || '') %>"><%= i %></a>
+                            </li>
+                        <% } %>
+
+                        <!-- Next Button -->
+                        <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                            <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= encodeURIComponent(req.query.search || '') %>" aria-label="Next">
+                                <span aria-hidden="true">»</span>
+                            </a>
+                        </li>
+
+                        <!-- Last Button -->
+                        <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                            <a class="page-link" href="?page=<%= totalPages %>&search=<%= encodeURIComponent(req.query.search || '') %>" aria-label="Last">
+                                <span aria-hidden="true">»»</span>
+                            </a>
+                        </li>
                     <% } %>
                 </ul>
             </nav>
@@ -197,29 +222,11 @@
 
             clearErrorMessages();
 
-            if (!name && !description) {
+            if (!name || !description) {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Please fill out both fields',
+                    title: 'Missing Fields',
                     text: 'Name and Description are required'
-                });
-                return false;
-            }
-
-            if (!name) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Name Required',
-                    text: 'Please enter a category name'
-                });
-                return false;
-            }
-
-            if (!description) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Description Required',
-                    text: 'Please enter a category description'
                 });
                 return false;
             }
@@ -243,25 +250,17 @@
                 Swal.fire({
                     icon: 'success',
                     title: 'Success',
-                    text: 'Category added successfully'
+                    text: data.message || 'Category added successfully'
                 }).then(() => {
                     location.reload();
                 });
             })
             .catch(error => {
-                if (error.message === 'Category already exists') {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops',
-                        text: 'Category already exists'
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops',
-                        text: 'An error occurred while adding the category'
-                    });
-                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'An error occurred while adding the category'
+                });
             });
         }
 
@@ -351,10 +350,7 @@
                 console.error('Error removing the offer', error);
             }
         }
-
-       
     </script>
 
     <%- include("../../views/partials/admin/footer") %>
 </body>
-</document_content>
