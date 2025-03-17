@@ -290,62 +290,71 @@
     <% } else { %>
         <div class="wishlist-grid">
             <% wishlist.products.forEach((item, index) => { %>
-                <div class="wishlist-item">
-                    <a href="/product/<%= item.productId._id %>">
-                        <img src="<%= item.productId.productImage[0] %>" 
-                             alt="<%= item.productId.productName %>">
-                    </a>
-                    <h3 class="item-title">
-                        <%= item.productId.productName %>
-                    </h3>
-                    
-                    <% 
-                        // Find the lowest sales price among variants
-                        let minPrice = Infinity;
-                        item.productId.variants.forEach(variant => {
-                            const price = variant.salesPrice || variant.regularPrice;
-                            if (price < minPrice) minPrice = price;
-                        });
-                    %>
-                    
-                    <p class="item-price">₹<%= minPrice.toLocaleString('en-IN') %></p>
-            
-                    <form class="add-to-cart-form" 
-                          onsubmit="return addToCart(event, '<%= item.productId._id %>', '<%= item.productId.productName %>', '<%= index %>')">
-                        <div class="size-selection">
-                            <label for="sizeSelect_<%= index %>">Select Size:</label>
-                            <div class="custom-dropdown" id="sizeDropdown_<%= index %>">
-                                <span class="dropdown-selected" onclick="toggleDropdown('<%= index %>')">Select a Size</span>
-                                <div id="sizeOptions_<%= index %>" class="size-options">
-                                    <% item.productId.variants.forEach(function(variant) { %>
-                                        <% if (variant.quantity > 0) { %>
-                                            <div class="dropdown-option" 
-                                                 data-value="<%= variant.size %>"
-                                                 data-quantity="<%= variant.quantity %>"
-                                                 data-price="<%= variant.salesPrice || variant.regularPrice %>"
-                                                 onclick="selectSize('<%= variant.size %>', '<%= index %>', <%= variant.salesPrice || variant.regularPrice %>)">
-                                                <%= variant.size %> - ₹<%= (variant.salesPrice || variant.regularPrice).toLocaleString('en-IN') %> 
-                                                (<%= variant.quantity %> left)
-                                            </div>
-                                        <% } %>
-                                    <% }); %>
+                <% if (item.productId) { %>
+                    <div class="wishlist-item">
+                        <a href="/product/<%= item.productId._id %>">
+                            <img src="<%= item.productId.productImage[0] %>" 
+                                 alt="<%= item.productId.productName %>">
+                        </a>
+                        <h3 class="item-title">
+                            <%= item.productId.productName %>
+                        </h3>
+                        
+                        <% 
+                            // Find the lowest sales price among variants
+                            let minPrice = Infinity;
+                            item.productId.variants.forEach(variant => {
+                                const price = variant.salesPrice || variant.regularPrice;
+                                if (price < minPrice) minPrice = price;
+                            });
+                        %>
+                        
+                        <p class="item-price">₹<%= minPrice.toLocaleString('en-IN') %></p>
+                
+                        <form class="add-to-cart-form" 
+                              onsubmit="return addToCart(event, '<%= item.productId._id %>', '<%= item.productId.productName %>', '<%= index %>')">
+                            <div class="size-selection">
+                                <label for="sizeSelect_<%= index %>">Select Size:</label>
+                                <div class="custom-dropdown" id="sizeDropdown_<%= index %>">
+                                    <span class="dropdown-selected" onclick="toggleDropdown('<%= index %>')">Select a Size</span>
+                                    <div id="sizeOptions_<%= index %>" class="size-options">
+                                        <% item.productId.variants.forEach(function(variant) { %>
+                                            <% if (variant.quantity > 0) { %>
+                                                <div class="dropdown-option" 
+                                                     data-value="<%= variant.size %>"
+                                                     data-quantity="<%= variant.quantity %>"
+                                                     data-price="<%= variant.salesPrice || variant.regularPrice %>"
+                                                     onclick="selectSize('<%= variant.size %>', '<%= index %>', <%= variant.salesPrice || variant.regularPrice %>)">
+                                                    <%= variant.size %> - ₹<%= (variant.salesPrice || variant.regularPrice).toLocaleString('en-IN') %> 
+                                                    (<%= variant.quantity %> left)
+                                                </div>
+                                            <% } %>
+                                        <% }); %>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <input type="hidden" id="selectedSize_<%= index %>" name="size" value="">
-                        <input type="hidden" id="selectedPrice_<%= index %>" name="price" value="">
-                        <input type="hidden" id="quantity_<%= index %>" name="quantity" value="1" class="input-number">
-                        <button type="submit" class="move-to-bag">
-                            Add to Cart
+                            <input type="hidden" id="selectedSize_<%= index %>" name="size" value="">
+                            <input type="hidden" id="selectedPrice_<%= index %>" name="price" value="">
+                            <input type="hidden" id="quantity_<%= index %>" name="quantity" value="1" class="input-number">
+                            <button type="submit" class="move-to-bag">
+                                Add to Cart
+                            </button>
+                        </form>
+                
+                        <button class="remove-item" onclick="removeFromWishlist('<%= item.productId._id %>')">
+                            Remove from wishlist
                         </button>
-                    </form>
-            
-                    <button class="remove-item" onclick="removeFromWishlist('<%= item.productId._id %>')">
-                        Remove from wishlist
-                    </button>
-                </div>
+                    </div>
+                <% } else { %>
+                    <div class="wishlist-item">
+                        <p>Product not available</p>
+                        <button class="remove-item" onclick="removeFromWishlist('<%= item._id %>')">
+                            Remove from wishlist
+                        </button>
+                    </div>
+                <% } %>
             <% }); %>
-        </div>
+        </div> 
     <% } %>
 </div>
 

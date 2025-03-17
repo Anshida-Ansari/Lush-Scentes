@@ -37,6 +37,7 @@ const loadWishlist = async (req,res)=>{
 
 
 
+
 const addWishlist = async (req, res) => {
     try {
         const userId = req.session.user;
