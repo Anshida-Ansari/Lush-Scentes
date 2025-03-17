@@ -129,6 +129,8 @@
         .site-block-order-table img {
             max-width: 50px;
             margin-right: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
         }
         .btn-primary {
             background-color: #7971ea;
@@ -138,12 +140,6 @@
             background-color: #685ed6;
             border-color: #685ed6;
         }
-        .site-block-order-table img {
-    max-width: 50px;
-    margin-right: 10px;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-}
     </style>
 </head>
 <body>
@@ -189,7 +185,7 @@
                                             <p>Phone: <%= address.phoneNumber %>, Alt: <%= address.altPhone %></p>
                                         </div>
                                         <div class="address-actions">
-                                            <a href="/checkout-edit-address/<%= address._id %>" class="btn btn-sm btn-outline-primary">Edit</a>
+                                            <a href="/edit-address/<%= address._id %>" class="btn btn-sm btn-outline-primary">Edit</a>
                                         </div>
                                     </div>
                                 <% }); %>
@@ -209,7 +205,6 @@
                             <div class="col-md-12">
                                 <h2 class="h3 mb-3 text-black">Your Order</h2>
                                 <div class="p-3 p-lg-5 border">
-                                  
                                     <div class="checkout-card">
                                       <div class="section-heading">
                                           <i class="fas fa-tag"></i>
@@ -259,6 +254,9 @@
                                                         <td>
                                                             <img src="<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>" width="50">
                                                             <%= item.productId.productName %> <%= item.variant.size %>
+                                                            <% if (item.productId.isBlocked) { %>
+                                                              <span style="color: #d9534f;"> (Blocked - Unavailable)</span>
+                                                            <% } %>
                                                         </td>
                                                         <td><%= item.variant.quantity %></td>
                                                         <td>₹<%= item.totalPrice.toFixed(2) %></td>
@@ -281,8 +279,6 @@
                                             </tr>
                                         </tbody>
                                     </table>
-
-                                   
 
                                     <!-- Payment Section -->
                                     <div class="row mb-5">
@@ -331,7 +327,6 @@
         </footer>
     </div>
 
-    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -343,11 +338,10 @@
     <script src="/js/aos.js"></script>
     <script src="/js/main.js"></script>
 
-    
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const addressCards = document.querySelectorAll('.address-card');
             const checkoutForm = document.getElementById('checkoutForm');
+            const placeOrderBtn = document.getElementById('place-order-btn');
             const couponInput = document.querySelector('.coupon-input');
             const applyCouponBtn = document.querySelector('.apply-coupon-btn');
             const removeCouponBtn = document.querySelector('.remove-coupon-btn');
@@ -356,7 +350,8 @@
             const finalAmountSpan = document.getElementById('final-amount');
             let appliedCoupon = null;
 
-           
+            // Address selection
+            const addressCards = document.querySelectorAll('.address-card');
             addressCards.forEach(card => {
                 const radio = card.querySelector('input[type="radio"]');
                 card.addEventListener('click', () => {
@@ -367,7 +362,7 @@
                 if (radio.checked) card.classList.add('selected');
             });
 
-           
+            // Coupon handling
             couponCards.forEach(card => {
                 card.addEventListener('click', () => {
                     const couponCode = card.getAttribute('data-coupon');
@@ -376,7 +371,6 @@
                 });
             });
 
-           
             applyCouponBtn.addEventListener('click', () => {
                 const couponCode = couponInput.value.trim();
                 if (!couponCode) {
@@ -409,7 +403,6 @@
                 }
             }
 
-           
             removeCouponBtn.addEventListener('click', async () => {
                 if (!appliedCoupon) return;
                 try {
@@ -432,7 +425,6 @@
                 }
             });
 
-           
             function updateCouponUI(discount, newTotal, code) {
                 const discountRow = document.getElementById('discount-row');
                 const discountValue = document.getElementById('discount-value');
@@ -450,163 +442,186 @@
                 appliedCoupon = null;
             }
 
-          
             function showCouponMessage(message, type) {
                 couponMessage.textContent = message;
                 couponMessage.className = `coupon-message ${type}`;
             }
 
-           
+            // Checkout form submission with blocked item check
             checkoutForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const selectedAddress = document.querySelector('input[name="deliveryAddressId"]:checked')?.value;
-                if (!selectedAddress) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Address Required',
-                        text: 'Please select a delivery address',
-                        confirmButtonColor: '#7971ea'
-                    });
-                    return;
+              e.preventDefault();
+
+              // Check for blocked items
+              const rows = document.querySelectorAll('.site-block-order-table tbody tr');
+              let hasBlockedItems = false;
+              rows.forEach(row => {
+                const productNameCell = row.querySelector('td:first-child');
+                if (productNameCell && productNameCell.textContent.includes('(Blocked - Unavailable)')) {
+                  hasBlockedItems = true;
                 }
+              });
 
-                const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
-                if (!paymentMethod) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Payment Method Required',
-                        text: 'Please select a payment method',
-                        confirmButtonColor: '#7971ea'
-                    });
-                    return;
-                }
+              if (hasBlockedItems) {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Checkout Blocked',
+                  text: 'Your cart contains blocked items that are no longer available. Please remove them to proceed.',
+                  confirmButtonColor: '#7971ea',
+                  confirmButtonText: 'OK'
+                });
+                return;
+              }
 
-                const finalAmount = parseFloat(finalAmountSpan.textContent.replace('₹', ''));
-                const submitButton = document.getElementById('place-order-btn');
-                submitButton.disabled = true;
-                submitButton.textContent = 'Processing...';
+              const selectedAddress = document.querySelector('input[name="deliveryAddressId"]:checked')?.value;
+              if (!selectedAddress) {
+                Swal.fire({
+                  icon: 'warning',
+                  title: 'Address Required',
+                  text: 'Please select a delivery address',
+                  confirmButtonColor: '#7971ea'
+                });
+                return;
+              }
 
-                let processingDialog;
-                try {
-                    processingDialog = Swal.fire({
-                        title: 'Processing Order',
-                        text: 'Please wait while we process your order...',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        didOpen: () => Swal.showLoading()
-                    });
+              const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+              if (!paymentMethod) {
+                Swal.fire({
+                  icon: 'warning',
+                  title: 'Payment Method Required',
+                  text: 'Please select a payment method',
+                  confirmButtonColor: '#7971ea'
+                });
+                return;
+              }
 
-                    const orderData = { selectedAddress, paymentMethod, couponCode: appliedCoupon || null };
-                    if (paymentMethod === 'razorpay') {
-                        await handleRazorpayPayment(selectedAddress, finalAmount, appliedCoupon);
-                    } else {
-                        const response = await fetch('/checkout', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(orderData)
-                        });
-                        const data = await response.json();
-                        if (data.success) {
-                            await handlePaymentSuccess(data.orderId);
-                        } else {
-                            throw new Error(data.message || 'Failed to place order');
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error processing order:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Order Failed',
-                        text: error.message || 'There was an error processing your order.',
-                        confirmButtonColor: '#7971ea'
-                    });
-                } finally {
-                    if (processingDialog) Swal.close();
-                    submitButton.disabled = false;
-                    submitButton.textContent = 'Place Order';
-                }
-            });
+              const finalAmount = parseFloat(finalAmountSpan.textContent.replace('₹', ''));
+              placeOrderBtn.disabled = true;
+              placeOrderBtn.textContent = 'Processing...';
 
-            
-            async function handleRazorpayPayment(selectedAddress, amount, couponCode) {
-                const response = await fetch('/create-razorpay-order', {
+              let processingDialog;
+              try {
+                processingDialog = Swal.fire({
+                  title: 'Processing Order',
+                  text: 'Please wait while we process your order...',
+                  allowOutsideClick: false,
+                  allowEscapeKey: false,
+                  didOpen: () => Swal.showLoading()
+                });
+
+                const orderData = { selectedAddress, paymentMethod, couponCode: appliedCoupon || null };
+                if (paymentMethod === 'razorpay') {
+                  // Additional validation before Razorpay
+                  if (hasBlockedItems) {
+                    throw new Error('Cannot proceed with payment due to blocked items.');
+                  }
+                  await handleRazorpayPayment(selectedAddress, finalAmount, appliedCoupon);
+                } else {
+                  const response = await fetch('/checkout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ selectedAddress, amount, couponCode })
+                    body: JSON.stringify(orderData)
+                  });
+                  const data = await response.json();
+                  if (data.success) {
+                    await handlePaymentSuccess(data.orderId);
+                  } else {
+                    throw new Error(data.message || 'Failed to place order');
+                  }
+                }
+              } catch (error) {
+                console.error('Error processing order:', error);
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Order Failed',
+                  text: error.message || 'There was an error processing your order.',
+                  confirmButtonColor: '#7971ea'
                 });
-                const orderData = await response.json();
-                if (!orderData.success) throw new Error(orderData.message);
+              } finally {
+                if (processingDialog) Swal.close();
+                placeOrderBtn.disabled = false;
+                placeOrderBtn.textContent = 'Place Order';
+              }
+            });
 
-                const options = {
-                    key: orderData.razorpayKeyId,
-                    amount: orderData.amount,
-                    currency: 'INR',
-                    name: 'Lush Scents',
-                    description: 'Order Payment',
-                    order_id: orderData.razorpayOrderId,
-                    handler: async (response) => await verifyPayment(response, orderData.orderId),
-                    prefill: {
-                        name: '<%= user.name %>',
-                        email: '<%= user.email %>',
-                        contact: '<%= user.phoneNumber %>'
-                    },
-                    theme: { color: '#7971ea' }
-                };
-                const rzp = new Razorpay(options);
-                rzp.open();
-                rzp.on('payment.failed', async (response) => {
-                    await handlePaymentDismissal(orderData.orderId, selectedAddress, response.error.description);
-                    await initializeRetryPayment(orderData.orderId, amount, selectedAddress);
-                });
+            async function handleRazorpayPayment(selectedAddress, amount, couponCode) {
+              const response = await fetch('/create-razorpay-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ selectedAddress, amount, couponCode })
+              });
+              const orderData = await response.json();
+              if (!orderData.success) throw new Error(orderData.message);
+
+              const options = {
+                key: orderData.razorpayKeyId,
+                amount: orderData.amount,
+                currency: 'INR',
+                name: 'Lush Scents',
+                description: 'Order Payment',
+                order_id: orderData.razorpayOrderId,
+                handler: async (response) => await verifyPayment(response, orderData.orderId),
+                prefill: {
+                  name: '<%= user.name %>',
+                  email: '<%= user.email %>',
+                  contact: '<%= user.phoneNumber %>'
+                },
+                theme: { color: '#7971ea' }
+              };
+              const rzp = new Razorpay(options);
+              rzp.open();
+              rzp.on('payment.failed', async (response) => {
+                await handlePaymentDismissal(orderData.orderId, selectedAddress, response.error.description);
+                await initializeRetryPayment(orderData.orderId, amount, selectedAddress);
+              });
             }
 
             async function verifyPayment(response, orderId) {
-                const verifyResponse = await fetch('/verify-razorpay-payment', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        orderId,
-                        razorpayOrderId: response.razorpay_order_id,
-                        razorpayPaymentId: response.razorpay_payment_id,
-                        razorpaySignature: response.razorpay_signature
-                    })
-                });
-                const verifyData = await verifyResponse.json();
-                if (verifyData.success) await handlePaymentSuccess(verifyData.orderId);
-                else throw new Error(verifyData.message);
+              const verifyResponse = await fetch('/verify-razorpay-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  orderId,
+                  razorpayOrderId: response.razorpay_order_id,
+                  razorpayPaymentId: response.razorpay_payment_id,
+                  razorpaySignature: response.razorpay_signature
+                })
+              });
+              const verifyData = await verifyResponse.json();
+              if (verifyData.success) await handlePaymentSuccess(verifyData.orderId);
+              else throw new Error(verifyData.message);
             }
 
             async function handlePaymentSuccess(orderId) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Order Placed Successfully!',
-                    text: 'Redirecting to order confirmation...',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-                window.location.href = `/thank-you?orderId=${orderId}`;
+              Swal.fire({
+                icon: 'success',
+                title: 'Order Placed Successfully!',
+                text: 'Redirecting to order confirmation...',
+                timer: 2000,
+                showConfirmButton: false
+              });
+              window.location.href = `/thank-you?orderId=${orderId}`;
             }
 
             async function handlePaymentDismissal(orderId, selectedAddress, reason) {
-                await fetch('/handle-payment-dismissal', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ orderId, selectedAddress, reason })
-                });
+              await fetch('/handle-payment-dismissal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId, selectedAddress, reason })
+              });
             }
 
             async function initializeRetryPayment(orderId, amount, selectedAddress) {
-                const result = await Swal.fire({
-                    icon: 'error',
-                    title: 'Payment Failed',
-                    text: 'Would you like to retry the payment?',
-                    showCancelButton: true,
-                    confirmButtonText: 'Retry Payment',
-                    cancelButtonText: 'View Order Details',
-                    confirmButtonColor: '#7971ea'
-                });
-                if (result.isConfirmed) await handleRazorpayPayment(selectedAddress, amount, appliedCoupon);
-                else if (orderId) window.location.href = `/order-details?orderId=${orderId}`;
+              const result = await Swal.fire({
+                icon: 'error',
+                title: 'Payment Failed',
+                text: 'Would you like to retry the payment?',
+                showCancelButton: true,
+                confirmButtonText: 'Retry Payment',
+                cancelButtonText: 'View Order Details',
+                confirmButtonColor: '#7971ea'
+              });
+              if (result.isConfirmed) await handleRazorpayPayment(selectedAddress, amount, appliedCoupon);
+              else if (orderId) window.location.href = `/order-details?orderId=${orderId}`;
             }
         });
     </script>

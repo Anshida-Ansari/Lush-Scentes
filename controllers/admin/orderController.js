@@ -2,6 +2,7 @@ const Product = require('../../models/productSchema')
 const Order = require('../../models/orderSchema')
 const Category = require('../../models/categorySchema')
 const User = require('../../models/userSchema')
+const Address = require('../../models/addressShema')
 const Cart = require('../../models/cartSchema')
 
 
@@ -45,24 +46,47 @@ const getListOfOrders = async (req, res) => {
 };
 
 const getOrderDetails = async (req, res) => {
-  try {
-      console.log('Getting order details');
-      const { orderId } = req.params
-      const order = await Order.findOne({_id: orderId}) 
-          .populate('userId', 'name email')
-          .populate('address')
-          .populate('orderedItems.product');
+    try {
+        console.log('Getting order details');
+        const { orderId } = req.params;
 
-      if (!order) {
-          return res.status(404).send('Order not found');
-      }
+        const order = await Order.findOne({ _id: orderId })
+            .populate('userId', 'name email')
+            .populate('orderedItems.product')
+            .lean(); 
 
-      
-      res.render('orderDetails', { order }); 
-  } catch (error) {
-      console.error('Error fetching order details:', error);
-      res.status(500).send('Server error');
-  }
+        if (!order) {
+            return res.status(404).send('Order not found');
+        }
+
+        
+        const addressDoc = await Address.findOne({ userID: order.userId._id });
+        if (addressDoc && addressDoc.address && addressDoc.address.length > 0) {
+            const selectedAddress = addressDoc.address.find(addr => addr._id.toString() === order.address.toString());
+            if (selectedAddress) {
+                order.addressDetails = {
+                    name: selectedAddress.name,
+                    landMark: selectedAddress.landMark,
+                    city: selectedAddress.city,
+                    state: selectedAddress.state,
+                    pincode: selectedAddress.pincode,
+                    phoneNumber: selectedAddress.phoneNumber,
+                    altPhone: selectedAddress.altPhone
+                };
+            } else {
+                console.log(`No matching address found for order ${order._id} with address ID ${order.address}`);
+                order.addressDetails = null;
+            }
+        } else {
+            console.log(`No address document found for user ${order.userId._id}`);
+            order.addressDetails = null;
+        }
+
+        res.render('orderDetails', { order });
+    } catch (error) {
+        console.error('Error fetching order details:', error);
+        res.status(500).send('Server error');
+    }
 };
 
 

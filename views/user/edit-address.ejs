@@ -1,5 +1,12 @@
 <%- include('../../views/partials/user/header') %>
-
+<style>
+    .form-control:invalid {
+    border-color: #dc3545;
+}
+.text-danger {
+    font-size: 0.9rem;
+}
+</style>
 <div class="container mt-5">
     <h2>Edit Address</h2>
     <form action="/editAddress" method="POST" id="editAddressForm">
@@ -9,52 +16,60 @@
             <label for="addressType">Address Type</label>
             <input type="text" class="form-control" id="addressType" name="addressType" 
                    value="<%= address.addressType %>" required>
+            <div id="addressTypeError" class="text-danger mt-1"></div>
         </div>
 
         <div class="form-group">
             <label for="name">Full Name</label>
             <input type="text" class="form-control" id="name" name="name" 
                    value="<%= address.name %>" required>
+            <div id="nameError" class="text-danger mt-1"></div>
         </div>
 
         <div class="form-group">
             <label for="city">City</label>
             <input type="text" class="form-control" id="city" name="city" 
                    value="<%= address.city %>" required>
+            <div id="cityError" class="text-danger mt-1"></div>
         </div>
 
         <div class="form-group">
             <label for="landMark">Landmark</label>
             <input type="text" class="form-control" id="landMark" name="landMark" 
                    value="<%= address.landMark %>" required>
+            <div id="landMarkError" class="text-danger mt-1"></div>
         </div>
 
         <div class="form-group">
             <label for="state">State</label>
             <input type="text" class="form-control" id="state" name="state" 
                    value="<%= address.state %>" required>
+            <div id="stateError" class="text-danger mt-1"></div>
         </div>
 
         <div class="form-group">
             <label for="pincode">Pincode</label>
             <input type="text" class="form-control" id="pincode" name="pincode" 
                    value="<%= address.pincode %>" required>
+            <div id="pincodeError" class="text-danger mt-1"></div>
         </div>
 
         <div class="form-group">
             <label for="phoneNumber">Phone Number</label>
             <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" 
                    value="<%= address.phoneNumber %>" required>
+            <div id="phoneNumberError" class="text-danger mt-1"></div>
         </div>
 
         <div class="form-group">
             <label for="altPhone">Alternative Phone</label>
             <input type="text" class="form-control" id="altPhone" name="altPhone" 
                    value="<%= address.altPhone %>">
+            <div id="altPhoneError" class="text-danger mt-1"></div>
         </div>
 
         <button type="submit" class="btn btn-primary">Update Address</button>
-        <div id="errorMessages" class="text-danger mt-2"></div>
+        <div id="generalErrorMessages" class="text-danger mt-2"></div>
     </form>
 </div>
 
@@ -62,51 +77,119 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
+        // Live validation functions
+        function validateAddressType() {
+            const value = $('#addressType').val().trim();
+            const errorDiv = $('#addressTypeError');
+            if (!value || !/^[A-Za-z\s]+$/.test(value)) {
+                errorDiv.text('Address type is required and should contain only letters and spaces.');
+                return false;
+            }
+            errorDiv.text('');
+            return true;
+        }
+
+        function validateName() {
+            const value = $('#name').val().trim();
+            const errorDiv = $('#nameError');
+            if (!value || !/^[A-Za-z\s]+$/.test(value)) {
+                errorDiv.text('Full name is required and should contain only letters and spaces.');
+                return false;
+            }
+            errorDiv.text('');
+            return true;
+        }
+
+        function validateCity() {
+            const value = $('#city').val().trim();
+            const errorDiv = $('#cityError');
+            if (!value || !/^[A-Za-z\s]+$/.test(value)) {
+                errorDiv.text('City is required and should contain only letters and spaces.');
+                return false;
+            }
+            errorDiv.text('');
+            return true;
+        }
+
+        function validateLandMark() {
+            const value = $('#landMark').val().trim();
+            const errorDiv = $('#landMarkError');
+            if (!value || !/^[A-Za-z0-9\s,.-]+$/.test(value)) { // Allow letters, numbers, and common punctuation
+                errorDiv.text('Landmark is required and should contain valid characters.');
+                return false;
+            }
+            errorDiv.text('');
+            return true;
+        }
+
+        function validateState() {
+            const value = $('#state').val().trim();
+            const errorDiv = $('#stateError');
+            if (!value || !/^[A-Za-z\s]+$/.test(value)) {
+                errorDiv.text('State is required and should contain only letters and spaces.');
+                return false;
+            }
+            errorDiv.text('');
+            return true;
+        }
+
+        function validatePincode() {
+            const value = $('#pincode').val().trim();
+            const errorDiv = $('#pincodeError');
+            if (!value || !/^\d{6}$/.test(value)) {
+                errorDiv.text('Pincode must be exactly 6 digits.');
+                return false;
+            }
+            errorDiv.text('');
+            return true;
+        }
+
+        function validatePhoneNumber() {
+            const value = $('#phoneNumber').val().trim();
+            const errorDiv = $('#phoneNumberError');
+            if (!value || !/^\d{10}$/.test(value)) {
+                errorDiv.text('Phone number must be exactly 10 digits.');
+                return false;
+            }
+            errorDiv.text('');
+            return true;
+        }
+
+        function validateAltPhone() {
+            const value = $('#altPhone').val().trim();
+            const errorDiv = $('#altPhoneError');
+            if (value && !/^\d{10}$/.test(value)) {
+                errorDiv.text('Alternative phone must be exactly 10 digits.');
+                return false;
+            }
+            errorDiv.text('');
+            return true;
+        }
+
+        $('#addressType').on('input', validateAddressType);
+        $('#name').on('input', validateName);
+        $('#city').on('input', validateCity);
+        $('#landMark').on('input', validateLandMark);
+        $('#state').on('input', validateState);
+        $('#pincode').on('input', validatePincode);
+        $('#phoneNumber').on('input', validatePhoneNumber);
+        $('#altPhone').on('input', validateAltPhone);
+
         $('#editAddressForm').on('submit', function(event) {
             event.preventDefault();
 
-            const errorMessages = $('#errorMessages');
+            const errorMessages = $('#generalErrorMessages');
             errorMessages.empty();
             let isValid = true;
 
-            // Validate all fields
-            const addressType = $('#addressType').val().trim();
-            const name = $('#name').val().trim();
-            const city = $('#city').val().trim();
-            const landMark = $('#landMark').val().trim();
-            const state = $('#state').val().trim();
-            const pincode = $('#pincode').val().trim();
-            const phoneNumber = $('#phoneNumber').val().trim();
-            const altPhone = $('#altPhone').val().trim();
-
-            if (!addressType || !/^[A-Za-z\s]+$/.test(addressType)) {
-                errorMessages.append('<p>Address type is required and should contain only letters and spaces.</p>');
-                isValid = false;
-            }
-            if (!name || !/^[A-Za-z\s]+$/.test(name)) {
-                errorMessages.append('<p>Full name is required and should contain only letters and spaces.</p>');
-                isValid = false;
-            }
-            if (!city || !/^[A-Za-z\s]+$/.test(city)) {
-                errorMessages.append('<p>City is required and should contain only letters and spaces.</p>');
-                isValid = false;
-            }
-            if (!state || !/^[A-Za-z\s]+$/.test(state)) {
-                errorMessages.append('<p>State is required and should contain only letters and spaces.</p>');
-                isValid = false;
-            }
-            if (!pincode || !/^\d{6}$/.test(pincode)) {
-                errorMessages.append('<p>Pincode must be exactly 6 digits.</p>');
-                isValid = false;
-            }
-            if (!phoneNumber || !/^\d{10}$/.test(phoneNumber)) {
-                errorMessages.append('<p>Phone number must be exactly 10 digits.</p>');
-                isValid = false;
-            }
-            if (altPhone && !/^\d{10}$/.test(altPhone)) {
-                errorMessages.append('<p>Alternative phone must be exactly 10 digits.</p>');
-                isValid = false;
-            }
+            isValid &= validateAddressType();
+            isValid &= validateName();
+            isValid &= validateCity();
+            isValid &= validateLandMark();
+            isValid &= validateState();
+            isValid &= validatePincode();
+            isValid &= validatePhoneNumber();
+            isValid &= validateAltPhone();
 
             if (isValid) {
                 $.ajax({
@@ -121,7 +204,7 @@
                                 text: response.message,
                                 icon: 'success'
                             }).then(() => {
-                                window.location.href = '/user/profile';
+                                window.location.href = '/userProfile';
                             });
                         } else {
                             errorMessages.append('<p>' + response.message + '</p>');

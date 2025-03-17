@@ -193,22 +193,30 @@ const userProfile = async (req, res) => {
         console.log('Session user:', req.session.user);
         const userId = req.session.user._id;
 
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 3;
-        const skip = (page - 1) * limit;
+        
+        const orderPage = parseInt(req.query.page) || 1;
+        const orderLimit = parseInt(req.query.limit) || 3;
+        const orderSkip = (orderPage - 1) * orderLimit;
 
-        const userData = await User.findById(userId);
+        
+        const walletPage = parseInt(req.query.walletPage) || 1;
+        const walletLimit = 5;
+        const walletSkip = (walletPage - 1) * walletLimit;
+
+        const userData = await User.findById(userId).lean();
         if (!userData) throw new Error('User not found');
 
         const addressData = await Address.findOne({ userID: userId });
 
+        
         const totalOrders = await Order.countDocuments({ userId: userId });
-        const totalPages = Math.ceil(totalOrders / limit);
+        const totalOrderPages = Math.ceil(totalOrders / orderLimit);
+
 
         const orders = await Order.find({ userId: userId })
             .sort({ createdOn: -1 })
-            .skip(skip)
-            .limit(limit)
+            .skip(orderSkip)
+            .limit(orderLimit)
             .populate({
                 path: 'orderedItems.product',
                 select: 'productName productImage variants',
@@ -230,28 +238,40 @@ const userProfile = async (req, res) => {
                         altPhone: selectedAddress.altPhone
                     };
                 } else {
-                    console.log(`No matching address found for order ${order._id} with address ID ${order.address}`);
                     order.addressDetails = null;
                 }
             } else {
-                console.log(`No address document found for user ${userId}`);
                 order.addressDetails = null;
             }
         }
 
+        
+        const paginatedWalletHistory = userData.walletHistory
+            ? userData.walletHistory.slice(walletSkip, walletSkip + walletLimit).reverse() 
+            : [];
+        const totalWalletTransactions = userData.walletHistory ? userData.walletHistory.length : 0;
+        const totalWalletPages = Math.ceil(totalWalletTransactions / walletLimit);
+
+
         res.render('profile', {
-            user: userData,
+            user: { ...userData, walletHistory: paginatedWalletHistory },
             userAddress: addressData,
             orders: orders,
             pagination: {
-                page,
-                limit,
+                orderPage,
+                orderLimit,
                 totalOrders,
-                totalPages
+                totalOrderPages
+            },
+            walletPagination: {
+                walletPage,
+                walletLimit,
+                totalWalletTransactions,
+                totalWalletPages
             }
         });
     } catch (error) {
-        console.error('Error for retrieve profile data', error);
+        console.error('Error retrieving profile data:', error);
         res.status(500).send('Internal Server Error: ' + error.message);
     }
 };
@@ -496,6 +516,13 @@ const postEditAddress = async (req, res) => {
         const addressId = req.body._id;
         const user = req.session.user;
 
+        if (!user || !user._id) {
+            return res.status(401).json({
+                success: false,
+                message: 'User not authenticated'
+            });
+        }
+
         const updatedAddress = await Address.findOneAndUpdate(
             {
                 userID: user._id,
@@ -520,16 +547,24 @@ const postEditAddress = async (req, res) => {
         );
 
         if (!updatedAddress) {
-            return res.redirect('/pageNotFound');
+            return res.status(404).json({
+                success: false,
+                message: 'Address not found'
+            });
         }
 
-        res.redirect('/userProfile');
+        res.status(200).json({
+            success: true,
+            message: 'Address updated successfully'
+        });
     } catch (error) {
         console.error('Error updating address:', error);
-        res.redirect('/pageNotFound');
+        res.status(500).json({
+            success: false,
+            message: 'Server error: ' + error.message
+        });
     }
 };
-
 const deleteAddress = async (req, res) => {
     try {
 

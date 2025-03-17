@@ -4,73 +4,7 @@ const User = require('../../models/userSchema');
 const Product = require('../../models/productSchema');
 const Address = require('../../models/addressShema.js')
 const Coupon = require('../../models/couponShema.js')
-// const Wallet = require('../../models/')
 
-
-// const applyCoupon = async(req,res)=>{
-//     try {
-//         const {couponCode, orderTotal} = req.body
-//         const userId = req.session.user
-       
-
-//         if(!userId){
-//             return res.status(404).json({
-//                 success:false,
-//                 message:'User is not Found'
-//             })
-//         }
-
-//         const coupon = await Product.findOne({
-//             name:couponCode,
-//             isList:true,
-//             expireOn: { $gt: new Date() }
-
-//         })
-        
-//         if(!coupon){
-//             return res.status(404).json({
-//                 success:false,
-//                 message:'Coupon is not Found'
-//             })
-//         }
-
-//         if(coupon.userBy.includes(userId)){
-//             return res.status(404).json({
-//                 success: false,
-//                 message: "You have already used this coupon"
-//             });
-//         }
-//         coupon.userBy.push(userId)
-//         await coupon.save()
-        
-
-//         if (orderTotal < coupon.minimumPrice) {
-//             return res.status(404).json({
-//                 success: false,
-//                 message: `Minimum order amount of ₹${coupon.minimumPrice} required`
-//             });
-//         }
-//         const discountAmount = Math.min(coupon.offerPrice, orderTotal);
-//         const newTotal = orderTotal - discountAmount;
-
-//         const cart = await Cart.findOne({ userId: userId })
-//         const totalPrice = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
-
-//         res.json({
-//             success: true,
-//             newTotal,
-//             discountAmount,
-//             message: "Coupon applied successfully!"
-//         });
-//     } catch (error) {
-//         console.error("Error in applyCoupon:", error);
-//         res.status(500).json({
-//             success: false,
-//             message: 'server error'
-//         });
-        
-//     }
-// }
 const applyCoupon = async (req, res) => {
     try {
         const { couponCode, orderTotal } = req.body;
@@ -87,7 +21,6 @@ const applyCoupon = async (req, res) => {
         });
 
         if (!coupon) {
-            // If coupon is invalid, return available coupons
             const availableCoupons = await Coupon.find({
                 isList: true,
                 expireOn: { $gt: new Date() },
@@ -141,7 +74,6 @@ const removeCoupon = async (req, res) => {
         const { couponCode } = req.body;
         const userId = req.session.user;
 
-        console.log('Removing coupon:', couponCode, 'for user:', userId); // Debug
 
         if (!userId) {
             console.log('User not found in session');

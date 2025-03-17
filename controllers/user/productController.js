@@ -119,7 +119,6 @@ const submitReview = async (req, res) => {
   
       product.reviews.push(newReview);
   
-      // Calculate and update the average rating
       const totalRatings = product.reviews.reduce((sum, review) => sum + review.rating, 0);
       product.rating = product.reviews.length > 0 ? (totalRatings / product.reviews.length).toFixed(1) : 0;
   
@@ -129,7 +128,7 @@ const submitReview = async (req, res) => {
         success: true,
         message: 'Review submitted successfully',
         averageRating: product.rating,
-        newReview: newReview, // Return the new review object
+        newReview: newReview, 
       });
     } catch (error) {
       console.error('Error submitting review:', error);

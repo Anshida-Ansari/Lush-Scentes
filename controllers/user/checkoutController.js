@@ -22,69 +22,72 @@ const razorpayInstance = new Razorpay({
 
 const loadCheckoutPage = async (req, res) => {
     try {
-        const userId = req.session.user;
-        console.log("User ID from session:", userId);
-
-        if (!userId) {
-            console.log("No user session found, redirecting to login");
-            return res.redirect('/login');
-        }
-
-       
-        const cart = await Cart.findOne({ userId })
-            .populate({
-                path: 'items.productId',
-                select: 'productName productImage salesPrice variants'
-            });
-
-        if (!cart || cart.items.length === 0) {
-            console.log("Cart is empty or not found, redirecting to cart");
-            return res.redirect('/cart');
-        }
-
-      
-        const user = await User.findById(userId);
-        if (!user) {
-            console.log("User not found, rendering error");
-            return res.status(404).render('error', { message: 'User not found' });
-        }
-
-       
-        const totals = {
-            subtotal: cart.items.reduce((sum, item) => sum + (item.totalPrice || 0), 0),
-            discount: 0,
-            finalAmount: cart.items.reduce((sum, item) => sum + (item.totalPrice || 0), 0)
-        };
-
-        
-        const address = await Address.findOne({ userID: userId });
-        console.log("Fetched Address:", address);
-
-       
-        const coupons = await Coupon.find({
-            isList: true,
-            expireOn: { $gt: new Date() },
-            userId: { $ne: userId } 
+      const userId = req.session.user;
+      console.log("User ID from session:", userId);
+  
+      if (!userId) {
+        console.log("No user session found, redirecting to login");
+        return res.redirect('/login');
+      }
+  
+      const cart = await Cart.findOne({ userId })
+        .populate({
+          path: 'items.productId',
+          select: 'productName productImage salesPrice variants isBlocked'
         });
-        console.log("Fetched Coupons:", coupons);
-
-       
-        res.render('checkout', {
-            cart,
-            userAddress: address || {},
-            totals,
-            user,
-            coupons 
+  
+      if (!cart || cart.items.length === 0) {
+        console.log("Cart is empty or not found, redirecting to cart");
+        return res.redirect('/cart');
+      }
+  
+      const blockedItems = cart.items.filter(item => item.productId.isBlocked);
+      if (blockedItems.length > 0) {
+        console.log("Blocked items found in cart:", blockedItems.map(item => item.productId.productName));
+        return res.status(400).render('cart', {
+          cart,
+          ...calculateCartTotals(cart.items),
+          error: 'Cannot proceed to checkout. Remove blocked items: ' + blockedItems.map(item => item.productId.productName).join(', ')
         });
-
+      }
+  
+      const user = await User.findById(userId);
+      if (!user) {
+        console.log("User not found, rendering error");
+        return res.status(404).render('error', { message: 'User not found' });
+      }
+  
+      const totals = {
+        subtotal: cart.items.reduce((sum, item) => sum + (item.totalPrice || 0), 0),
+        discount: 0,
+        finalAmount: cart.items.reduce((sum, item) => sum + (item.totalPrice || 0), 0)
+      };
+  
+      const address = await Address.findOne({ userID: userId });
+      console.log("Fetched Address:", address);
+  
+      const coupons = await Coupon.find({
+        isList: true,
+        expireOn: { $gt: new Date() },
+        userId: { $ne: userId }
+      });
+      console.log("Fetched Coupons:", coupons);
+  
+      res.render('checkout', {
+        cart,
+        userAddress: address || {},
+        totals,
+        user,
+        coupons
+      });
+  
     } catch (error) {
-        console.error('Error loading checkout page:', error);
-        res.status(500).render('error', {
-            message: 'Error loading checkout page: ' + (error.message || 'Unknown error')
-        });
+      console.error('Error loading checkout page:', error);
+      res.status(500).render('error', {
+        message: 'Error loading checkout page: ' + (error.message || 'Unknown error')
+      });
     }
-};
-
+  };
 const processCheckout = async (req, res) => {
     try {
         const userId = req.session.user;
@@ -993,7 +996,6 @@ const downloadInvoice = async (req, res) => {
     try {
         const orderId = req.params.orderId;
 
-        // Fetch the order with populated product and user data
         const order = await Order.findOne({ orderId })
             .populate({
                 path: 'orderedItems.product',
@@ -1001,23 +1003,20 @@ const downloadInvoice = async (req, res) => {
             })
             .populate({
                 path: 'userId',
-                select: 'name', // We only need the user's name here
+                select: 'name', 
             })
             .lean();
 
         if (!order) return res.status(404).send('Order not found');
 
-        // Fetch the address from the Address model using userId and order.address
         const addressDoc = await Address.findOne({ userID: order.userId });
         if (!addressDoc || !addressDoc.address || addressDoc.address.length === 0) {
             return res.status(404).send('Address not found');
         }
 
-        // Find the specific address matching the order.address ObjectId
         const selectedAddress = addressDoc.address.find(addr => addr._id.toString() === order.address.toString());
         if (!selectedAddress) return res.status(404).send('Specific address not found');
 
-        // Initialize PDF document
         const doc = new PDFDocument({
             margin: 50,
             size: 'A4',
@@ -1028,13 +1027,12 @@ const downloadInvoice = async (req, res) => {
         res.setHeader('Content-Disposition', `attachment; filename=invoice-${orderId}.pdf`);
         doc.pipe(res);
 
-        // Header with "LUSH SCENTES" branding
         doc.fontSize(24)
             .text('LUSH SCENTES', 50, 50, { align: 'left' })
             .fontSize(10)
-            .text('www.lushscentes.com', 50, 80, { align: 'left' }) // Replace with your actual website
-            .text('support@lushscentes.com', 50, 95, { align: 'left' }) // Replace with your actual email
-            .text('+91 98765 43210', 50, 110, { align: 'left' }); // Replace with your actual phone number
+            .text('www.lushscentes.com', 50, 80, { align: 'left' }) 
+            .text('support@lushscentes.com', 50, 95, { align: 'left' }) 
+            .text('+91 98765 43210', 50, 110, { align: 'left' }); 
 
         doc.fontSize(20)
             .text('INVOICE', 300, 50, { align: 'right', width: 250 })
@@ -1045,17 +1043,16 @@ const downloadInvoice = async (req, res) => {
 
         doc.moveTo(50, 140).lineTo(550, 140).stroke();
 
-        // Bill To Section (using selected address from Address model)
         doc.fontSize(14)
             .text('Bill To:', 50, 170)
             .fontSize(10)
             .text(selectedAddress.name || order.userId.name || 'Customer', 50, 190)
-            .text(selectedAddress.landMark || '', 50, 205) // Using landMark as address line 1
+            .text(selectedAddress.landMark || '', 50, 205) 
             .text(`${selectedAddress.city}, ${selectedAddress.state} - ${selectedAddress.pincode}`, 50, 220)
             .text(`Phone: ${selectedAddress.phoneNumber || 'N/A'}`, 50, 235)
             .text(`Alt Phone: ${selectedAddress.altPhone || 'N/A'}`, 50, 250);
 
-        // Items Table
+        
         const tableTop = 300;
         const tableHeaders = {
             item: { x: 50, width: 200 },
@@ -1094,7 +1091,7 @@ const downloadInvoice = async (req, res) => {
         doc.moveTo(50, yPosition).lineTo(550, yPosition).stroke();
         yPosition += 20;
 
-        // Summary Section
+       
         const summaryX = 370;
         const summaryWidth = 180;
 
@@ -1119,14 +1116,14 @@ const downloadInvoice = async (req, res) => {
             .text('Total:', summaryX, yPosition, { width: 90, align: 'right' })
             .text(`₹${order.finalAmount.toFixed(2)}`, summaryX + 90, yPosition, { width: 90, align: 'right' });
 
-        // Payment Information
+        
         yPosition += 50;
         doc.fontSize(10)
             .text('Payment Information', 50, yPosition)
             .text(`Method: ${order.paymentMethod}`, 50, yPosition + 15)
             .text(`Status: ${order.status === 'Delivered' ? 'Paid' : order.status}`, 50, yPosition + 30);
 
-        // Footer
+       
         doc.fontSize(10)
             .text('Thank you for shopping with LUSH SCENTES!', 50, doc.page.height - 100, { align: 'center' })
             .fontSize(8)

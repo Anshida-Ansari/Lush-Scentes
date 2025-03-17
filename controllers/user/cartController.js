@@ -35,7 +35,7 @@ const loadcartPage = async (req, res) => {
         const cart = await Cart.findOne({ userId })
             .populate({
                 path: 'items.productId',
-                select: 'productName productImage salesPrice variants'
+                select: 'productName productImage salesPrice variants isBlocked'
             });
 
         if (cart && cart.items) {
@@ -70,103 +70,7 @@ const loadcartPage = async (req, res) => {
 
 
 
-// const addToCart = async (req, res) => {
-//     try {
-//         const { productId, variant } = req.body;
-       
-//         const userId = req.session.user;
 
-//         if (!productId || !variant || !variant.size || !variant.quantity) {
-//             return res.status(400).json({
-//                 success: false,
-//                 message: 'Missing required fields'
-//             });
-//         }
-
-
-//         const product = await Product.findById(productId);
-//         if (!product) {
-//             return res.status(404).json({
-//                 success: false,
-//                 message: 'Product not found'
-//             });
-//         }
-
-
-//         const selectedVariant = product.variants.find(v => v.size === variant.size);
-//         if (!selectedVariant) {
-//             return res.status(404).json({
-//                 success: false,
-//                 message: 'Variant not found'
-//             });
-//         }
-//         const priceToUse = selectedVariant.salesPrice || selectedVariant.regularPrice;
-
-
-//         let cart = await Cart.findOne({ userId });
-//         if (!cart) {
-//             cart = new Cart({ userId, items: [] });
-//         }
-
-//         const existingItemIndex = cart.items.findIndex(item =>
-//             item.productId.toString() === productId &&
-//             item.variant.size === variant.size
-//         );
-
-//         if (existingItemIndex > -1) {
-//             const newQuantity = cart.items[existingItemIndex].variant.quantity + variant.quantity;
-
-//             if (newQuantity > selectedVariant.quantity) {
-//                 return res.status(400).json({
-//                     success: false,
-//                     message: 'Stock limit reached',
-//                     availableStock: selectedVariant.quantity,
-//                     currentCartQuantity: cart.items[existingItemIndex].variant.quantity
-//                 });
-//             }
-
-//             cart.items[existingItemIndex].variant.quantity = newQuantity;
-//             cart.items[existingItemIndex].totalPrice = newQuantity * priceToUse;
-//         } else {
-
-//             if (variant.quantity > selectedVariant.quantity) {
-//                 return res.status(400).json({
-//                     success: false,
-//                     message: 'Stock limit reached',
-//                     availableStock: selectedVariant.quantity
-//                 });
-//             }
-            
-            
-
-//             cart.items.push({
-//                 productId,
-//                 variant:{
-//                     size:variant.size,
-//                     quantity:variant.quantity,
-//                     regularPrice: selectedVariant.regularPrice,
-//                     salesPrice: selectedVariant.salesPrice
-//                 },
-//                 totalPrice: variant.quantity * priceToUse
-//             });
-//         }
-
-//         await cart.save();
-
-//         return res.status(200).json({
-//             success: true,
-//             message: 'Item added to cart successfully',
-//             cart: cart
-//         });
-
-//     } catch (error) {
-//         console.error('Cart validation error details:', error);
-//         return res.status(500).json({
-//             success: false,
-//             message: 'Server error while adding to cart'
-//         });
-//     }
-// };
 const addToCart = async (req, res) => {
     try {
       const { productId, variant } = req.body;
@@ -205,13 +109,11 @@ const addToCart = async (req, res) => {
         (item) => item.productId.toString() === productId && item.variant.size === variant.size
       );
   
-      // Check purchase limit
       let newQuantity = variant.quantity;
       if (existingItemIndex > -1) {
         newQuantity = cart.items[existingItemIndex].variant.quantity + variant.quantity;
       }
   
-      // Apply the exact check you provided
       if (newQuantity > 5) {
         return res.status(400).json({
           status: false,
@@ -219,7 +121,6 @@ const addToCart = async (req, res) => {
         });
       }
   
-      // Check stock limit
       if (newQuantity > selectedVariant.quantity) {
         return res.status(400).json({
           success: false,
@@ -260,73 +161,7 @@ const addToCart = async (req, res) => {
       });
     }
   };
-// const updateCart = async (req, res) => {
-//     try {
-//         const { productId,size } = req.params;
-//         const { quantity } = req.body;
-//         const userId = req.session.user;
 
-
-//         const newQuantity = parseInt(quantity);
-//         if (isNaN(newQuantity) || newQuantity < 1) {
-//             return res.status(400).json({ message: 'Invalid quantity' });
-//         }
-
-//         const cart = await Cart.findOne({ userId });
-//         if (!cart) {
-//             return res.status(404).json({ message: 'Cart not found' });
-//         }
-
-
-//         const itemIndex = cart.items.findIndex(item =>
-//             item.productId.toString() === productId &&
-//             item.variant.size === size
-//         );
-
-//         if (itemIndex === -1) {
-//             return res.status(404).json({ message: 'Item not found in cart' });
-//         }
-
-
-//         const product = await Product.findById(productId);
-//         if (!product) {
-//             return res.status(404).json({ message: 'Product not found' });
-//         }
-
-
-//         const variant = product.variants.find(v => v.size === cart.items[itemIndex].variant.size);
-//         if (!variant) {
-//             return res.status(404).json({ message: 'Variant not found' });
-//         }
-
-
-//         if (newQuantity > variant.quantity) {
-//             return res.status(400).json({
-//                 message: 'Stock limit reached',
-//                 availableStock: variant.quantity
-//             });
-//         }
-
-
-//         cart.items[itemIndex].variant.quantity = newQuantity;
-//         const priceToUse = variant.salesPrice || variant.regularPrice
-//         cart.items[itemIndex].totalPrice = newQuantity * priceToUse;
-
-//         await cart.save();
-
-
-//         const totals = calculateCartTotals(cart.items);
-
-//         res.status(200).json({
-//             message: 'Cart updated successfully',
-//             cart,
-//             totals
-//         });
-//     } catch (error) {
-//         console.error('Error updating cart:', error);
-//         res.status(500).json({ message: 'Server error' });
-//     }
-// };
 const updateCart = async (req, res) => {
     try {
       const { productId, size } = req.params;
@@ -338,7 +173,6 @@ const updateCart = async (req, res) => {
         return res.status(400).json({ message: 'Invalid quantity' });
       }
   
-      // Add purchase limit check
       if (newQuantity > 5) {
         return res.status(400).json({
           status: false,

@@ -202,50 +202,38 @@
                                 <% if (item.productId) { %>
                                     <tr>
                                         <td style="width: 80px;">
-                                            <img src="<%= item.productId.productImage[0] %>"
-                                                 alt="<%= item.productId.productName %>" class="product-img">
+                                          <img src="<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>" class="product-img">
                                         </td>
                                         <td>
-                                            <div class="product-details">
-                                                <h3 class="product-name">
-                                                    <%= item.productId.productName %>
-                                                </h3>
-                                                <p class="product-variant">
-                                                    Size: <%= item.variant.size %> | 
-                                                    Price: $<%= item.variant.salesPrice || item.variant.regularPrice %>
-                                                </p>
-                                            </div>
+                                          <div class="product-details">
+                                            <h3 class="product-name"><%= item.productId.productName %></h3>
+                                            <p class="product-variant">
+                                              Size: <%= item.variant.size %> | 
+                                              Price: $<%= item.variant.salesPrice || item.variant.regularPrice %>
+                                              <% if (item.productId.isBlocked) { %>
+                                                <span style="color: #d9534f;"> (Blocked - Unavailable)</span>
+                                              <% } %>
+                                            </p>
+                                          </div>
                                         </td>
                                         <td style="width: 120px;">
-                                            <div class="quantity-control">
-                                                <button class="quantity-btn decrement"
-                                                    data-product-id="<%= item.productId._id %>"
-                                                    data-size="<%= item.variant.size %>">-</button>
-                                                <input type="text" class="form-control quantity-input" readonly
-                                                    value="<%= item.variant.quantity %>"
-                                                    data-product-id="<%= item.productId._id %>"
-                                                    data-size="<%= item.variant.size %>"
-                                                    data-price="<%= item.variant.salesPrice || item.variant.regularPrice %>"
-                                                    data-stock="<%= item.productId.variants.find(v => v.size === item.variant.size)?.quantity || 0 %>">
-                                                <button class="quantity-btn increment"
-                                                    data-product-id="<%= item.productId._id %>"
-                                                    data-size="<%= item.variant.size %>">+</button>
-                                            </div>
-                                            <div class="stock-message" id="stock-msg-<%= item.productId._id %>-<%= item.variant.size %>">
-                                            </div>
+                                          <div class="quantity-control">
+                                            <button class="quantity-btn decrement" data-product-id="<%= item.productId._id %>" data-size="<%= item.variant.size %>">-</button>
+                                            <input type="text" class="form-control quantity-input" readonly value="<%= item.variant.quantity %>"
+                                              data-product-id="<%= item.productId._id %>" data-size="<%= item.variant.size %>"
+                                              data-price="<%= item.variant.salesPrice || item.variant.regularPrice %>"
+                                              data-stock="<%= item.productId.variants.find(v => v.size === item.variant.size)?.quantity || 0 %>">
+                                            <button class="quantity-btn increment" data-product-id="<%= item.productId._id %>" data-size="<%= item.variant.size %>">+</button>
+                                          </div>
+                                          <div class="stock-message" id="stock-msg-<%= item.productId._id %>-<%= item.variant.size %>"></div>
                                         </td>
-                                        <td class="product-price"
-                                        data-product-id="<%= item.productId._id %>" 
-                                        data-size="<%= item.variant.size %>">
-                                            
-                                            $<%= (item.variant.salesPrice || item.variant.regularPrice * item.variant.quantity).toFixed(2) %>
+                                        <td class="product-price" data-product-id="<%= item.productId._id %>" data-size="<%= item.variant.size %>">
+                                          $<%= ((item.variant.salesPrice || item.variant.regularPrice) * item.variant.quantity).toFixed(2) %>
                                         </td>
                                         <td style="width: 30px;">
-                                            <button class="remove-btn" 
-                                                data-product-id="<%= item.productId._id %>"
-                                                data-size="<%= item.variant.size %>">&times;</button>
+                                          <button class="remove-btn" data-product-id="<%= item.productId._id %>" data-size="<%= item.variant.size %>">×</button>
                                         </td>
-                                    </tr>
+                                      </tr>  
                                 <% } %>
                             <% }); %>
                         <% } else { %>
@@ -477,28 +465,53 @@
         });
     });
 
-    document.querySelector('.btn-checkout').addEventListener('click', function () {
-        if (!this.disabled) {
-            Swal.fire({
-                title: 'Proceeding to Checkout',
-                text: 'Please wait...',
-                icon: 'info',
-                showConfirmButton: false,
-                allowOutsideClick: false,
-                willOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-            window.location.href = '/checkout';
-        } else {
-            Swal.fire({
-                title: 'Cart Empty',
-                text: 'Please add items to your cart before checking out.',
-                icon: 'info',
-                confirmButtonColor: '#3085d6'
-            });
-        }
+    document.querySelector('.btn-checkout').addEventListener('click', async function () {
+  if (!this.disabled) {
+    
+    const cartItems = [];
+    document.querySelectorAll('.cart-table tbody tr').forEach(row => {
+      const productId = row.querySelector('.quantity-btn').dataset.productId;
+      const size = row.querySelector('.quantity-btn').dataset.size;
+      const quantityInput = row.querySelector('.quantity-input');
+      const quantity = parseInt(quantityInput.value);
+      const price = parseFloat(quantityInput.dataset.price);
+      const isBlocked = row.querySelector('.product-variant span') !== null; 
+
+      cartItems.push({ productId, size, quantity, price, isBlocked });
     });
+
+    
+    const hasBlockedItems = cartItems.some(item => item.isBlocked);
+    if (hasBlockedItems) {
+      Swal.fire({
+        title: 'Checkout Blocked',
+        text: 'Your cart contains blocked items that are no longer available. Please remove them to proceed.',
+        icon: 'error',
+        confirmButtonColor: '#3085d6'
+      });
+      return;
+    }
+
+    Swal.fire({
+      title: 'Proceeding to Checkout',
+      text: 'Please wait...',
+      icon: 'info',
+      showConfirmButton: false,
+      allowOutsideClick: false,
+      willOpen: () => {
+        Swal.showLoading();
+      }
+    });
+    window.location.href = '/checkout';
+  } else {
+    Swal.fire({
+      title: 'Cart Empty',
+      text: 'Please add items to your cart before checking out.',
+      icon: 'info',
+      confirmButtonColor: '#3085d6'
+    });
+  }
+});
 
     function loadShop() {
         window.location.href = '/shop';

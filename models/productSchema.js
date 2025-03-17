@@ -23,7 +23,7 @@ const productSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  isDeleted: { // Added for soft delete
+  isDeleted: {
     type: Boolean,
     default: false,
   },
@@ -62,7 +62,7 @@ const productSchema = new Schema({
     type: Number,
     default: 0,
     min: 0,
-    max: 5, // Assuming this is an average rating
+    max: 5, 
   },
   reviews: [{
     user: {
@@ -70,11 +70,11 @@ const productSchema = new Schema({
       ref: 'User',
       required: true,
     },
-    name: { // Optional if you fetch from User, but keep for display consistency
+    name: { 
       type: String,
       required: true,
     },
-    email: { // Optional if you fetch from User
+    email: {
       type: String,
       required: true,
     },

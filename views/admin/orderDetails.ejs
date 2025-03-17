@@ -17,19 +17,21 @@
                         <div class="col-md-6">
                             <p class="card-text"><strong>Total Amount:</strong> ₹<%= order.finalAmount.toFixed(2) %></p>
                             <p class="card-text"><strong>Payment Method:</strong> <%= order.paymentMethod || 'N/A' %></p>
-                            <p class="card-text"><strong>Status:</strong> <span class="badge bg-<%= order.status === 'Delivered' ? 'success' : order.status === 'Cancelled' ? 'danger' : order.status === 'Processing' ? 'warning' : 'info' %>"><%= order.status %></p>
+                            <p class="card-text"><strong>Status:</strong> <span class="badge bg-<%= order.status === 'Delivered' ? 'success' : order.status === 'Cancelled' ? 'danger' : order.status === 'Processing' ? 'warning' : 'info' %>"><%= order.status %></span></p>
                             <p class="card-text"><strong>Order Date:</strong> <%= order.createdOn ? new Date(order.createdOn).toLocaleString() : 'N/A' %></p>
                         </div>
                         <div class="col-md-6">
                             <!-- Shipping Address -->
-                            <% if (order.address && order.address.address && order.address.address.length > 0) { %>
-                                <% const defaultAddress = order.address.address.find(addr => addr.default) || order.address.address[0]; %>
+                            <% if (order.addressDetails) { %>
                                 <p class="card-text"><strong>Shipping Address:</strong></p>
                                 <address class="mb-0">
-                                    <%= defaultAddress.name %><br>
-                                    <%= defaultAddress.city %>, <%= defaultAddress.state %> - <%= defaultAddress.pincode %><br>
-                                    Landmark: <%= defaultAddress.landMark %><br>
-                                    Phone: <%= defaultAddress.phoneNumber %>
+                                    <%= order.addressDetails.name %><br>
+                                    <%= order.addressDetails.city %>, <%= order.addressDetails.state %> - <%= order.addressDetails.pincode %><br>
+                                    Landmark: <%= order.addressDetails.landMark %><br>
+                                    Phone: <%= order.addressDetails.phoneNumber %><br>
+                                    <% if (order.addressDetails.altPhone) { %>
+                                        Alt Phone: <%= order.addressDetails.altPhone %>
+                                    <% } %>
                                 </address>
                             <% } else { %>
                                 <p class="card-text"><strong>Shipping Address:</strong> N/A</p>
@@ -46,10 +48,10 @@
                                 <img src="<%= item.productImage[0] %>" alt="<%= item.name %>" class="img-thumbnail me-3" style="width: 100px; height: 100px; object-fit: cover;">
                                 <div class="flex-grow-1">
                                     <h6 class="mb-1"><%= item.name %></h6>
-                                    <p class="text-muted mb-1">Price: ₹<%= item.price.toFixed(2) %> (Qty: <%= item.variant.quantity %>)</p>
-                                    <p class="text-muted mb-1">Size: <%= item.variant.size %></p>
-                                    <p class="text-muted mb-1">Cancel Status: <%= item.cancelStatus || 'Completed' %></p>
-                                    <p class="text-muted mb-1">Return Status: <%= item.returnStatus || 'Not Requested' %></p>
+                                    <p class="mb-1">Price: ₹<%= item.price.toFixed(2) %> (Qty: <%= item.variant.quantity %>)</p>
+                                    <p class="mb-1">Size: <%= item.variant.size %></p>
+                                    <p class="mb-1">Cancel Status: <%= item.cancelStatus || 'Completed' %></p>
+                                    <p class="mb-1">Return Status: <%= item.returnStatus || 'Not Requested' %></p>
                                     <% if (item.returnStatus && item.returnStatus !== 'Not Requested') { %>
                                         <p class="mb-1"><strong>Return Reason:</strong> <%= item.returnReason || 'No reason provided' %></p>
                                         <p class="mb-1"><strong>Requested At:</strong> <%= item.returnRequestedAt ? new Date(item.returnRequestedAt).toLocaleString() : 'N/A' %></p>
@@ -72,179 +74,180 @@
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        window.approveReturn = function(orderId, productId) {
-            console.log('Fetching:', '/admin/approve-return', { orderId, productId });
-            Swal.fire({
-                title: 'Approve Return',
-                text: 'Are you sure you want to approve this return?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, Approve',
-                confirmButtonColor: '#28a745',
-                cancelButtonText: 'Cancel',
-                showLoaderOnConfirm: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch('/admin/approve-return', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ orderId, productId })
-                    })
-                    .then(response => {
-                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire({
-                                title: 'Approved',
-                                text: data.message,
-                                icon: 'success'
-                            }).then(() => location.reload());
-                        } else {
-                            Swal.fire({
-                                title: 'Error',
-                                text: data.message || 'Failed to approve return',
-                                icon: 'error'
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
+<script>
+    window.approveReturn = function(orderId, productId) {
+        console.log('Fetching:', '/admin/approve-return', { orderId, productId });
+        Swal.fire({
+            title: 'Approve Return',
+            text: 'Are you sure you want to approve this return?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Approve',
+            confirmButtonColor: '#28a745',
+            cancelButtonText: 'Cancel',
+            showLoaderOnConfirm: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('/admin/approve-return', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ orderId, productId })
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Approved',
+                            text: data.message,
+                            icon: 'success'
+                        }).then(() => location.reload());
+                    } else {
                         Swal.fire({
                             title: 'Error',
-                            text: 'An error occurred while processing your request.',
+                            text: data.message || 'Failed to approve return',
                             icon: 'error'
                         });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'An error occurred while processing your request.',
+                        icon: 'error'
                     });
-                }
-            });
-        };
-
-        window.rejectReturn = function(orderId, productId) {
-            console.log('Fetching:', '/admin/reject-return', { orderId, productId });
-            Swal.fire({
-                title: 'Reject Return',
-                text: 'Are you sure you want to reject this return?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, Reject',
-                confirmButtonColor: '#dc3545',
-                cancelButtonText: 'Cancel',
-                showLoaderOnConfirm: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch('/admin/reject-return', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ orderId, productId })
-                    })
-                    .then(response => {
-                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire({
-                                title: 'Rejected',
-                                text: data.message,
-                                icon: 'success'
-                            }).then(() => location.reload());
-                        } else {
-                            Swal.fire({
-                                title: 'Error',
-                                text: data.message || 'Failed to reject return',
-                                icon: 'error'
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        Swal.fire({
-                            title: 'Error',
-                            text: 'An error occurred while processing your request.',
-                            icon: 'error'
-                        });
-                    });
-                }
-            });
-        };
-    </script>
-
-    <%- include("../partials/admin/footer") %>
-
-    <style>
-        .card {
-            border: none;
-            border-radius: 0.5rem;
-        }
-
-        .card-header {
-            border-bottom: none;
-            padding: 1rem 1.5rem;
-        }
-
-        .card-title {
-            margin-bottom: 0;
-        }
-
-        .card-text {
-            margin-bottom: 0.5rem;
-            font-size: 1rem;
-        }
-
-        .badge {
-            padding: 0.4rem 0.8rem;
-            font-size: 0.9rem;
-            border-radius: 0.25rem;
-        }
-
-        address {
-            font-style: normal;
-            line-height: 1.5;
-            margin-bottom: 0;
-            padding-left: 1rem;
-            border-left: 2px solid #f1f4f8;
-            background-color: #ffffff;
-            border-radius: 0.25rem;
-        }
-
-        .list-group-item {
-            border: none;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .list-group-item:hover {
-            background-color: #f8f9fa;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .img-thumbnail {
-            border: none;
-            border-radius: 0.25rem;
-        }
-
-        .btn-sm {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.875rem;
-        }
-
-        .text-muted {
-            font-size: 0.9rem;
-        }
-
-        @media (max-width: 768px) {
-            .col-md-6 {
-                margin-bottom: 1rem;
+                });
             }
+        });
+    };
+
+    window.rejectReturn = function(orderId, productId) {
+        console.log('Fetching:', '/admin/reject-return', { orderId, productId });
+        Swal.fire({
+            title: 'Reject Return',
+            text: 'Are you sure you want to reject this return?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Reject',
+            confirmButtonColor: '#dc3545',
+            cancelButtonText: 'Cancel',
+            showLoaderOnConfirm: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('/admin/reject-return', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ orderId, productId })
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Rejected',
+                            text: data.message,
+                            icon: 'success'
+                        }).then(() => location.reload());
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: data.message || 'Failed to reject return',
+                            icon: 'error'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'An error occurred while processing your request.',
+                        icon: 'error'
+                    });
+                });
+            }
+        });
+    };
+</script>
+
+<%- include("../partials/admin/footer") %>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 0.5rem;
+    }
+
+    .card-header {
+        border-bottom: none;
+        padding: 1rem 1.5rem;
+    }
+
+    .card-title {
+        margin-bottom: 0;
+    }
+
+    .card-text {
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .badge {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+        border-radius: 0.25rem;
+    }
+
+    address {
+        font-style: normal;
+        line-height: 1.5;
+        margin-bottom: 0;
+        padding-left: 1rem;
+        border-left: 2px solid #f1f4f8;
+        background-color: #ffffff;
+        border-radius: 0.25rem;
+    }
+
+    .list-group-item {
+        border: none;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .img-thumbnail {
+        border: none;
+        border-radius: 0.25rem;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .text-muted {
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+        .col-md-6 {
+            margin-bottom: 1rem;
         }
-    </style>
+    }
+</style>

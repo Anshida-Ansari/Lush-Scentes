@@ -68,7 +68,7 @@ const addWishlist = async (req, res) => {
         res.json({ success: true, message: 'Product added to wishlist' });
     } catch (error) {
         console.error('Error in addToWishlist:', error);
-        res.status(500).json({ success: false, message: 'Server error' }); // Fixed response in error case
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 };
 
@@ -91,7 +91,6 @@ const removeFromWishlist = async (req, res) => {
             });
         }
 
-        // Find the wishlist for the user and remove the product
         const updatedWishlist = await Wishlist.findOneAndUpdate(
             { userId: userId },
             { $pull: { products: { productId: productId } } },
