@@ -643,6 +643,42 @@
       });
     });
   }
+  document.addEventListener('DOMContentLoaded', function() {
+  const deleteBtn = document.getElementById('deleteProductBtn');
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', confirmDeleteProduct);
+  }
+});
+
+// Confirm product deletion with modal
+function confirmDeleteProduct() {
+  if (confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+    deleteProduct();
+  }
+}
+
+// Handle product deletion
+function deleteProduct() {
+  fetch(`/admin/deleteProduct/<%= product._id %>`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('Product deleted successfully');
+      window.location.href = '/admin/product'; // Redirect to products page
+    } else {
+      alert(data.message || 'Failed to delete product');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('An error occurred while deleting the product');
+  });
+}
 
   // Assume handleUpload is defined elsewhere for Cloudinary
   async function handleUpload(file) {

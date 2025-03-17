@@ -5,8 +5,7 @@ const fs = require('fs')
 const path = require('path')
 const sharp = require('sharp')
 const product = require('../../models/productSchema')
-const cloudinary = require('../../config/cloudinary.js')
-
+const { handleUpload } = require('../../config/cloudinary');
 const getProductAddPage = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -146,7 +145,7 @@ const addProducts = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: 'Product added successfully',
-      redirectUrl: '/admin/products',
+      redirectUrl: '/admin/product',
     });
   } catch (error) {
     console.error('Error saving product:', error);
@@ -354,35 +353,46 @@ const editProduct = async (req, res) => {
     res.status(500).json({ error: 'Server error occurred' }); 
   }
 };
+
 const deleteSingleImage = async (req, res) => {
   try {
-    const { imageNameToServer, productIdToServer } = req.body;
-
-    const product = await Product.findById(productIdToServer);
-    if (!product) {
-      return res.status(404).json({ status: false, error: 'Product not found' });
-    }
-
-    if (product.productImage.length <= 1) {
-      return res.status(400).json({ status: false, error: 'Cannot delete the last image' });
-    }
-
-    await Product.findByIdAndUpdate(productIdToServer, {
-      $pull: { productImage: imageNameToServer },
-    });
-
-    const imagePath = path.join('public', 'uploads', 'product-image', path.basename(imageNameToServer));
-    if (fs.existsSync(imagePath)) {
-      await fs.promises.unlink(imagePath);
-      console.log(`Image ${imageNameToServer} deleted successfully`);
-    }
-
-    res.json({ status: true });
+      const { imageNameToServer, productIdToServer } = req.body;
+      
+      const product = await Product.findByIdAndUpdate(
+          productIdToServer, 
+          { $pull: { productImage: imageNameToServer } },
+          { new: true }
+      );
+      
+      if (!product) {
+          return res.status(404).json({
+              success: false,
+              message:' product not found'
+          });
+      }
+      
+      const publicId = imageNameToServer.split('/').pop().split('.')[0];
+      
+      try {
+          await cloudinary.uploader.destroy(`perfume_images/${publicId}`);
+          console.log(`Image ${publicId} deleted from Cloudinary successfully`);
+      } catch (cloudinaryError) {
+          console.error("Error deleting from Cloudinary:", cloudinaryError);
+      }
+      
+      res.send({ 
+          status: true,
+          message: "Image deleted successfully"
+      });
   } catch (error) {
-    console.error('Error deleting image:', error);
-    res.status(500).json({ status: false, error: 'Server error' });
+      console.error("Error in deleteSingleImage:", error);
+      return res.status(404).json({
+          success: false,
+          message: 'server error'
+      });
   }
 };
+
 const softDeleteProduct = async (req, res) => {
   try {
     const { productId } = req.params;

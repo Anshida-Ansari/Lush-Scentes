@@ -47,7 +47,7 @@ router.get('/unblockProduct', isAuthenticated, productController.unblockProduct)
 router.get('/editProduct', isAuthenticated, productController.getEditProduct)
 router.put('/editProduct/:id', upload.fields([{ name: 'images', maxCount: 4 }]),productController.editProduct);
 router.post('/editProduct/:id', isAuthenticated, upload.single('productImage'), productController.editProduct)
-router.post('/deleteImage', isAuthenticated, productController.deleteSingleImage)
+router.post('/deleteSingleImage', isAuthenticated, productController.deleteSingleImage)
 
 router.get('/order', isAuthenticated, orderController.getListOfOrders)
 router.get('/order/:orderId', isAuthenticated, orderController.getOrderDetails)
