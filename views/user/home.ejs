@@ -1,95 +1,2242 @@
 <%-include('../../views/partials/user/header')%>
+<style>
+  /* Hover effects for more interactivity */
+  .collection-card:hover .collection-image-container img {
+    transform: scale(1.05);
+  }
+  
+  .collection-card:hover .btn-outline-light {
+    background-color: white;
+    color: black;
+  }
+  
+  /* Media queries for responsive design */
+  @media (max-width: 992px) {
+    .collection-image-container {
+      height: 380px !important;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .collection-image-container {
+      height: 320px !important;
+    }
+  }
+  .carousel-slide {
+  image-rendering: -webkit-optimize-contrast; /* For Chrome/Safari */
+  image-rendering: crisp-edges; /* For Firefox */
+}
+.category-title {
+    position: relative;
+    padding-bottom: 10px;
+    font-size: 1.5rem;
+}
 
-<div class="site-blocks-cover inner-page" data-aos="fade">
-  <div class="container">
-    <div class="row">
-      <div class="col-md-6 ml-auto order-md-2 align-self-start">
-        <div class="site-block-cover-content">
-        <h2 class="sub-title">#New Summer Collection 2019</h2>
-        <h1>Arrivals Sales</h1>
-        <p><a href="/shop" class="btn btn-black rounded-0">Shop Now</a></p>
+.category-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background-color: #007bff;
+}
+
+.item-entry {
+    transition: transform 0.3s ease;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.item-entry:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.product-item {
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.product-item img {
+    transition: transform 0.3s ease;
+}
+
+.product-item:hover img {
+    transform: scale(1.05);
+}
+
+.item-title {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 5px;
+    height: 40px;
+    overflow: hidden;
+}
+
+.price-container {
+    margin-bottom: 10px;
+}
+
+.item-price {
+    color: #e83e8c;
+}
+
+.item-price del {
+    color: #6c757d;
+    font-weight: normal;
+    margin-right: 10px;
+}
+/* Product Showcase Styling */
+.product-showcase {
+  padding: 60px 0;
+  background-color: #fff;
+}
+
+.title-section h2 {
+  font-size: 2.5rem;
+  letter-spacing: 2px;
+  font-weight: 300;
+  margin-bottom: 0.5rem;
+  color: #000;
+}
+
+.title-section .subtitle {
+  font-size: 1.2rem;
+  color: #777;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.product-grid {
+  margin-top: 40px;
+}
+
+.product-item {
+  transition: all 0.3s ease;
+}
+
+.product-item:hover {
+  transform: translateY(-5px);
+}
+
+.product-image-container {
+  background-color: #f8f8f8;
+  padding: 20px;
+  margin-bottom: 15px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-image-container img {
+  max-height: 250px;
+  object-fit: contain;
+}
+
+.product-name {
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.product-description {
+  color: #777;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.product-price {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.product-price del {
+  color: #999;
+  font-weight: 400;
+  margin-right: 10px;
+}
+
+.product-actions {
+  margin-top: 15px;
+}
+
+.btn-outline-dark, .btn-dark {
+  border-radius: 0;
+  padding: 8px 15px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.btn-outline-dark:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+.btn-dark {
+  background-color: #000;
+}
+
+.btn-dark:hover {
+  background-color: #333;
+}
+
+/* View All Products button */
+.btn-lg {
+  padding: 12px 30px;
+  font-size: 0.9rem;
+}
+.product-showcase {
+  padding: 60px 0;
+  background-color: #fff;
+}
+
+.title-section h2 {
+  font-size: 2.2rem;
+  letter-spacing: 1px;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+  color: #000;
+}
+
+.title-section .subtitle {
+  font-size: 1.1rem;
+  color: #777;
+  font-weight: 300;
+}
+
+.product-grid {
+  margin-top: 30px;
+}
+
+.product-item {
+  padding: 15px;
+  background-color: #f9f9f9;
+  margin-bottom: 30px;
+}
+
+/* Remove hover effects as requested */
+.product-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.product-image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.product-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: contain;
+}
+
+.product-info {
+  padding: 10px 0;
+}
+
+.product-name {
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+  font-weight: 400;
+  color: #000; /* Black color as requested */
+}
+
+.product-type {
+  font-size: 0.9rem;
+  color: #777;
+  margin-bottom: 10px;
+}
+
+.price-container {
+  margin-top: 10px;
+}
+
+.product-price {
+  font-weight: 500;
+  font-size: 1rem;
+  color: #333;
+}
+
+.product-price del {
+  color: #999;
+  margin-right: 10px;
+}
+  .carousel-slide {
+  image-rendering: -webkit-optimize-contrast; /* For Chrome/Safari */
+  image-rendering: crisp-edges; /* For Firefox */
+}
+.category-title {
+    position: relative;
+    padding-bottom: 10px;
+    font-size: 1.5rem;
+}
+
+.category-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background-color: #007bff;
+}
+
+.item-entry {
+    transition: transform 0.3s ease;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.item-entry:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.product-item {
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.product-item img {
+    transition: transform 0.3s ease;
+}
+
+.product-item:hover img {
+    transform: scale(1.05);
+}
+
+.item-title {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 5px;
+    height: 40px;
+    overflow: hidden;
+}
+
+.price-container {
+    margin-bottom: 10px;
+}
+
+.item-price {
+    color: #e83e8c;
+}
+
+.item-price del {
+    color: #6c757d;
+    font-weight: normal;
+    margin-right: 10px;
+}
+/* Product Showcase Styling */
+.product-showcase {
+  padding: 60px 0;
+  background-color: #fff;
+}
+
+.title-section h2 {
+  font-size: 2.5rem;
+  letter-spacing: 2px;
+  font-weight: 300;
+  margin-bottom: 0.5rem;
+  color: #000;
+}
+
+.title-section .subtitle {
+  font-size: 1.2rem;
+  color: #777;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.product-grid {
+  margin-top: 40px;
+}
+
+.product-item {
+  transition: all 0.3s ease;
+}
+
+.product-item:hover {
+  transform: translateY(-5px);
+}
+
+.product-image-container {
+  background-color: #f8f8f8;
+  padding: 20px;
+  margin-bottom: 15px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-image-container img {
+  max-height: 250px;
+  object-fit: contain;
+}
+
+.product-name {
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.product-description {
+  color: #777;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.product-price {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.product-price del {
+  color: #999;
+  font-weight: 400;
+  margin-right: 10px;
+}
+
+.product-actions {
+  margin-top: 15px;
+}
+
+.btn-outline-dark, .btn-dark {
+  border-radius: 0;
+  padding: 8px 15px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.btn-outline-dark:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+.btn-dark {
+  background-color: #000;
+}
+
+.btn-dark:hover {
+  background-color: #333;
+}
+
+/* View All Products button */
+.btn-lg {
+  padding: 12px 30px;
+  font-size: 0.9rem;
+}
+.product-showcase {
+  padding: 60px 0;
+  background-color: #fff;
+}
+
+.title-section h2 {
+  font-size: 2.2rem;
+  letter-spacing: 1px;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+  color: #000;
+}
+
+.title-section .subtitle {
+  font-size: 1.1rem;
+  color: #777;
+  font-weight: 300;
+}
+
+.product-grid {
+  margin-top: 30px;
+}
+
+.product-item {
+  padding: 15px;
+  background-color: #f9f9f9;
+  margin-bottom: 30px;
+}
+
+/* Remove hover effects as requested */
+.product-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.product-image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.product-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: contain;
+}
+
+.product-info {
+  padding: 10px 0;
+}
+
+.product-name {
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+  font-weight: 400;
+  color: #000; /* Black color as requested */
+}
+
+.product-type {
+  font-size: 0.9rem;
+  color: #777;
+  margin-bottom: 10px;
+}
+
+.price-container {
+  margin-top: 10px;
+}
+
+.product-price {
+  font-weight: 500;
+  font-size: 1rem;
+  color: #333;
+}
+
+.product-price del {
+  color: #999;
+  margin-right: 10px;
+}
+  .carousel-slide {
+  image-rendering: -webkit-optimize-contrast; /* For Chrome/Safari */
+  image-rendering: crisp-edges; /* For Firefox */
+}
+.category-title {
+    position: relative;
+    padding-bottom: 10px;
+    font-size: 1.5rem;
+}
+
+.category-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background-color: #007bff;
+}
+
+.item-entry {
+    transition: transform 0.3s ease;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.item-entry:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.product-item {
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.product-item img {
+    transition: transform 0.3s ease;
+}
+
+.product-item:hover img {
+    transform: scale(1.05);
+}
+
+.item-title {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 5px;
+    height: 40px;
+    overflow: hidden;
+}
+
+.price-container {
+    margin-bottom: 10px;
+}
+
+.item-price {
+    color: #e83e8c;
+}
+
+.item-price del {
+    color: #6c757d;
+    font-weight: normal;
+    margin-right: 10px;
+}
+/* Product Showcase Styling */
+.product-showcase {
+  padding: 60px 0;
+  background-color: #fff;
+}
+
+.title-section h2 {
+  font-size: 2.5rem;
+  letter-spacing: 2px;
+  font-weight: 300;
+  margin-bottom: 0.5rem;
+  color: #000;
+}
+
+.title-section .subtitle {
+  font-size: 1.2rem;
+  color: #777;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.product-grid {
+  margin-top: 40px;
+}
+
+.product-item {
+  transition: all 0.3s ease;
+}
+
+.product-item:hover {
+  transform: translateY(-5px);
+}
+
+.product-image-container {
+  background-color: #f8f8f8;
+  padding: 20px;
+  margin-bottom: 15px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-image-container img {
+  max-height: 250px;
+  object-fit: contain;
+}
+
+.product-name {
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.product-description {
+  color: #777;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.product-price {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.product-price del {
+  color: #999;
+  font-weight: 400;
+  margin-right: 10px;
+}
+
+.product-actions {
+  margin-top: 15px;
+}
+
+.btn-outline-dark, .btn-dark {
+  border-radius: 0;
+  padding: 8px 15px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.btn-outline-dark:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+.btn-dark {
+  background-color: #000;
+}
+
+.btn-dark:hover {
+  background-color: #333;
+}
+
+/* View All Products button */
+.btn-lg {
+  padding: 12px 30px;
+  font-size: 0.9rem;
+}
+.product-showcase {
+  padding: 60px 0;
+  background-color: #fff;
+}
+
+.title-section h2 {
+  font-size: 2.2rem;
+  letter-spacing: 1px;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+  color: #000;
+}
+
+.title-section .subtitle {
+  font-size: 1.1rem;
+  color: #777;
+  font-weight: 300;
+}
+
+.product-grid {
+  margin-top: 30px;
+}
+
+.product-item {
+  padding: 15px;
+  background-color: #f9f9f9;
+  margin-bottom: 30px;
+}
+
+/* Remove hover effects as requested */
+.product-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.product-image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.product-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: contain;
+}
+
+.product-info {
+  padding: 10px 0;
+}
+
+.product-name {
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+  font-weight: 400;
+  color: #000; /* Black color as requested */
+}
+
+.product-type {
+  font-size: 0.9rem;
+  color: #777;
+  margin-bottom: 10px;
+}
+
+.price-container {
+  margin-top: 10px;
+}
+
+.product-price {
+  font-weight: 500;
+  font-size: 1rem;
+  color: #333;
+}
+
+.product-price del {
+  color: #999;
+  margin-right: 10px;
+}
+  .carousel-slide {
+  image-rendering: -webkit-optimize-contrast; /* For Chrome/Safari */
+  image-rendering: crisp-edges; /* For Firefox */
+}
+.category-title {
+    position: relative;
+    padding-bottom: 10px;
+    font-size: 1.5rem;
+}
+
+.category-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background-color: #007bff;
+}
+
+.item-entry {
+    transition: transform 0.3s ease;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.item-entry:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.product-item {
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.product-item img {
+    transition: transform 0.3s ease;
+}
+
+.product-item:hover img {
+    transform: scale(1.05);
+}
+
+.item-title {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 5px;
+    height: 40px;
+    overflow: hidden;
+}
+
+.price-container {
+    margin-bottom: 10px;
+}
+
+.item-price {
+    color: #e83e8c;
+}
+
+.item-price del {
+    color: #6c757d;
+    font-weight: normal;
+    margin-right: 10px;
+}
+/* Product Showcase Styling */
+.product-showcase {
+  padding: 60px 0;
+  background-color: #fff;
+}
+
+.title-section h2 {
+  font-size: 2.5rem;
+  letter-spacing: 2px;
+  font-weight: 300;
+  margin-bottom: 0.5rem;
+  color: #000;
+}
+
+.title-section .subtitle {
+  font-size: 1.2rem;
+  color: #777;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.product-grid {
+  margin-top: 40px;
+}
+
+.product-item {
+  transition: all 0.3s ease;
+}
+
+.product-item:hover {
+  transform: translateY(-5px);
+}
+
+.product-image-container {
+  background-color: #f8f8f8;
+  padding: 20px;
+  margin-bottom: 15px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-image-container img {
+  max-height: 250px;
+  object-fit: contain;
+}
+
+.product-name {
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.product-description {
+  color: #777;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.product-price {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.product-price del {
+  color: #999;
+  font-weight: 400;
+  margin-right: 10px;
+}
+
+.product-actions {
+  margin-top: 15px;
+}
+
+.btn-outline-dark, .btn-dark {
+  border-radius: 0;
+  padding: 8px 15px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.btn-outline-dark:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+.btn-dark {
+  background-color: #000;
+}
+
+.btn-dark:hover {
+  background-color: #333;
+}
+
+/* View All Products button */
+.btn-lg {
+  padding: 12px 30px;
+  font-size: 0.9rem;
+}
+.product-showcase {
+  padding: 60px 0;
+  background-color: #fff;
+}
+
+.title-section h2 {
+  font-size: 2.2rem;
+  letter-spacing: 1px;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+  color: #000;
+}
+
+.title-section .subtitle {
+  font-size: 1.1rem;
+  color: #777;
+  font-weight: 300;
+}
+
+.product-grid {
+  margin-top: 30px;
+}
+
+.product-item {
+  padding: 15px;
+  background-color: #f9f9f9;
+  margin-bottom: 30px;
+}
+
+/* Remove hover effects as requested */
+.product-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.product-image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.product-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: contain;
+}
+
+.product-info {
+  padding: 10px 0;
+}
+
+.product-name {
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+  font-weight: 400;
+  color: #000; /* Black color as requested */
+}
+
+.product-type {
+  font-size: 0.9rem;
+  color: #777;
+  margin-bottom: 10px;
+}
+
+.price-container {
+  margin-top: 10px;
+}
+
+.product-price {
+  font-weight: 500;
+  font-size: 1rem;
+  color: #333;
+}
+
+.product-price del {
+  color: #999;
+  margin-right: 10px;
+}
+  .carousel-slide {
+  image-rendering: -webkit-optimize-contrast; /* For Chrome/Safari */
+  image-rendering: crisp-edges; /* For Firefox */
+}
+.category-title {
+    position: relative;
+    padding-bottom: 10px;
+    font-size: 1.5rem;
+}
+
+.category-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background-color: #007bff;
+}
+
+.item-entry {
+    transition: transform 0.3s ease;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.item-entry:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.product-item {
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.product-item img {
+    transition: transform 0.3s ease;
+}
+
+.product-item:hover img {
+    transform: scale(1.05);
+}
+
+.item-title {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 5px;
+    height: 40px;
+    overflow: hidden;
+}
+
+.price-container {
+    margin-bottom: 10px;
+}
+
+.item-price {
+    color: #e83e8c;
+}
+
+.item-price del {
+    color: #6c757d;
+    font-weight: normal;
+    margin-right: 10px;
+}
+/* Product Showcase Styling */
+.product-showcase {
+  padding: 60px 0;
+  background-color: #fff;
+}
+
+.title-section h2 {
+  font-size: 2.5rem;
+  letter-spacing: 2px;
+  font-weight: 300;
+  margin-bottom: 0.5rem;
+  color: #000;
+}
+
+.title-section .subtitle {
+  font-size: 1.2rem;
+  color: #777;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.product-grid {
+  margin-top: 40px;
+}
+
+.product-item {
+  transition: all 0.3s ease;
+}
+
+.product-item:hover {
+  transform: translateY(-5px);
+}
+
+.product-image-container {
+  background-color: #f8f8f8;
+  padding: 20px;
+  margin-bottom: 15px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-image-container img {
+  max-height: 250px;
+  object-fit: contain;
+}
+
+.product-name {
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.product-description {
+  color: #777;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.product-price {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.product-price del {
+  color: #999;
+  font-weight: 400;
+  margin-right: 10px;
+}
+
+.product-actions {
+  margin-top: 15px;
+}
+
+.btn-outline-dark, .btn-dark {
+  border-radius: 0;
+  padding: 8px 15px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.btn-outline-dark:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+.btn-dark {
+  background-color: #000;
+}
+
+.btn-dark:hover {
+  background-color: #333;
+}
+
+/* View All Products button */
+.btn-lg {
+  padding: 12px 30px;
+  font-size: 0.9rem;
+}
+.product-showcase {
+  padding: 60px 0;
+  background-color: #fff;
+}
+
+.title-section h2 {
+  font-size: 2.2rem;
+  letter-spacing: 1px;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+  color: #000;
+}
+
+.title-section .subtitle {
+  font-size: 1.1rem;
+  color: #777;
+  font-weight: 300;
+}
+
+.product-grid {
+  margin-top: 30px;
+}
+
+.product-item {
+  padding: 15px;
+  background-color: #f9f9f9;
+  margin-bottom: 30px;
+}
+
+/* Remove hover effects as requested */
+.product-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.product-image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.product-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: contain;
+}
+
+.product-info {
+  padding: 10px 0;
+}
+
+.product-name {
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+  font-weight: 400;
+  color: #000; /* Black color as requested */
+}
+
+.product-type {
+  font-size: 0.9rem;
+  color: #777;
+  margin-bottom: 10px;
+}
+
+.price-container {
+  margin-top: 10px;
+}
+
+.product-price {
+  font-weight: 500;
+  font-size: 1rem;
+  color: #333;
+}
+
+.product-price del {
+  color: #999;
+  margin-right: 10px;
+}
+  .carousel-slide {
+  image-rendering: -webkit-optimize-contrast; /* For Chrome/Safari */
+  image-rendering: crisp-edges; /* For Firefox */
+}
+.category-title {
+    position: relative;
+    padding-bottom: 10px;
+    font-size: 1.5rem;
+}
+
+.category-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background-color: #007bff;
+}
+
+.item-entry {
+    transition: transform 0.3s ease;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.item-entry:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.product-item {
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.product-item img {
+    transition: transform 0.3s ease;
+}
+
+.product-item:hover img {
+    transform: scale(1.05);
+}
+
+.item-title {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 5px;
+    height: 40px;
+    overflow: hidden;
+}
+
+.price-container {
+    margin-bottom: 10px;
+}
+
+.item-price {
+    color: #e83e8c;
+}
+
+.item-price del {
+    color: #6c757d;
+    font-weight: normal;
+    margin-right: 10px;
+}
+/* Product Showcase Styling */
+.product-showcase {
+  padding: 60px 0;
+  background-color: #fff;
+}
+
+.title-section h2 {
+  font-size: 2.5rem;
+  letter-spacing: 2px;
+  font-weight: 300;
+  margin-bottom: 0.5rem;
+  color: #000;
+}
+
+.title-section .subtitle {
+  font-size: 1.2rem;
+  color: #777;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.product-grid {
+  margin-top: 40px;
+}
+
+.product-item {
+  transition: all 0.3s ease;
+}
+
+.product-item:hover {
+  transform: translateY(-5px);
+}
+
+.product-image-container {
+  background-color: #f8f8f8;
+  padding: 20px;
+  margin-bottom: 15px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-image-container img {
+  max-height: 250px;
+  object-fit: contain;
+}
+
+.product-name {
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.product-description {
+  color: #777;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.product-price {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.product-price del {
+  color: #999;
+  font-weight: 400;
+  margin-right: 10px;
+}
+
+.product-actions {
+  margin-top: 15px;
+}
+
+.btn-outline-dark, .btn-dark {
+  border-radius: 0;
+  padding: 8px 15px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.btn-outline-dark:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+.btn-dark {
+  background-color: #000;
+}
+
+.btn-dark:hover {
+  background-color: #333;
+}
+
+/* View All Products button */
+.btn-lg {
+  padding: 12px 30px;
+  font-size: 0.9rem;
+}
+.product-showcase {
+  padding: 60px 0;
+  background-color: #fff;
+}
+
+.title-section h2 {
+  font-size: 2.2rem;
+  letter-spacing: 1px;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+  color: #000;
+}
+
+.title-section .subtitle {
+  font-size: 1.1rem;
+  color: #777;
+  font-weight: 300;
+}
+
+.product-grid {
+  margin-top: 30px;
+}
+
+.product-item {
+  padding: 15px;
+  background-color: #f9f9f9;
+  margin-bottom: 30px;
+}
+
+/* Remove hover effects as requested */
+.product-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.product-image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.product-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: contain;
+}
+
+.product-info {
+  padding: 10px 0;
+}
+
+.product-name {
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+  font-weight: 400;
+  color: #000; /* Black color as requested */
+}
+
+.product-type {
+  font-size: 0.9rem;
+  color: #777;
+  margin-bottom: 10px;
+}
+
+.price-container {
+  margin-top: 10px;
+}
+
+.product-price {
+  font-weight: 500;
+  font-size: 1rem;
+  color: #333;
+}
+
+.product-price del {
+  color: #999;
+  margin-right: 10px;
+}
+  .carousel-slide {
+  image-rendering: -webkit-optimize-contrast; /* For Chrome/Safari */
+  image-rendering: crisp-edges; /* For Firefox */
+}
+.category-title {
+    position: relative;
+    padding-bottom: 10px;
+    font-size: 1.5rem;
+}
+
+.category-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background-color: #007bff;
+}
+
+.item-entry {
+    transition: transform 0.3s ease;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.item-entry:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.product-item {
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.product-item img {
+    transition: transform 0.3s ease;
+}
+
+.product-item:hover img {
+    transform: scale(1.05);
+}
+
+.item-title {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 5px;
+    height: 40px;
+    overflow: hidden;
+}
+
+.price-container {
+    margin-bottom: 10px;
+}
+
+.item-price {
+    color: #e83e8c;
+}
+
+.item-price del {
+    color: #6c757d;
+    font-weight: normal;
+    margin-right: 10px;
+}
+/* Product Showcase Styling */
+.product-showcase {
+  padding: 60px 0;
+  background-color: #fff;
+}
+
+.title-section h2 {
+  font-size: 2.5rem;
+  letter-spacing: 2px;
+  font-weight: 300;
+  margin-bottom: 0.5rem;
+  color: #000;
+}
+
+.title-section .subtitle {
+  font-size: 1.2rem;
+  color: #777;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.product-grid {
+  margin-top: 40px;
+}
+
+.product-item {
+  transition: all 0.3s ease;
+}
+
+.product-item:hover {
+  transform: translateY(-5px);
+}
+
+.product-image-container {
+  background-color: #f8f8f8;
+  padding: 20px;
+  margin-bottom: 15px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-image-container img {
+  max-height: 250px;
+  object-fit: contain;
+}
+
+.product-name {
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.product-description {
+  color: #777;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.product-price {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.product-price del {
+  color: #999;
+  font-weight: 400;
+  margin-right: 10px;
+}
+
+.product-actions {
+  margin-top: 15px;
+}
+
+.btn-outline-dark, .btn-dark {
+  border-radius: 0;
+  padding: 8px 15px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.btn-outline-dark:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+.btn-dark {
+  background-color: #000;
+}
+
+.btn-dark:hover {
+  background-color: #333;
+}
+
+/* View All Products button */
+.btn-lg {
+  padding: 12px 30px;
+  font-size: 0.9rem;
+}
+.product-showcase {
+  padding: 60px 0;
+  background-color: #fff;
+}
+
+.title-section h2 {
+  font-size: 2.2rem;
+  letter-spacing: 1px;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+  color: #000;
+}
+
+.title-section .subtitle {
+  font-size: 1.1rem;
+  color: #777;
+  font-weight: 300;
+}
+
+.product-grid {
+  margin-top: 30px;
+}
+
+.product-item {
+  padding: 15px;
+  background-color: #f9f9f9;
+  margin-bottom: 30px;
+}
+
+/* Remove hover effects as requested */
+.product-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.product-image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.product-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: contain;
+}
+
+.product-info {
+  padding: 10px 0;
+}
+
+.product-name {
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+  font-weight: 400;
+  color: #000; /* Black color as requested */
+}
+
+.product-type {
+  font-size: 0.9rem;
+  color: #777;
+  margin-bottom: 10px;
+}
+
+.price-container {
+  margin-top: 10px;
+}
+
+.product-price {
+  font-weight: 500;
+  font-size: 1rem;
+  color: #333;
+}
+
+.product-price del {
+  color: #999;
+  margin-right: 10px;
+}
+  .carousel-slide {
+  image-rendering: -webkit-optimize-contrast; /* For Chrome/Safari */
+  image-rendering: crisp-edges; /* For Firefox */
+}
+.category-title {
+    position: relative;
+    padding-bottom: 10px;
+    font-size: 1.5rem;
+}
+
+.category-title:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background-color: #007bff;
+}
+
+.item-entry {
+    transition: transform 0.3s ease;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.item-entry:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.product-item {
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.product-item img {
+    transition: transform 0.3s ease;
+}
+
+.product-item:hover img {
+    transform: scale(1.05);
+}
+
+.item-title {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 5px;
+    height: 40px;
+    overflow: hidden;
+}
+
+.price-container {
+    margin-bottom: 10px;
+}
+
+.item-price {
+    color: #e83e8c;
+}
+
+.item-price del {
+    color: #6c757d;
+    font-weight: normal;
+    margin-right: 10px;
+}
+/* Product Showcase Styling */
+.product-showcase {
+  padding: 60px 0;
+  background-color: #fff;
+}
+
+.title-section h2 {
+  font-size: 2.5rem;
+  letter-spacing: 2px;
+  font-weight: 300;
+  margin-bottom: 0.5rem;
+  color: #000;
+}
+
+.title-section .subtitle {
+  font-size: 1.2rem;
+  color: #777;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.product-grid {
+  margin-top: 40px;
+}
+
+.product-item {
+  transition: all 0.3s ease;
+}
+
+.product-item:hover {
+  transform: translateY(-5px);
+}
+
+.product-image-container {
+  background-color: #f8f8f8;
+  padding: 20px;
+  margin-bottom: 15px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-image-container img {
+  max-height: 250px;
+  object-fit: contain;
+}
+
+.product-name {
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.product-description {
+  color: #777;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.product-price {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.product-price del {
+  color: #999;
+  font-weight: 400;
+  margin-right: 10px;
+}
+
+.product-actions {
+  margin-top: 15px;
+}
+
+.btn-outline-dark, .btn-dark {
+  border-radius: 0;
+  padding: 8px 15px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.btn-outline-dark:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+.btn-dark {
+  background-color: #000;
+}
+
+.btn-dark:hover {
+  background-color: #333;
+}
+
+/* View All Products button */
+.btn-lg {
+  padding: 12px 30px;
+  font-size: 0.9rem;
+}
+.product-showcase {
+  padding: 60px 0;
+  background-color: #fff;
+}
+
+.title-section h2 {
+  font-size: 2.2rem;
+  letter-spacing: 1px;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+  color: #000;
+}
+
+.title-section .subtitle {
+  font-size: 1.1rem;
+  color: #777;
+  font-weight: 300;
+}
+
+.product-grid {
+  margin-top: 30px;
+}
+
+.product-item {
+  padding: 15px;
+  background-color: #f9f9f9;
+  margin-bottom: 30px;
+}
+
+/* Remove hover effects as requested */
+.product-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.product-image-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.product-image {
+  max-width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: contain;
+}
+
+.product-info {
+  padding: 10px 0;
+}
+
+.product-name {
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+  font-weight: 400;
+  color: #000; /* Black color as requested */
+}
+
+.product-type {
+  font-size: 0.9rem;
+  color: #777;
+  margin-bottom: 10px;
+}
+
+.price-container {
+  margin-top: 10px;
+}
+
+.product-price {
+  font-weight: 500;
+  font-size: 1rem;
+  color: #333;
+}
+
+.product-price del {
+  color: #999;
+  margin-right: 10px;
+}
+</style>
+<div class="hero-carousel" style="position: relative; width: 100%; height: 100vh; overflow: hidden;">
+  <!-- Carousel container -->
+  <div class="carousel-container" style="position: relative; width: 100%; height: 100%;">
+    <!-- Carousel slides -->
+    <div class="carousel-slide" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://www.dior.com/dw/image/v2/BGXS_PRD/on/demandware.static/-/Library-Sites-DiorSharedLibrary/default/dwffe539af/images/beauty/01-FRAGRANCES/2025/MissDior-MiniMiss/Plp/MD_MiniMiss_Mood_Trio-MiniMiss_5550x2000.jpg?sw=1280') center center/cover no-repeat; display: flex; align-items: center; opacity: 1; transition: opacity 0.5s ease;">
+      <!-- Overlay -->
+      <div class="overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.2);"></div>
+      
+      <!-- Content -->
+      <div class="container" style="position: relative; z-index: 2; padding: 0 5%;">
+        <div class="banner-content" style="max-width: 600px; color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">
+          <h3 style="font-size: 1.2rem; font-weight: 500; text-transform: uppercase; margin-bottom: 1rem; letter-spacing: 2px;">#NEW SUMMER COLLECTION 2019</h3>
+          <h1 style="font-size: 4.5rem; font-weight: 700; margin-bottom: 2rem; letter-spacing: 3px; line-height: 1.1;">ARRIVALS SALES</h1>
+          <a href="/shop" class="shop-now-btn" style="display: inline-block; background-color: #000; color: #fff; padding: 15px 40px; text-decoration: none; font-weight: 500; letter-spacing: 1px; transition: all 0.3s ease; border: 2px solid #000;">SHOP NOW</a>
         </div>
       </div>
-      <div class="col-md-6 order-1 align-self-end">
-        <img src="images/unisex.jpg" alt="Image" class="img-fluid">
+    </div>
+
+    <!-- Slide 2 -->
+    
+    <div class="carousel-slide" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://i.pinimg.com/736x/f4/28/a8/f428a8f8fcda2f0f5247f43acf1dea16.jpg ') center center/cover no-repeat; display: flex; align-items: center; opacity: 0; transition: opacity 0.5s ease;">
+      <div class="overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.2);"></div>
+      <div class="container" style="position: relative; z-index: 2; padding: 0 5%;">
+        <div class="banner-content" style="max-width: 600px; color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">
+          <h3 style="font-size: 1.2rem; font-weight: 500; text-transform: uppercase; margin-bottom: 1rem; letter-spacing: 2px;">#LUXURY FRAGRANCE</h3>
+          <h1 style="font-size: 4.5rem; font-weight: 700; margin-bottom: 2rem; letter-spacing: 3px; line-height: 1.1;">SIGNATURE SCENTS</h1>
+          <a href="/shop" class="shop-now-btn" style="display: inline-block; background-color: #000; color: #fff; padding: 15px 40px; text-decoration: none; font-weight: 500; letter-spacing: 1px; transition: all 0.3s ease; border: 2px solid #000;">DISCOVER</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Arrows -->
+    <div class="carousel-nav" style="position: absolute; width: 100%; top: 50%; transform: translateY(-50%); z-index: 3; display: flex; justify-content: space-between; padding: 0 20px;">
+      <button class="prev-btn" style="background: rgba(0,0,0,0.3); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center;">&lt;</button>
+      <button class="next-btn" style="background: rgba(0,0,0,0.3); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center;">&gt;</button>
+    </div>
+
+    <!-- Indicators -->
+    <div class="carousel-indicators" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 3; display: flex; gap: 10px;">
+      <button class="indicator active" data-slide="0" style="width: 12px; height: 12px; border-radius: 50%; background-color: white; border: none; cursor: pointer; opacity: 0.7;"></button>
+      <button class="indicator" data-slide="1" style="width: 12px; height: 12px; border-radius: 50%; background-color: white; border: none; cursor: pointer; opacity: 0.7;"></button>
+      <button class="indicator" data-slide="2" style="width: 12px; height: 12px; border-radius: 50%; background-color: white; border: none; cursor: pointer; opacity: 0.7;"></button>
+      <button class="indicator" data-slide="3" style="width: 12px; height: 12px; border-radius: 50%; background-color: white; border: none; cursor: pointer; opacity: 0.7;"></button>
+    </div>
+  </div>
+</div>
+
+
+<div class="site-section py-5">
+  <div class="container">
+    <div class="title-section text-center mb-5">
+      <h2 class="text-uppercase position-relative">
+        <span class="d-block" style="font-size: 1rem; color: #777; letter-spacing: 3px; margin-bottom: 10px;">Explore</span>
+        Our Fragrance Collections
+      </h2>
+    </div>
+    
+    <div class="row">
+      <!-- Women's Collection -->
+      <div class="col-lg-4 mb-4">
+        <div class="collection-card position-relative overflow-hidden h-100" style="border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+          <div class="collection-image-container" style="height: 450px; overflow: hidden;">
+            <img src="images/women.jpg" alt="Women's Collection" class="img-fluid w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease;">
+          </div>
+          <div class="collection-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)); display: flex; flex-direction: column; justify-content: flex-end; padding: 25px;">
+            <h3 class="text-white mb-2" style="font-size: 1.75rem; font-weight: 600;">Women</h3>
+            <p class="text-white mb-3" style="font-size: 1rem; opacity: 0.9;">Elegant and sophisticated fragrances</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <a href="#" class="btn btn-outline-light rounded-0" style="padding: 8px 20px; font-size: 0.9rem; letter-spacing: 1px; transition: all 0.3s ease;">EXPLORE</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Men's Collection -->
+      <div class="col-lg-4 mb-4">
+        <div class="collection-card position-relative overflow-hidden h-100" style="border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+          <div class="collection-image-container" style="height: 450px; overflow: hidden;">
+            <img src="images/Hyun Bin.jpeg" alt="Men's Collection" class="img-fluid w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease;">
+          </div>
+          <div class="collection-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)); display: flex; flex-direction: column; justify-content: flex-end; padding: 25px;">
+            <h3 class="text-white mb-2" style="font-size: 1.75rem; font-weight: 600;">Men</h3>
+            <p class="text-white mb-3" style="font-size: 1rem; opacity: 0.9;">Bold and distinctive scents</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <a href="#" class="btn btn-outline-light rounded-0" style="padding: 8px 20px; font-size: 0.9rem; letter-spacing: 1px; transition: all 0.3s ease;">EXPLORE</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Unisex Collection -->
+      <div class="col-lg-4 mb-4">
+        <div class="collection-card position-relative overflow-hidden h-100" style="border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+          <div class="collection-image-container" style="height: 450px; overflow: hidden;">
+            <img src="images/unisex2.jpg" alt="Unisex Collection" class="img-fluid w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease;">
+          </div>
+          <div class="collection-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.5)); display: flex; flex-direction: column; justify-content: flex-end; padding: 25px;">
+            <h3 class="text-white mb-2" style="font-size: 1.75rem; font-weight: 600;">Unisex</h3>
+            <p class="text-white mb-3" style="font-size: 1rem; opacity: 0.9;">Universal fragrances for all</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <a href="#" class="btn btn-outline-light rounded-0" style="padding: 8px 20px; font-size: 0.9rem; letter-spacing: 1px; transition: all 0.3s ease;">EXPLORE</a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-    <!-- <div class="site-section">
-      <div class="container">
-        <div class="title-section mb-5">
-          <h2 class="text-uppercase"><span class="d-block">Explore </span> Our Fragrance Collections</h2>
-        </div>
-        <div class="row align-items-stretch">
-          <div class="col-lg-8">
-            <div class="product-item sm-height full-height bg-gray">
-              <a href="#" class="product-category">Women <span>25 items</span></a>
-              <img src="images/women.jpg" alt="Image" class="img-fluid">
-            </div>
-          </div>
-          <div class="col-lg-4">
-            <div class="product-item sm-height bg-gray mb-4">
-              <a href="#" class="product-category">Men <span>25 items</span></a>
-              <img src="images/wom1.jpg" alt="Image" class="img-fluid">
-            </div>
-
-            <div class="product-item sm-height bg-gray">
-              <a href="#" class="product-category">Unisex <span>25 items</span></a>
-              <img src="images/unisex2.jpg" alt="Image" class="img-fluid">
-            </div>
-          </div>
-        </div>
-      </div>
-    </div> -->
-
-
     
-    <div class="site-section">
-      <div class="container">
-        <div class="row">
-          <div class="title-section mb-5 col-12">
-            <h2 class="text-uppercase">Our Top Picks</h2>
-          </div>
-        </div>
-        <div class="row">
+<div class="site-section product-showcase">
+  <div class="container">
+    <div class="row">
          
-          <% for( let i = 0; i < products.length; i++ ) { %>
+      <% for( let i = 0; i < products.length; i++ ) { %>
 
-          <div class="col-lg-4 col-md-6 item-entry mb-4">
-                      
-            <a href="/productDetailsPage?id=<%=products[i]._id%>" class="product-item md-height bg-gray d-block">
-              <img src="<%=products[i].productImage[0]%>" alt="<%=products[i].productName%>" class="img-fluid">
-            </a>      
-            <h2 class="item-title"><%=products[i].productName%></h2>
-            <strong class="item-price"><del><%=products[i].regularPrice%></del><%=products[i].salesPrice%></strong>
-          </div>
-      
-          <% } %>
-
-        </div>
+      <div class="col-lg-4 col-md-6 item-entry mb-4">
+                  
+        <a href="/productDetailsPage?id=<%=products[i]._id%>" class="product-item md-height bg-gray d-block">
+          <img src="<%=products[i].productImage[0]%>" alt="<%=products[i].productName%>" class="img-fluid">
+        </a>      
+        <h2 class="item-title"><%=products[i].productName%></h2>
+        <strong class="item-price"><del><%=products[i].regularPrice%></del><%=products[i].salesPrice%></strong>
       </div>
+  
+      <% } %>
+
     </div>
+    
+   
+  </div>
+</div>
 
    
 
 
-    <div class="site-blocks-cover inner-page py-5" data-aos="fade">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-6 ml-auto order-md-2 align-self-start">
-            <div class="site-block-cover-content">
-            <h2 class="sub-title">#Summer Scents You Can't Miss</h2>
-            <h1>Dior Sauvage</h1>
+   
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const slides = document.querySelectorAll('.carousel-slide');
+        const indicators = document.querySelectorAll('.indicator');
+        const prevBtn = document.querySelector('.prev-btn');
+        const nextBtn = document.querySelector('.next-btn');
+        let currentSlide = 0;
+        const slideCount = slides.length;
+        
+        // Function to show a specific slide
+        function showSlide(index) {
+          // Hide all slides
+          slides.forEach(slide => {
+            slide.style.opacity = 0;
+            slide.style.zIndex = 0;
+          });
           
-            <p><a href="#" class="btn btn-black rounded-0">Shop Now</a></p>
-            </div>
-          </div>
-          <div class="col-md-6 order-1 align-self-end">
-            <img src="images/unisex.jpg" alt="Image" class="img-fluid">
-          </div>
-        </div>
-      </div>
-    </div>
+          // Show the current slide
+          slides[index].style.opacity = 1;
+          slides[index].style.zIndex = 1;
+          
+          // Update indicators
+          indicators.forEach(indicator => {
+            indicator.classList.remove('active');
+            indicator.style.opacity = 0.7;
+          });
+          indicators[index].classList.add('active');
+          indicators[index].style.opacity = 1;
+          
+          // Update current slide index
+          currentSlide = index;
+        }
+        
+        // Next slide function
+        function nextSlide() {
+          let newIndex = currentSlide + 1;
+          if (newIndex >= slideCount) {
+            newIndex = 0;
+          }
+          showSlide(newIndex);
+        }
+        
+        // Previous slide function
+        function prevSlide() {
+          let newIndex = currentSlide - 1;
+          if (newIndex < 0) {
+            newIndex = slideCount - 1;
+          }
+          showSlide(newIndex);
+        }
+        
+        // Event listeners
+        nextBtn.addEventListener('click', nextSlide);
+        prevBtn.addEventListener('click', prevSlide);
+        
+        // Indicator click event
+        indicators.forEach((indicator, index) => {
+          indicator.addEventListener('click', () => {
+            showSlide(index);
+          });
+        });
+        
+        // Auto-play (optional)
+        let slideInterval = setInterval(nextSlide, 5000);
+        
+        // Pause auto-play on hover (optional)
+        const carousel = document.querySelector('.hero-carousel');
+        carousel.addEventListener('mouseenter', () => {
+          clearInterval(slideInterval);
+        });
+        
+        carousel.addEventListener('mouseleave', () => {
+          slideInterval = setInterval(nextSlide, 5000);
+        });
+        
+        // Initialize first slide
+        showSlide(0);
+      });
+    </script>
    <%-include('../../views/partials/user/footer')%>

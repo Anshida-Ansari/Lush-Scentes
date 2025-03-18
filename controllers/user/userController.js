@@ -27,46 +27,40 @@ const pageNotFound = async (req, res) => {
 }
 const loadHomePage = async (req, res) => {
     try {
-
-
         const user = req.session.user
         const categories = await Category.find({ isListed: true })
-        const notBlockedProducts = await Product.find({ isBlocked: false });
-        const validCategoryProducts = await Product.find({
-            category: { $in: categories.map(category => category._id) }
-        });
-        const inStockProducts = await Product.find({ totalStock: { $gt: 0 } });
-        console.log('Products in stock:', inStockProducts.length);
-
+        
+        // Find products that match all criteria
         let productData = await Product.find({
             isBlocked: false,
             category: { $in: categories.map(category => category._id) },
             totalStock: { $gt: 0 }
-
-        })
-
-        if (productData.length > 0) {
-            console.log('Sample product:', JSON.stringify(productData[0], null, 2));
-        }
+        }).populate('category')
+        
+        // Sort by creation date (newest first)
         productData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-
-        productData = productData.slice(0, 6)
-
+        
+        // Get featured products (most recent ones)
+        const featuredProducts = productData.slice(0, 4)
 
         if (user) {
-
             const userData = await User.findOne({ _id: user._id })
-            return res.render('home', { user: userData, products: productData })
-
+            return res.render('home', { 
+                user: userData, 
+                products: productData,
+                featuredProducts: featuredProducts,
+                categories: categories
+            })
         } else {
-            return res.render('home', { products: productData })
+            return res.render('home', { 
+                products: productData,
+                featuredProducts: featuredProducts,
+                categories: categories
+            })
         }
-
     } catch (error) {
         console.log('Home page not found', error);
         res.status(500).send('server error')
-
-
     }
 }
 
