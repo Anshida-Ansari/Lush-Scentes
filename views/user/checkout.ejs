@@ -592,15 +592,15 @@
             }
 
             async function handlePaymentSuccess(orderId) {
-              Swal.fire({
-                icon: 'success',
-                title: 'Order Placed Successfully!',
-                text: 'Redirecting to order confirmation...',
-                timer: 2000,
-                showConfirmButton: false
-              });
-              window.location.href = `/thank-you?orderId=${orderId}`;
-            }
+  await Swal.fire({
+    icon: 'success',
+    title: 'Order Placed Successfully!',
+    text: 'Your order has been placed. Click OK to view your order details.',
+    confirmButtonText: 'OK',
+    confirmButtonColor: '#7971ea'
+  });
+  window.location.href = `/thank-you?orderId=${orderId}`;
+}
 
             async function handlePaymentDismissal(orderId, selectedAddress, reason) {
               await fetch('/handle-payment-dismissal', {
