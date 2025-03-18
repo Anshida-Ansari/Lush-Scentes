@@ -40,7 +40,7 @@ const addressSchema = new Schema({
             type: String,
             required: true
         },
-        default: {
+        default: { 
             type: Boolean,
             default: false
         }
