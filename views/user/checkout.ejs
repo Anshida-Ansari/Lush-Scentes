@@ -348,7 +348,7 @@
     const couponMessage = document.querySelector('.coupon-message');
     const couponCards = document.querySelectorAll('.coupon-card');
     const finalAmountSpan = document.getElementById('final-amount');
-    let appliedCoupon = localStorage.getItem('appliedCoupon') || null; // Load from localStorage
+    let appliedCoupon = localStorage.getItem('appliedCoupon') || null; 
 
     // Restore UI if a coupon was applied
     if (appliedCoupon) {
@@ -634,13 +634,39 @@
         window.location.href = `/thank-you?orderId=${orderId}`;
     }
 
-    async function handlePaymentDismissal(orderId, selectedAddress, reason) {
-        await fetch('/handle-payment-dismissal', {
+   async function handlePaymentDismissal(orderId) {
+    try {
+        const selectedAddress = document.querySelector('input[name="address"]:checked')?.value;
+        const selectedCoupon = (typeof selectedCouponCode !== 'undefined') ? selectedCouponCode : null;
+
+        showLoadingSpinner();
+        const response = await fetch('/handle-payment-dismissal', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ orderId, selectedAddress, reason })
+            body: JSON.stringify({
+                orderId,
+                selectedAddress,
+                reason: 'Payment dismissed by user', // Default reason, can be enhanced with Razorpay error
+                razorpayOrderId: window.razorpayOrderId || null, // Assuming this is set during payment initiation
+                razorpayPaymentId: null // Will be null on dismissal
+            })
         });
+
+        const data = await response.json();
+        hideLoadingSpinner();
+
+        if (data.success) {
+            showAlert('Order saved with Payment Pending status. You can retry payment later.', 'info');
+            window.location.href = data.redirectUrl; // Redirect to failure page
+        } else {
+            showAlert(data.message || 'Failed to save order', 'error');
+        }
+    } catch (error) {
+        hideLoadingSpinner();
+        showAlert('Failed to save order', 'error');
+        console.error('Payment dismissal error:', error);
     }
+}
 
     async function initializeRetryPayment(orderId, amount, selectedAddress) {
         const result = await Swal.fire({

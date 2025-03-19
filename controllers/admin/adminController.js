@@ -101,6 +101,8 @@ const createDateFilter = (filter, startDate, endDate) => {
     return dateFilter;
   };
   
+
+  
   const getBestSellingProducts = async (dateFilter) => {
     return await Order.aggregate([
       { $match: { ...dateFilter, status: 'Delivered' } },
@@ -108,8 +110,15 @@ const createDateFilter = (filter, startDate, endDate) => {
       {
         $group: {
           _id: '$orderedItems.product',
-          unitsSold: { $sum: '$orderedItems.quantity' },
-          revenue: { $sum: { $multiply: ['$orderedItems.price', '$orderedItems.quantity'] } }
+          unitsSold: { $sum: '$orderedItems.variant.quantity' },
+          revenue: {
+            $sum: {
+              $multiply: [
+                { $ifNull: ['$orderedItems.variant.salesPrice', '$orderedItems.variant.regularPrice'] },
+                '$orderedItems.variant.quantity'
+              ]
+            }
+          }
         }
       },
       { $sort: { revenue: -1 } },
@@ -131,7 +140,7 @@ const createDateFilter = (filter, startDate, endDate) => {
       }
     ]);
   };
-  
+
   const getBestCategories = async (dateFilter) => {
     return await Order.aggregate([
       { $match: { ...dateFilter, status: 'Delivered' } },
@@ -156,8 +165,15 @@ const createDateFilter = (filter, startDate, endDate) => {
         $group: {
           _id: { $arrayElemAt: ['$categoryInfo._id', 0] },
           name: { $first: { $arrayElemAt: ['$categoryInfo.name', 0] } },
-          unitsSold: { $sum: '$orderedItems.quantity' },
-          revenue: { $sum: { $multiply: ['$orderedItems.price', '$orderedItems.quantity'] } }
+          unitsSold: { $sum: '$orderedItems.variant.quantity' },
+          revenue: {
+            $sum: {
+              $multiply: [
+                { $ifNull: ['$orderedItems.variant.salesPrice', '$orderedItems.variant.regularPrice'] },
+                '$orderedItems.variant.quantity'
+              ]
+            }
+          }
         }
       },
       { $match: { _id: { $ne: null } } },
@@ -165,23 +181,57 @@ const createDateFilter = (filter, startDate, endDate) => {
       { $limit: 10 }
     ]);
   };
-  
-  const getSalesData = async (dateFilter) => {
-    const format = '%Y-%m-%d'; 
-    return await Order.aggregate([
-      { $match: { ...dateFilter, status: 'Delivered' } },
-      { $unwind: '$orderedItems' },
-      {
-        $group: {
-          _id: { $dateToString: { format, date: '$createdOn' } },
-          revenue: { $sum: { $multiply: ['$orderedItems.price', '$orderedItems.quantity'] } },
-          orderCount: { $sum: 1 }
-        }
-      },
-      { $sort: { '_id': 1 } },
-      { $project: { date: '$_id', revenue: 1, orderCount: 1, _id: 0 } }
+
+  const getSalesData = async (dateFilter, filterType = 'daily') => {
+    let dateFormat;
+    switch (filterType.toLowerCase()) {
+        case 'daily':
+            dateFormat = '%Y-%m-%d';
+            break;
+        case 'weekly':
+            dateFormat = '%Y-W%U';
+            break;
+        case 'monthly':
+            dateFormat = '%Y-%m';
+            break;
+        case 'yearly':
+            dateFormat = '%Y';
+            break;
+        case 'custom':
+            dateFormat = '%Y-%m-%d';
+            break;
+        default:
+            dateFormat = '%Y-%m-%d';
+    }
+
+
+    const result = await Order.aggregate([
+        { $match: { ...dateFilter, status: 'Delivered' } },
+        { $unwind: '$orderedItems' },
+        {
+            $project: {
+                createdOn: 1,
+                itemRevenue: {
+                    $multiply: [
+                        { $ifNull: ['$orderedItems.variant.salesPrice', '$orderedItems.variant.regularPrice'] },
+                        '$orderedItems.variant.quantity'
+                    ]
+                }
+            }
+        },
+        {
+            $group: {
+                _id: { $dateToString: { format: dateFormat, date: '$createdOn' } },
+                revenue: { $sum: '$itemRevenue' },
+                orderCount: { $sum: 1 }
+            }
+        },
+        { $sort: { '_id': 1 } },
+        { $project: { date: '$_id', revenue: 1, orderCount: 1, _id: 0 } }
     ]);
-  };
+
+    return result;
+};
   const loadDashboard = async (req, res) => {
     try {
         const { page = 1, filter = 'daily', startDate, endDate } = req.query;
@@ -245,6 +295,9 @@ const createDateFilter = (filter, startDate, endDate) => {
             getBestCategories(dateFilter),
             getSalesData(dateFilter)
         ]);
+        console.log('Best Selling Products:', bestSellingProducts);
+        console.log('Best Categories:', bestCategories);
+       console.log('Sales Data:', salesData);
 
         const responseData = {
             totalOrders,

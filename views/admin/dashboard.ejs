@@ -1,4 +1,5 @@
 <%- include("../../views/partials/admin/header") %>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
     .card {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -17,6 +18,10 @@
         font-size: 0.9em;
         display: none;
     }
+    canvas {
+    max-width: 100%;
+    height: 300px; /* Adjust as needed */
+}
 </style>
 
 <section class="content-main">
@@ -39,6 +44,40 @@
                           href="/admin/download/pdf?filter=<%= selectedFilter %>&startDate=<%= startDate %>&endDate=<%= endDate %>">
                           Export PDF</a></li>
                 </ul>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6>Total Sales</h6>
+                    <h4>₹<%= totalSales.toFixed(2) %></h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6>Total Orders</h6>
+                    <h4><%= totalOrders %></h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6>Total Discount</h6>
+                    <h4>₹<%= totalDiscount.toFixed(2) %></h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6>Total Users</h6>
+                    <h4><%= totalUsers %></h4>
+                </div>
             </div>
         </div>
     </div>
@@ -74,41 +113,27 @@
             </form>
         </div>
     </div>
-
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h6>Total Sales</h6>
-                    <h4>₹<%= totalSales.toFixed(2) %></h4>
+                    <h4>Top Best Selling Products</h4>
+                    <canvas id="bestProductsChart"></canvas>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h6>Total Orders</h6>
-                    <h4><%= totalOrders %></h4>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h6>Total Discount</h6>
-                    <h4>₹<%= totalDiscount.toFixed(2) %></h4>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h6>Total Users</h6>
-                    <h4><%= totalUsers %></h4>
+                    <h4>Top Best Selling Categories</h4>
+                    <canvas id="bestCategoriesChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
+    
+
+   
 
     <div class="card">
         <div class="card-body">
@@ -164,6 +189,18 @@
             <% } %>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4>Sales Over Time</h4>
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -230,6 +267,91 @@
         event.target.submit();
         return true;
     }
+    const bestProductsCtx = document.getElementById('bestProductsChart').getContext('2d');
+    const bestProductsChart = new Chart(bestProductsCtx, {
+        type: 'bar',
+        data: {
+            labels: <%- JSON.stringify(bestSellingProducts.map(p => p.name)) %>,
+            datasets: [{
+                label: 'Revenue (₹)',
+                data: <%- JSON.stringify(bestSellingProducts.map(p => p.revenue)) %>,
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Revenue (₹)' }
+                }
+            },
+            plugins: {
+                legend: { display: true }
+            }
+        }
+    });
+
+    const bestCategoriesCtx = document.getElementById('bestCategoriesChart').getContext('2d');
+    const bestCategoriesChart = new Chart(bestCategoriesCtx, {
+        type: 'bar',
+        data: {
+            labels: <%- JSON.stringify(bestCategories.map(c => c.name)) %>,
+            datasets: [{
+                label: 'Revenue (₹)',
+                data: <%- JSON.stringify(bestCategories.map(c => c.revenue)) %>,
+                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Revenue (₹)' }
+                }
+            },
+            plugins: {
+                legend: { display: true }
+            }
+        }
+    });
+
+    const salesCtx = document.getElementById('salesChart').getContext('2d');
+    const salesChart = new Chart(salesCtx, {
+    type: 'line',
+    data: {
+        labels: <%- JSON.stringify(salesData.map(s => s.date)) %>,
+        datasets: [{
+            label: 'Total Sales (₹)',
+            data: <%- JSON.stringify(salesData.map(s => s.revenue || 0)) %>,
+            fill: false,
+            borderColor: 'rgba(255, 99, 132, 1)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true,
+                title: { display: true, text: 'Sales (₹)' },
+                ticks: {
+                    callback: function(value) {
+                        return '₹' + value.toLocaleString();
+                    }
+                }
+            },
+            x: {
+                title: { display: true, text: 'Date' }
+            }
+        },
+        plugins: {
+            legend: { display: true }
+        }
+    }
+});
 </script>
 
 <%- include("../../views/partials/admin/footer") %>
