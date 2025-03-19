@@ -166,7 +166,7 @@ const processCheckout = async (req, res) => {
         }
 
         const totalPrice = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
-        const discount = 0;
+        let discount = 0;
         if (couponCode) {
             const coupon = await Coupon.findOne({ name: couponCode, isList: true });
             if (coupon && !coupon.userId.includes(userId) && totalPrice >= coupon.minimumPrice) {
@@ -178,8 +178,94 @@ const processCheckout = async (req, res) => {
             }
           }
         const finalAmount = totalPrice - discount;
+        if (paymentMethod === 'wallet') {
+            const user = await User.findById(userId);
+            if (user.wallet < finalAmount) {
+                return res.status(200).json({
+                    success: false,
+                    message: `Your wallet balance is insufficient. You currently have ₹${user.wallet}. Please choose a different payment method.`
+                });
+            }
+            
+            
+
+            const walletTransaction = {
+                transactionId: `WAL${Date.now()}`,
+                type: "debit",
+                amount: finalAmount,
+                status: "Completed"
+            };
+
+            const orderId = `ORD${Date.now()}`
+            const order = new Order({
+                userId,
+                orderId,
+                orderedItems: cart.items.map(item => {
+                    const product = item.productId;
+                    const selectedVariant = product.variants.find(v => v.size === item.variant.size);
+
+                    return {
+                        product: product._id,
+                        variant: {
+                            size: item.variant.size,
+                            quantity: item.variant.quantity,
+                            regularPrice: selectedVariant.regularPrice,
+                            salesPrice: selectedVariant.salesPrice
+                        },
+                        price: item.totalPrice / item.variant.quantity,
+                        name: product.productName,
+                        productImage: product.productImage,
+                    };
+                }),
+                totalPrice,
+                discount,
+                finalAmount,
+                couponApplied: !!couponCode,
+                couponCode: couponCode || null,
+                address: selectedAddress,
+                paymentMethod,
+                status: 'Pending', 
+                createdOn: new Date(),
+            });
+            const savedOrder = await order.save()
+            await Promise.all([
+                User.findByIdAndUpdate(userId, {
+                    $inc: { wallet: -finalAmount },
+                    $push: {
+                        walletHistory: walletTransaction,
+                        orderHistory: savedOrder._id
+                    }
+                }),
+                ...stockUpdates.map(update =>
+                    Product.updateOne(
+                        { _id: update.productId, "variants.size": update.size },
+                        { $inc: { "variants.$.quantity": -update.quantity } },
+                    
+                    )
+                ),
+                Cart.updateOne(
+                    { userId },
+                    { $set: { items: [], bill: 0 } }
+                )
+            ]);
+
+            req.session.activeCoupon = null;
+            req.session.couponDiscount = null;
+
+            return res.status(200).json({
+                success: true,
+                orderId: savedOrder.orderId,
+                redirectUrl: `/thank-you?orderId=${savedOrder.orderId}`            });
+        }
+        if (paymentMethod === 'Cash on Delivery' && finalAmount > 1000) {
+            return res.status(400).json({
+                success: false,
+                message: 'Cash on Delivery is not allowed for orders exceeding ₹1000. Please choose another payment method.'
+            });
+        }
 
         const { v4: uuidv4 } = require('uuid');  
+        const orderId = `ORD${Date.now()}`;
         const order = new Order({
             userId,
             orderId:uuidv4(),
@@ -230,6 +316,7 @@ const processCheckout = async (req, res) => {
         return res.status(200).json({
             success: true,
             orderId: savedOrder.orderId,
+            redirectUrl: `/thank-you?orderId=${savedOrder.orderId}`,
             message: 'Order placed successfully'
         });
 
@@ -241,27 +328,37 @@ const processCheckout = async (req, res) => {
         });
     }
 };
+
+
 const loadThankYouPage = async (req, res) => {
     try {
-        const orderId = req.query.orderId;
+        const orderId = req.query.orderId ? req.query.orderId.trim() : null;
+        console.log('Order ID received in loadThankYouPage:', orderId);
 
-        if (!orderId) {
+        if (!orderId || orderId === 'undefined') {
+            console.log('Invalid or missing orderId, redirecting to home');
             return res.redirect('/');
         }
 
-        const order = await Order.findOne({ orderId })
-            .populate({
-                path: 'orderedItems.product',
-                model: 'Product',
-                select: 'productName productImage'
-            });
-
-           
+        let order = null;
+        for (let i = 0; i < 3; i++) {
+            order = await Order.findOne({ orderId })
+                .populate({
+                    path: 'orderedItems.product',
+                    model: 'Product',
+                    select: 'productName productImage'
+                });
+            if (order) break;
+            console.log(`Retry ${i + 1}: Order not found for orderId: ${orderId}`);
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
 
         if (!order) {
+            console.log('Order not found after retries for orderId:', orderId);
             return res.status(404).render('error', { message: 'Order not found' });
         }
 
+        console.log('Order found:', order.orderId);
         res.render('thankyou', {
             order: {
                 orderId: order.orderId,
@@ -283,7 +380,6 @@ const loadThankYouPage = async (req, res) => {
         res.status(500).render('error', { message: 'Error loading thank you page' });
     }
 };
-
 const loadCheckoutAddress = async (req, res) => {
     try {
 

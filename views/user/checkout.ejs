@@ -296,11 +296,11 @@
                                                              class="custom-control-input">
                                                       <label class="custom-control-label" for="payment_razorpay">Razorpay</label>
                                                   </div>
-                                                  <!-- <div class="custom-control custom-radio mb-3">
+                                                  <div class="custom-control custom-radio mb-3">
                                                     <input type="radio" id="payment_wallet" name="paymentMethod" value="wallet" 
                                                            class="custom-control-input">
                                                     <label class="custom-control-label" for="payment_wallet">Wallet</label>
-                                                </div> -->
+                                                </div>
                                               </div>
                                           </div>
                                         </div>
@@ -468,7 +468,7 @@
                 updateCouponUI(data.discountAmount, data.newTotal, appliedCoupon);
                 removeCouponBtn.style.display = 'inline-block';
             } else {
-                localStorage.removeItem('appliedCoupon'); // Clear if no longer valid
+                localStorage.removeItem('appliedCoupon'); 
                 appliedCoupon = null;
                 resetCouponUI();
             }
@@ -554,20 +554,33 @@
                     body: JSON.stringify(orderData)
                 });
                 const data = await response.json();
+                console.log('Response from /checkout:', data); // Debug log
                 if (data.success) {
-                    await handlePaymentSuccess(data.orderId);
+                    await handlePaymentSuccess(data. );
                 } else {
                     throw new Error(data.message || 'Failed to place order');
                 }
             }
         } catch (error) {
             console.error('Error processing order:', error);
-            Swal.fire({
+            if (processingDialog) {
+            await processingDialog.close();
+        }
+            await Swal.fire({
                 icon: 'error',
                 title: 'Order Failed',
-                text: error.message || 'There was an error processing your order.',
-                confirmButtonColor: '#7971ea'
-            });
+                text: error.message ,
+                confirmButtonColor: '#7971ea',
+                confirmButtonText: 'OK',
+                allowOutsideClick: false, 
+                allowEscapeKey: false
+
+            }).then((result)=>{
+                if(result.isConfirmed){
+                    placeOrderBtn.disabled = false;
+                placeOrderBtn.textContent = 'Place Order';
+                }
+            })
         } finally {
             if (processingDialog) Swal.close();
             placeOrderBtn.disabled = false;
@@ -646,9 +659,9 @@
             body: JSON.stringify({
                 orderId,
                 selectedAddress,
-                reason: 'Payment dismissed by user', // Default reason, can be enhanced with Razorpay error
-                razorpayOrderId: window.razorpayOrderId || null, // Assuming this is set during payment initiation
-                razorpayPaymentId: null // Will be null on dismissal
+                reason: 'Payment dismissed by user',
+                razorpayOrderId: window.razorpayOrderId || null, 
+                razorpayPaymentId: null 
             })
         });
 
@@ -657,7 +670,7 @@
 
         if (data.success) {
             showAlert('Order saved with Payment Pending status. You can retry payment later.', 'info');
-            window.location.href = data.redirectUrl; // Redirect to failure page
+            window.location.href = data.redirectUrl; 
         } else {
             showAlert(data.message || 'Failed to save order', 'error');
         }
