@@ -205,7 +205,6 @@
             background-color: #e9ecef;
         }
 
-
         .order-details {
             display: none;
             padding: 20px;
@@ -242,7 +241,6 @@
             font-weight: 600;
         }
 
-
         .order-info-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -264,7 +262,6 @@
             color: #666;
             font-size: 0.85rem;
         }
-
 
         .shipping-details {
             background-color: white;
@@ -455,75 +452,75 @@
                 width: 100%;
                 height: 200px;
             }
+
             .address-card {
-    border: 1px solid #e0e0e0;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    font-size: 0.9rem;
-}
+                border: 1px solid #e0e0e0;
+                background-color: #f8f9fa;
+                border-radius: 8px;
+                font-size: 0.9rem;
+            }
 
-.address-card p {
-    margin-bottom: 0.5rem;
-}
+            .address-card p {
+                margin-bottom: 0.5rem;
+            }
 
-.address-card strong {
-    color: #333;
-    font-weight: 600;
-}
+            .address-card strong {
+                color: #333;
+                font-weight: 600;
+            }
         }
+
         /* Pagination Styles */
-.pagination-container {
-    margin-top: 20px;
-}
+        .pagination-container {
+            margin-top: 20px;
+        }
 
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-}
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
 
-.pagination .page-item {
-    margin: 0;
-}
+        .pagination .page-item {
+            margin: 0;
+        }
 
-.pagination .page-link {
-    border: 1px solid #dee2e6;
-    color: var(--secondary-color);
-    background-color: #fff;
-    padding: 8px 12px;
-    font-size: 0.9rem;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-}
+        .pagination .page-link {
+            border: 1px solid #dee2e6;
+            color: var(--secondary-color);
+            background-color: #fff;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
 
-.pagination .page-link:hover {
-    background-color: var(--primary-color);
-    color: #fff;
-    border-color: var(--primary-color);
-}
+        .pagination .page-link:hover {
+            background-color: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
 
-.pagination .page-item.active .page-link {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-    color: #fff;
-}
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #fff;
+        }
 
-.pagination .page-item.disabled .page-link {
-    color: #6c757d;
-    background-color: #f8f9fa;
-    border-color: #dee2e6;
-    cursor: not-allowed;
-}
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+            cursor: not-allowed;
+        }
 
-.pagination .ellipsis {
-    padding: 8px 12px;
-    color: #6c757d;
-    font-size: 0.9rem;
-}
+        .pagination .ellipsis {
+            padding: 8px 12px;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
     </style>
-
-
 </head>
 
 <body class="bg-light">
@@ -539,13 +536,12 @@
         </div>
     </nav>
 
-
     <div class="bg-white border-bottom">
         <div class="container py-2">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
                     <li class="breadcrumb-item"><a href="/">Home</a></li>
-                    <li class="breadcrumb-item active"><a href='/userProfile'>Profile </a></li>
+                    <li class="breadcrumb-item active"><a href='/userProfile'>Profile</a></li>
                 </ol>
             </nav>
         </div>
@@ -553,52 +549,41 @@
 
     <div class="container py-4">
         <div class="row g-4">
-
             <div class="col-md-3">
                 <div class="side-nav p-3">
                     <h5 class="mb-3">Account Settings</h5>
                     <div class="nav flex-column">
-                        <a class="nav-link active" onclick="showContent('profile')"><i class="fas fa-user me-2"></i> Profile</a>
-                        <a class="nav-link" onclick="showContent('address')"><i class="fas fa-map-marker-alt me-2"></i> Address</a>
-                        <a class="nav-link" onclick="showContent('orders')"><i class="fas fa-shopping-bag me-2"></i> Orders</a>
-                        <a class="nav-link" onclick="showContent('wallet')"><i class="fas fa-wallet me-2"></i> Wallet Status</a>
-                        <a class="nav-link" onclick="showContent('wallet-history')"><i class="fas fa-clock me-2"></i> Wallet History</a>
+                        <a class="nav-link <%= activeTab === 'profile' ? 'active' : '' %>" href="?tab=profile"><i class="fas fa-user me-2"></i> Profile</a>
+                        <a class="nav-link <%= activeTab === 'address' ? 'active' : '' %>" href="?tab=address"><i class="fas fa-map-marker-alt me-2"></i> Address</a>
+                        <a class="nav-link <%= activeTab === 'orders' ? 'active' : '' %>" href="?tab=orders"><i class="fas fa-shopping-bag me-2"></i> Orders</a>
+                        <a class="nav-link <%= activeTab === 'wallet' ? 'active' : '' %>" href="?tab=wallet"><i class="fas fa-wallet me-2"></i> Wallet Status</a>
+                        <a class="nav-link <%= activeTab === 'wallet-history' ? 'active' : '' %>" href="?tab=wallet-history"><i class="fas fa-clock me-2"></i> Wallet History</a>
                         <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
                     </div>
                 </div>
             </div>
 
-
             <div class="col-md-9">
-
-               
-
-                <div id="profile" class="content-section active">
+                <div id="profile" class="content-section <%= activeTab === 'profile' ? 'active' : '' %>">
                     <div class="profile-card bg-white p-4 rounded">
                         <h4 class="mb-4">Personal Information</h4>
                         <form>
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Name</label>
-                                    <h6>
-                                        <%=user.name%>
-                                    </h6>
+                                    <h6><%= user.name %></h6>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Email Address</label>
                                 <div class="input-group">
-                                    <h6>
-                                        <%=user.email%>
-                                    </h6>
+                                    <h6><%= user.email %></h6>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Phone Number</label>
                                 <div class="input-group">
-                                    <h6>
-                                        <%=user.phone%>
-                                    </h6>
+                                    <h6><%= user.phone %></h6>
                                 </div>
                             </div>
                             <div class="mb-4">
@@ -609,8 +594,7 @@
                     </div>
                 </div>
 
-
-                <div id="address" class="content-section">
+                <div id="address" class="content-section <%= activeTab === 'address' ? 'active' : '' %>">
                     <div class="profile-card bg-white p-4 rounded">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h4 class="mb-0">My Addresses</h4>
@@ -619,23 +603,20 @@
                             </a>
                         </div>
 
-
                         <div class="row">
-                            <% if (userAddress && userAddress.address && userAddress.address.length> 0) { %>
-                                <% userAddress.address.forEach(address=> { %>
+                            <% if (userAddress && userAddress.address && userAddress.address.length > 0) { %>
+                                <% userAddress.address.forEach(address => { %>
                                     <div class="col-md-6 mb-3">
                                         <div class="card">
                                             <div class="card-body">
-                                                <h6 class="card-title">
-                                                    <%= address.addressType %>
-                                                </h6>
+                                                <h6 class="card-title"><%= address.addressType %></h6>
                                                 <p class="card-text">
                                                     <%= address.name %><br>
-                                                        <%= address.landMark %><br>
-                                                            <%= address.city %>, <%= address.state %><br>
-                                                                    PIN: <%= address.pincode %><br>
-                                                                        Phone: <%= address.phoneNumber %><br>
-                                                                            Alt Phone: <%= address.altPhone %>
+                                                    <%= address.landMark %><br>
+                                                    <%= address.city %>, <%= address.state %><br>
+                                                    PIN: <%= address.pincode %><br>
+                                                    Phone: <%= address.phoneNumber %><br>
+                                                    Alt Phone: <%= address.altPhone %>
                                                 </p>
                                                 <div class="d-flex gap-2">
                                                     <a href="/editAddress?id=<%= address._id %>"
@@ -651,22 +632,19 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <% }) %>
-                                        <% } else { %>
-                                            <div class="col-12">
-                                                <p class="text-muted">No addresses found. Add a new address to get
-                                                    started.</p>
-                                            </div>
-                                            <% } %>
+                                <% }) %>
+                            <% } else { %>
+                                <div class="col-12">
+                                    <p class="text-muted">No addresses found. Add a new address to get started.</p>
+                                </div>
+                            <% } %>
                         </div>
                     </div>
                 </div>
 
-
-                <div id="orders" class="content-section">
+                <div id="orders" class="content-section <%= activeTab === 'orders' ? 'active' : '' %>">
                     <div class="profile-card bg-white p-4 rounded">
                         <h4 class="mb-4">My Orders</h4>
-                
                         <div class="order-list">
                             <% if (orders && orders.length > 0) { %>
                                 <% orders.forEach(order => { %>
@@ -704,7 +682,7 @@
                                                     </a>
                                                 </div>
                                             </div>
-                
+
                                             <div class="collapse mt-3" id="orderDetails<%= order._id %>">
                                                 <div class="card card-body">
                                                     <h6 class="mb-3">Shipping Address:</h6>
@@ -728,7 +706,7 @@
                                                         <p class="text-muted">Address not available</p>
                                                     <% } %>
                                                     <hr>
-                
+
                                                     <h6>Order Items:</h6>
                                                     <% if (order.orderedItems && order.orderedItems.length > 0) { %>
                                                         <% order.orderedItems.forEach(product => { %>
@@ -753,7 +731,7 @@
                                                                 </div>
                                                                 <div class="d-flex align-items-center">
                                                                     <p class="mb-0 me-3">₹<%= product.price ? product.price.toFixed(2) : '0.00' %></p>
-                
+
                                                                     <% if ((order.status === 'Delivered') && 
                                                                         (product.cancelStatus !== 'Cancelled') && 
                                                                         (product.returnStatus === 'Not Requested' || product.returnStatus === undefined)) { %>
@@ -762,7 +740,7 @@
                                                                             Return Product
                                                                         </button>
                                                                     <% } %>
-                
+
                                                                     <% if ((product.status === 'Pending' || product.status === 'Processing' || 
                                                                         (order.status === 'Pending' || order.status === 'Processing') && !product.status) && 
                                                                         (!product.cancelStatus || product.cancelStatus !== 'Cancelled')) { %>
@@ -777,13 +755,13 @@
                                                     <% } else { %>
                                                         <p>No items found in this order.</p>
                                                     <% } %>
-                
+
                                                     <hr>
                                                     <div class="d-flex justify-content-between">
                                                         <strong>Total:</strong>
                                                         <strong>₹<%= order.finalAmount ? order.finalAmount.toFixed(2) : '0.00' %></strong>
                                                     </div>
-                
+
                                                     <div class="mt-3">
                                                         <% if (order.status === 'Pending' || order.status === 'Processing') { %>
                                                             <button class="btn btn-danger btn-sm"
@@ -807,22 +785,22 @@
                                 </div>
                             <% } %>
                         </div>
-                
+
                         <!-- Updated Pagination Controls -->
                         <% if (pagination.totalOrderPages > 1) { %>
                             <nav aria-label="Order pagination" class="pagination-container">
                                 <ul class="pagination justify-content-center mt-4">
                                     <!-- Previous Button -->
                                     <li class="page-item <%= pagination.orderPage === 1 ? 'disabled' : '' %>">
-                                        <a class="page-link" href="?page=<%= pagination.orderPage - 1 %>&limit=<%= pagination.orderLimit %>" aria-label="Previous">
+                                        <a class="page-link" href="?tab=orders&page=<%= pagination.orderPage - 1 %>&limit=<%= pagination.orderLimit %>" aria-label="Previous">
                                             <i class="fas fa-chevron-left"></i>
                                         </a>
                                     </li>
-                
+
                                     <!-- First Page -->
                                     <% if (pagination.orderPage > 3) { %>
                                         <li class="page-item">
-                                            <a class="page-link" href="?page=1&limit=<%= pagination.orderLimit %>">1</a>
+                                            <a class="page-link" href="?tab=orders&page=1&limit=<%= pagination.orderLimit %>">1</a>
                                         </li>
                                         <% if (pagination.orderPage > 4) { %>
                                             <li class="page-item disabled">
@@ -830,7 +808,7 @@
                                             </li>
                                         <% } %>
                                     <% } %>
-                
+
                                     <!-- Pages Around Current Page -->
                                     <% 
                                         const startPage = Math.max(1, pagination.orderPage - 2);
@@ -838,10 +816,10 @@
                                         for (let i = startPage; i <= endPage; i++) { 
                                     %>
                                         <li class="page-item <%= pagination.orderPage === i ? 'active' : '' %>">
-                                            <a class="page-link" href="?page=<%= i %>&limit=<%= pagination.orderLimit %>"><%= i %></a>
+                                            <a class="page-link" href="?tab=orders&page=<%= i %>&limit=<%= pagination.orderLimit %>"><%= i %></a>
                                         </li>
                                     <% } %>
-                
+
                                     <!-- Last Page with Ellipsis -->
                                     <% if (pagination.orderPage < pagination.totalOrderPages - 2) { %>
                                         <% if (pagination.orderPage < pagination.totalOrderPages - 3) { %>
@@ -850,13 +828,13 @@
                                             </li>
                                         <% } %>
                                         <li class="page-item">
-                                            <a class="page-link" href="?page=<%= pagination.totalOrderPages %>&limit=<%= pagination.orderLimit %>"><%= pagination.totalOrderPages %></a>
+                                            <a class="page-link" href="?tab=orders&page=<%= pagination.totalOrderPages %>&limit=<%= pagination.orderLimit %>"><%= pagination.totalOrderPages %></a>
                                         </li>
                                     <% } %>
-                
+
                                     <!-- Next Button -->
                                     <li class="page-item <%= pagination.orderPage === pagination.totalOrderPages ? 'disabled' : '' %>">
-                                        <a class="page-link" href="?page=<%= pagination.orderPage + 1 %>&limit=<%= pagination.orderLimit %>" aria-label="Next">
+                                        <a class="page-link" href="?tab=orders&page=<%= pagination.orderPage + 1 %>&limit=<%= pagination.orderLimit %>" aria-label="Next">
                                             <i class="fas fa-chevron-right"></i>
                                         </a>
                                     </li>
@@ -865,86 +843,117 @@
                         <% } %>
                     </div>
                 </div>
-                <div id="wallet" class="content-section">
-    <div class="profile-card bg-white p-4 rounded">
-        <h4 class="mb-4">Wallet Status</h4>
-        <div class="text-center py-4">
-            <div class="mb-4">
-                <i class="fas fa-wallet fa-3x text-primary"></i>
+
+                <div id="wallet" class="content-section <%= activeTab === 'wallet' ? 'active' : '' %>">
+                    <div class="profile-card bg-white p-4 rounded">
+                        <h4 class="mb-4">Wallet Status</h4>
+                        <div class="text-center py-4">
+                            <div class="mb-4">
+                                <i class="fas fa-wallet fa-3x text-primary"></i>
+                            </div>
+                            <h3 class="mb-2">₹<%= user.wallet %></h3>
+                            <p class="text-muted">Current Balance</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="wallet-history" class="content-section <%= activeTab === 'wallet-history' ? 'active' : '' %>">
+                    <div class="profile-card bg-white p-4 rounded">
+                        <h4 class="mb-4">Transaction History</h4>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Transaction ID</th>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (user.walletHistory && user.walletHistory.length > 0) { %>
+                                        <% user.walletHistory.forEach(transaction => { %>
+                                            <tr>
+                                                <td><%= transaction.transactionId %></td>
+                                                <td><%= new Date(transaction.date).toLocaleDateString() %></td>
+                                                <td><span class="badge <%= transaction.type === 'credit' ? 'bg-success' : 'bg-danger' %>"><%= transaction.type.toUpperCase() %></span></td>
+                                                <td>₹<%= transaction.amount %></td>
+                                                <td><span class="badge bg-success">Completed</span></td>
+                                            </tr>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td class="text-center text-muted" colspan="5">
+                                                <i class="fas fa-history fa-3x mb-3"></i>
+                                                <h6>No transactions found</h6>
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Wallet History Pagination Controls -->
+                        <% if (walletPagination.totalWalletPages > 1) { %>
+                            <nav aria-label="Wallet history pagination" class="pagination-container">
+                                <ul class="pagination justify-content-center mt-4">
+                                    <!-- Previous Button -->
+                                    <li class="page-item <%= walletPagination.walletPage === 1 ? 'disabled' : '' %>">
+                                        <a class="page-link" href="?tab=wallet-history&walletPage=<%= walletPagination.walletPage - 1 %>" aria-label="Previous">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </a>
+                                    </li>
+
+                                    <!-- First Page -->
+                                    <% if (walletPagination.walletPage > 3) { %>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?tab=wallet-history&walletPage=1">1</a>
+                                        </li>
+                                        <% if (walletPagination.walletPage > 4) { %>
+                                            <li class="page-item disabled">
+                                                <span class="ellipsis">...</span>
+                                            </li>
+                                        <% } %>
+                                    <% } %>
+
+                                    <!-- Pages Around Current Page -->
+                                    <% 
+                                        const startWalletPage = Math.max(1, walletPagination.walletPage - 2);
+                                        const endWalletPage = Math.min(walletPagination.totalWalletPages, walletPagination.walletPage + 2);
+                                        for (let i = startWalletPage; i <= endWalletPage; i++) { 
+                                    %>
+                                        <li class="page-item <%= walletPagination.walletPage === i ? 'active' : '' %>">
+                                            <a class="page-link" href="?tab=wallet-history&walletPage=<%= i %>"><%= i %></a>
+                                        </li>
+                                    <% } %>
+
+                                    <!-- Last Page with Ellipsis -->
+                                    <% if (walletPagination.walletPage < walletPagination.totalWalletPages - 2) { %>
+                                        <% if (walletPagination.walletPage < walletPagination.totalWalletPages - 3) { %>
+                                            <li class="page-item disabled">
+                                                <span class="ellipsis">...</span>
+                                            </li>
+                                        <% } %>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?tab=wallet-history&walletPage=<%= walletPagination.totalWalletPages %>"><%= walletPagination.totalWalletPages %></a>
+                                        </li>
+                                    <% } %>
+
+                                    <!-- Next Button -->
+                                    <li class="page-item <%= walletPagination.walletPage === walletPagination.totalWalletPages ? 'disabled' : '' %>">
+                                        <a class="page-link" href="?tab=wallet-history&walletPage=<%= walletPagination.walletPage + 1 %>" aria-label="Next">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        <% } %>
+                    </div>
+                </div>
             </div>
-            <h3 class="mb-2">₹<%= user.wallet %></h3>
-            <p class="text-muted">Current Balance</p>
         </div>
     </div>
-</div>
-
-<div id="wallet-history" class="content-section">
-    <div class="profile-card bg-white p-4 rounded">
-        <h4 class="mb-4">Transaction History</h4>
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Transaction ID</th>
-                        <th>Date</th>
-                        <th>Type</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% if (user.walletHistory && user.walletHistory.length > 0) { %>
-                        <% user.walletHistory.forEach(transaction => { %>
-                            <tr>
-                                <td><%= transaction.transactionId %></td>
-                                <td><%= new Date(transaction.date).toLocaleDateString() %></td>
-                                <td><span class="badge <%= transaction.type === 'credit' ? 'bg-success' : 'bg-danger' %>"><%= transaction.type.toUpperCase() %></span></td>
-                                <td>₹<%= transaction.amount %></td>
-                                <td><span class="badge bg-success">Completed</span></td>
-                            </tr>
-                        <% }) %>
-                    <% } else { %>
-                        <tr>
-                            <td class="text-center text-muted" colspan="5">
-                                <i class="fas fa-history fa-3x mb-3"></i>
-                                <h6>No transactions found</h6>
-                            </td>
-                        </tr>
-                    <% } %>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Wallet History Pagination Controls -->
-        <div class="container mt-3">
-            <nav aria-label="Wallet history page navigation">
-                <ul class="pagination justify-content-center">
-                    <% if (walletPagination.walletPage > 1) { %>
-                        <li class="page-item">
-                            <a class="page-link" href="?walletPage=<%= walletPagination.walletPage - 1 %>">Previous</a>
-                        </li>
-                    <% } %>
-
-                    <% for (let i = 1; i <= walletPagination.totalWalletPages; i++) { %>
-                        <li class="page-item <%= (i === walletPagination.walletPage) ? 'active' : '' %>">
-                            <a class="page-link" href="?walletPage=<%= i %>"><%= i %></a>
-                        </li>
-                    <% } %>
-
-                    <% if (walletPagination.walletPage < walletPagination.totalWalletPages) { %>
-                        <li class="page-item">
-                            <a class="page-link" href="?walletPage=<%= walletPagination.walletPage + 1 %>">Next</a>
-                        </li>
-                    <% } %>
-                </ul>
-            </nav>
-        </div>
-    </div>
-</div>
-            </div>
-        </div>
-    </div>
-
 
     <div class="modal fade" id="addAddressModal" tabindex="-1">
         <div class="modal-dialog">
@@ -979,7 +988,6 @@
                             <label class="form-label">Another number</label>
                             <input type="text" class="form-control">
                         </div>
-
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -989,12 +997,10 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-
-  
 
     <script>
         window.openCancelModal = function (orderId) {
@@ -1208,30 +1214,9 @@
     </script>
 
     <script>
-
-        function showContent(contentId) {
-
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-            });
-
-
-            document.getElementById(contentId).classList.add('active');
-
-
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active');
-            });
-
-
-            event.currentTarget.classList.add('active');
-        }
-
         document.addEventListener('DOMContentLoaded', function () {
-
             const form = document.querySelector('#addAddressModal form');
             const saveButton = document.querySelector('#addAddressModal .btn-primary');
-
 
             const inputs = {
                 name: form.querySelector('input[placeholder="e.g., Home, Office"]'),
@@ -1241,7 +1226,6 @@
                 phone: form.querySelector('input[type="text"]:nth-of-type(5)'),
                 altPhone: form.querySelector('input[type="text"]:nth-of-type(6)')
             };
-
 
             const validationRules = {
                 name: {
@@ -1271,7 +1255,6 @@
                 }
             };
 
-
             const errorMessages = {
                 name: {
                     required: 'Please enter a name for this address',
@@ -1300,7 +1283,6 @@
                 }
             };
 
-
             function validateField(field, value) {
                 const rules = validationRules[field];
 
@@ -1321,7 +1303,6 @@
                 return '';
             }
 
-
             function validateForm() {
                 let errors = [];
 
@@ -1335,14 +1316,12 @@
                 return errors;
             }
 
-
             saveButton.addEventListener('click', function (e) {
                 e.preventDefault();
 
                 const errors = validateForm();
 
                 if (errors.length > 0) {
-
                     Swal.fire({
                         icon: 'error',
                         title: 'Validation Error',
@@ -1350,7 +1329,6 @@
                         confirmButtonColor: '#ff4081'
                     });
                 } else {
-
                     Swal.fire({
                         icon: 'success',
                         title: 'Success!',
@@ -1364,13 +1342,11 @@
                 }
             });
 
-
             for (let field in inputs) {
                 inputs[field].addEventListener('input', function () {
                     const error = validateField(field, this.value);
                     this.classList.remove('is-valid', 'is-invalid');
                     this.classList.add(error ? 'is-invalid' : 'is-valid');
-
 
                     let feedback = this.nextElementSibling;
                     if (!feedback || !feedback.classList.contains('invalid-feedback')) {
@@ -1383,12 +1359,6 @@
             }
         });
     </script>
-
-
-
-
-
-
-  </body>
+</body>
 
 </html>

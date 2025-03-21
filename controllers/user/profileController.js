@@ -188,30 +188,29 @@ const resetPassword = async (req, res) => {
 
 
 
+
 const userProfile = async (req, res) => {
     try {
         console.log('Session user:', req.session.user);
         const userId = req.session.user._id;
 
-        
         const orderPage = parseInt(req.query.page) || 1;
         const orderLimit = parseInt(req.query.limit) || 3;
         const orderSkip = (orderPage - 1) * orderLimit;
 
-        
         const walletPage = parseInt(req.query.walletPage) || 1;
         const walletLimit = 5;
         const walletSkip = (walletPage - 1) * walletLimit;
+
+        const activeTab = req.query.tab || 'profile';
 
         const userData = await User.findById(userId).lean();
         if (!userData) throw new Error('User not found');
 
         const addressData = await Address.findOne({ userID: userId });
 
-        
         const totalOrders = await Order.countDocuments({ userId: userId });
         const totalOrderPages = Math.ceil(totalOrders / orderLimit);
-
 
         const orders = await Order.find({ userId: userId })
             .sort({ createdOn: -1 })
@@ -245,16 +244,12 @@ const userProfile = async (req, res) => {
             }
         }
 
-        
         const sortedWalletHistory = userData.walletHistory
-        ? [...userData.walletHistory].sort((a, b) => new Date(b.date) - new Date(a.date))
-        : [];
-
-    // Paginate the sorted wallet history
-    const paginatedWalletHistory = sortedWalletHistory.slice(walletSkip, walletSkip + walletLimit);
-
-    const totalWalletTransactions = userData.walletHistory ? userData.walletHistory.length : 0;
-    const totalWalletPages = Math.ceil(totalWalletTransactions / walletLimit);
+            ? [...userData.walletHistory].sort((a, b) => new Date(b.date) - new Date(a.date))
+            : [];
+        const paginatedWalletHistory = sortedWalletHistory.slice(walletSkip, walletSkip + walletLimit);
+        const totalWalletTransactions = userData.walletHistory ? userData.walletHistory.length : 0;
+        const totalWalletPages = Math.ceil(totalWalletTransactions / walletLimit);
 
         res.render('profile', {
             user: { ...userData, walletHistory: paginatedWalletHistory },
@@ -271,14 +266,14 @@ const userProfile = async (req, res) => {
                 walletLimit,
                 totalWalletTransactions,
                 totalWalletPages
-            }
+            },
+            activeTab 
         });
     } catch (error) {
         console.error('Error retrieving profile data:', error);
         res.status(500).send('Internal Server Error: ' + error.message);
     }
 };
-
 const changePassWord = async (req, res) => {
     try {
 
