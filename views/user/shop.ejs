@@ -1,160 +1,54 @@
 <%- include('../../views/partials/user/header') %>
 
 <style>
-  /* Filter Sidebar Outline */
+  /* Main Layout */
   .shop-container {
     display: flex;
+    flex-direction: column;
     width: 100%;
     min-height: 100vh;
     padding: 20px;
   }
   
-  .filters-sidebar {
-    width: 280px;
-    padding: 20px;
-    background: #fff;
-    border-right: 1px solid #eee;
-    height: 100%;
-  }
-  
-  .products-grid {
-    flex: 1;
-    padding: 20px 30px;
-  }
-  
-  .filter-section {
-    margin-bottom: 25px;
-  }
-  
-  .filter-section h3 {
-    font-size: 16px;
-    margin-bottom: 10px;
-    color: #333;
-    font-weight: 600;
-  }
-  
-  /* Enhanced Search Box */
-  .search-container {
-    position: relative;
-    margin-bottom: 15px;
-  }
-  
-  .search-input {
-    width: 100%;
-    padding: 10px 40px 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 25px;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.3s;
-  }
-  
-  .search-input:focus {
-    border-color: #e34298;
-  }
-  
-  .search-icon {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 16px;
-    color: #666;
-    cursor: pointer;
-  }
-  
-  /* Category Filter as Dropdown/Button */
-  .category-select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    background: #fff;
-    cursor: pointer;
-    text-align: left;
-    position: relative;
-  }
-  
-  .category-select:focus {
-    border-color: #e34298;
-    outline: none;
-  }
-  
-  .category-options {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    z-index: 10;
-    max-height: 200px;
-    overflow-y: auto;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  }
-  
-  .category-options.active {
-    display: block;
-  }
-  
-  .category-options label {
-    display: block;
-    padding: 8px 15px;
-    cursor: pointer;
-  }
-  
-  .category-options input[type="radio"] {
-    margin-right: 10px;
-  }
-  
-  .filter-select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    font-size: 14px;
+  .shop-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 0 10px;
   }
   
   .filter-button {
-    width: 100%;
-    padding: 10px;
-    background: #e34298;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-bottom: 10px;
-  }
-  
-  .filter-button:hover {
-    background: #e34298;
-  }
-  
-  .clear-button {
-    width: 100%;
-    padding: 10px;
-    background: #f8f9fa;
-    color: #333;
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 4px;
     cursor: pointer;
-    text-align: center;
-    text-decoration: none;
+    font-size: 15px;
+    transition: all 0.3s ease;
   }
   
-  .clear-button:hover {
-    background: #efe9ec;
+  .filter-button:hover {
+    background-color: #f5f5f5;
   }
   
+  .filter-button i {
+    margin-right: 10px;
+  }
+  
+  .products-count {
+    font-size: 15px;
+    color: #666;
+  }
+  
+  /* Products Grid */
   .products-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
-    padding: 20px;
+    padding: 20px 10px;
   }
   
   .product-card {
@@ -235,7 +129,108 @@
     content: "\2665";
     color: #ff2020;
   }
-
+  
+  /* Filter Modal */
+  .filter-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    overflow: auto;
+  }
+  
+  .filter-modal-content {
+    position: relative;
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 0;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    animation: modalFadeIn 0.3s;
+  }
+  
+  @keyframes modalFadeIn {
+    from {opacity: 0; transform: translateY(-50px);}
+    to {opacity: 1; transform: translateY(0);}
+  }
+  
+  .filter-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .filter-modal-header h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #333;
+  }
+  
+  .filter-modal-close {
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+  }
+  
+  .filter-modal-body {
+    padding: 20px;
+  }
+  
+  .filter-section {
+    margin-bottom: 25px;
+  }
+  
+  .filter-section h3 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #333;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .filter-section h3::after {
+    content: "+";
+    font-size: 18px;
+  }
+  
+  .filter-section.open h3::after {
+    content: "-";
+  }
+  
+  .filter-options {
+    display: none;
+    padding: 10px 0;
+  }
+  
+  .filter-section.open .filter-options {
+    display: block;
+  }
+  
+  .category-options label {
+    display: block;
+    padding: 8px 5px;
+    margin-bottom: 5px;
+    cursor: pointer;
+  }
+  
+  .category-options input[type="radio"] {
+    margin-right: 10px;
+  }
+  
+  /* Price Range Slider */
   .price-slider-container {
     padding: 10px 0;
   }
@@ -267,90 +262,105 @@
     color: #666;
     margin-top: 10px;
   }
+  
+  /* Sort Options */
+  .sort-options label {
+    display: block;
+    padding: 8px 5px;
+    margin-bottom: 5px;
+    cursor: pointer;
+  }
+  
+  .sort-options input[type="radio"] {
+    margin-right: 10px;
+  }
+  
+  .filter-modal-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+  }
+  
+  .filter-button-modal {
+    padding: 10px 25px;
+    background: #e34298;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .filter-button-modal:hover {
+    background: #d13b8a;
+  }
+  
+  .clear-button-modal {
+    padding: 10px 25px;
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .clear-button-modal:hover {
+    background: #efe9ec;
+  }
+
+  /* Applied Filters Section */
+  .applied-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 0 10px;
+  }
+  
+  .filter-tag {
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    border: 1px solid #eee;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 13px;
+    color: #333;
+  }
+  
+  .filter-tag span {
+    margin-right: 8px;
+  }
+  
+  .filter-tag button {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+    margin-left: 5px;
+  }
 </style>
 
 <div class="site-wrap">
   <div class="shop-container">
-    <div class="filters-sidebar">
-      <form action="/shop" method="get">
-        <!-- Enhanced Search Bar with Icon -->
-        <div class="filter-section">
-          <div class="search-container">
-            <input 
-              type="text" 
-              name="search" 
-              class="search-input" 
-              placeholder="Search products..." 
-              value="<%= query.search || '' %>"
-            >
-            <span class="search-icon"><i class="fas fa-search"></i></span>
-          </div>
-        </div>
-    
-        <!-- Category Filter as Dropdown -->
-        <div class="filter-section">
-          <h3>Category</h3>
-          <div class="category-select" onclick="toggleCategoryOptions()">
-            <%= selectedCategory ? categories.find(c => c._id.toString() === selectedCategory)?.name || 'Select Category' : 'Select Category' %>
-            <div class="category-options" id="categoryOptions">
-              <label>
-                <input type="radio" name="category" value="" <%= !selectedCategory ? 'checked' : '' %>> All Categories
-              </label>
-              <% categories.forEach(function(category) { %>
-                <label>
-                  <input type="radio" name="category" value="<%= category._id %>" <%= selectedCategory === category._id.toString() ? 'checked' : '' %>> <%= category.name %>
-                </label>
-              <% }); %>
-            </div>
-          </div>
-        </div>
-    
-        <!-- Price Range Slider (500-15000) -->
-        <div class="filter-section">
-          <h3>Price Range (₹)</h3>
-          <div class="price-slider-container">
-            <input 
-              type="range" 
-              min="500" 
-              max="15000" 
-              value="<%= selectedPriceRange ? selectedPriceRange.split('-')[0] : '500' %>" 
-              class="slider" 
-              id="priceMin"
-              name="priceMin"
-            >
-            <input 
-              type="range" 
-              min="500" 
-              max="15000" 
-              value="<%= selectedPriceRange ? (selectedPriceRange.split('-')[1] || '15000') : '15000' %>" 
-              class="slider" 
-              id="priceMax"
-              name="priceMax"
-            >
-            <div class="price-values">
-              <span id="min-value">₹<%= selectedPriceRange ? selectedPriceRange.split('-')[0] : '500' %></span>
-              <span>-</span>
-              <span id="max-value">₹<%= selectedPriceRange ? (selectedPriceRange.split('-')[1] || '15000') : '15000' %></span>
-            </div>
-          </div>
-        </div>
-    
-        <!-- Sort By Filter -->
-        <div class="filter-section">
-          <h3>Sort By</h3>
-          <select name="sortBy" class="filter-select">
-            <option value="">Select Sorting</option>
-            <option value="priceLowToHigh" <%= sortBy === 'priceLowToHigh' ? 'selected' : '' %>>Price: Low to High</option>
-            <option value="nameAZ" <%= sortBy === 'nameAZ' ? 'selected' : '' %>>Alphabetical (A-Z)</option>
-            <option value="newest" <%= sortBy === 'newest' ? 'selected' : '' %>>New Arrivals</option>
-          </select>
-        </div>
-    
-        <button type="submit" class="filter-button">Apply Filters</button>
-        <a href="/shop" class="clear-button">Clear Filters</a>
-      </form>
+    <!-- Shop Header with Filter Button -->
+    <div class="shop-header">
+      <button class="filter-button" onclick="openFilterModal()">
+        <i class="fas fa-sliders-h"></i> Filter
+      </button>
+      <div class="products-count"><%= totalProducts %> products</div>
     </div>
     
+    <!-- Applied Filters -->
+    <div class="applied-filters" id="appliedFilters">
+      <!-- Applied filters will be added here dynamically -->
+    </div>
+    
+    <!-- Products Grid -->
     <div class="products-grid">
       <% if (noProductsFound) { %>
         <div class="no-results">
@@ -391,19 +401,138 @@
       <% } %>
     </div>
   </div>
+  
+  <!-- Filter Modal -->
+  <div id="filterModal" class="filter-modal">
+    <div class="filter-modal-content">
+      <div class="filter-modal-header">
+        <h2>Filter Products</h2>
+        <button class="filter-modal-close" onclick="closeFilterModal()">&times;</button>
+      </div>
+      
+      <form id="filterForm" action="/shop" method="get">
+        <!-- Hidden input for search value -->
+        <input type="hidden" id="searchInput" name="search" value="<%= query.search || '' %>">
+        
+        <div class="filter-modal-body">
+          <!-- Category Filter Section -->
+          <div class="filter-section" onclick="toggleSection(this)">
+            <h3>Category</h3>
+            <div class="filter-options category-options">
+              <label>
+                <input type="radio" name="category" value="" <%= !selectedCategory ? 'checked' : '' %>> All Categories
+              </label>
+              <% categories.forEach(function(category) { %>
+                <label>
+                  <input type="radio" name="category" value="<%= category._id %>" <%= selectedCategory === category._id.toString() ? 'checked' : '' %>> <%= category.name %>
+                </label>
+              <% }); %>
+            </div>
+          </div>
+          
+          <!-- Price Range Section -->
+          <div class="filter-section" onclick="toggleSection(this)">
+            <h3>Price Range (₹)</h3>
+            <div class="filter-options">
+              <div class="price-slider-container">
+                <input 
+                  type="range" 
+                  min="500" 
+                  max="15000" 
+                  value="<%= selectedPriceRange ? selectedPriceRange.split('-')[0] : '500' %>" 
+                  class="slider" 
+                  id="priceMin"
+                  name="priceMin"
+                >
+                <input 
+                  type="range" 
+                  min="500" 
+                  max="15000" 
+                  value="<%= selectedPriceRange ? (selectedPriceRange.split('-')[1] || '15000') : '15000' %>" 
+                  class="slider" 
+                  id="priceMax"
+                  name="priceMax"
+                >
+                <div class="price-values">
+                  <span id="min-value">₹<%= selectedPriceRange ? selectedPriceRange.split('-')[0] : '500' %></span>
+                  <span>-</span>
+                  <span id="max-value">₹<%= selectedPriceRange ? (selectedPriceRange.split('-')[1] || '15000') : '15000' %></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Sort By Section -->
+          <div class="filter-section" onclick="toggleSection(this)">
+            <h3>Sort By</h3>
+            <div class="filter-options sort-options">
+              <label>
+                <input type="radio" name="sortBy" value="newest" <%= sortBy === 'newest' || !sortBy ? 'checked' : '' %>> New Arrivals
+              </label>
+              <label>
+                <input type="radio" name="sortBy" value="priceLowToHigh" <%= sortBy === 'priceLowToHigh' ? 'checked' : '' %>> Price: Low to High
+              </label>
+              <label>
+                <input type="radio" name="sortBy" value="nameAZ" <%= sortBy === 'nameAZ' ? 'checked' : '' %>> Alphabetical (A-Z)
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="filter-modal-footer">
+          <button type="button" class="clear-button-modal" onclick="clearFilters()">Clear All</button>
+          <button type="submit" class="filter-button-modal">Apply Filters</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
 <script>
+  // Modal Functions
+  function openFilterModal() {
+    document.getElementById('filterModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+  }
+  
+  function closeFilterModal() {
+    document.getElementById('filterModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+  }
+  
+  // Close modal when clicking outside of it
+  window.onclick = function(event) {
+    const modal = document.getElementById('filterModal');
+    if (event.target === modal) {
+      closeFilterModal();
+    }
+  }
+  
+  // Toggle filter sections
+  function toggleSection(section) {
+    const wasOpen = section.classList.contains('open');
+    
+    // Close all sections first
+    document.querySelectorAll('.filter-section').forEach(el => {
+      el.classList.remove('open');
+    });
+    
+    // If the clicked section wasn't open, open it
+    if (!wasOpen) {
+      section.classList.add('open');
+    }
+  }
+  
+  // Handle price slider updates
   const priceMin = document.getElementById('priceMin');
   const priceMax = document.getElementById('priceMax');
   const minValue = document.getElementById('min-value');
   const maxValue = document.getElementById('max-value');
-  const categorySelect = document.querySelector('.category-select');
-  const categoryOptions = document.getElementById('categoryOptions');
-
+  
   function updatePriceValues() {
     let min = parseInt(priceMin.value);
     let max = parseInt(priceMax.value);
@@ -418,138 +547,112 @@
     
     minValue.textContent = `₹${min}`;
     maxValue.textContent = `₹${max}`;
-    document.querySelector('form').dispatchEvent(new Event('change'));
   }
-
+  
   priceMin.addEventListener('input', updatePriceValues);
   priceMax.addEventListener('input', updatePriceValues);
   updatePriceValues();
-
-  document.querySelector('form').addEventListener('submit', (e) => {
-    console.log('Form submitted with:', {
-      priceMin: priceMin.value,
-      priceMax: priceMax.value
-    });
-  });
-
-  function toggleCategoryOptions() {
-    categoryOptions.classList.toggle('active');
+  
+  // Clear all filters
+  function clearFilters() {
+    // Reset form elements
+    document.querySelectorAll('input[name="category"]')[0].checked = true;
+    document.querySelectorAll('input[name="sortBy"]')[0].checked = true;
+    priceMin.value = 500;
+    priceMax.value = 15000;
+    document.getElementById('searchInput').value = '';
+    updatePriceValues();
+    updateAppliedFilters();
   }
-
-  // Close dropdown when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!categorySelect.contains(e.target)) {
-      categoryOptions.classList.remove('active');
+  
+  // Update applied filters display
+  function updateAppliedFilters() {
+    const appliedFiltersContainer = document.getElementById('appliedFilters');
+    appliedFiltersContainer.innerHTML = '';
+    
+    // Get current filters
+    const searchValue = '<%= query.search || "" %>';
+    const categoryValue = '<%= selectedCategory %>';
+    const priceMinValue = '<%= selectedPriceRange ? selectedPriceRange.split("-")[0] : "500" %>';
+    const priceMaxValue = '<%= selectedPriceRange ? selectedPriceRange.split("-")[1] || "15000" : "15000" %>';
+    const sortByValue = '<%= sortBy || "" %>';
+    
+    // Add search filter tag
+    if (searchValue) {
+      addFilterTag('Search', searchValue, 'search');
     }
-  });
-
-  function showToast(message, type = "info") {
-    const colors = {
-      success: { bg: "#4CAF50", text: "#fff" },
-      info: { bg: "#1286b4", text: "#fff" },
-      warning: { bg: "#FF9800", text: "#fff" },
-      error: { bg: "#F44336", text: "#fff" }
-    };
     
-    const colorScheme = colors[type] || colors.info;
+    // Add category filter tag
+    if (categoryValue) {
+      const categoryName = '<%= selectedCategory ? categories.find(c => c._id.toString() === selectedCategory)?.name || "" : "" %>';
+      if (categoryName) {
+        addFilterTag('Category', categoryName, 'category');
+      }
+    }
     
-    const toast = document.createElement("div");
-    toast.className = "custom-toast";
-    toast.innerHTML = `
-      <div class="toast-icon">
-        ${type === "success" ? '<i class="fas fa-check-circle"></i>' : 
-          type === "info" ? '<i class="fas fa-info-circle"></i>' : 
-          type === "warning" ? '<i class="fas fa-exclamation-triangle"></i>' : 
-          '<i class="fas fa-times-circle"></i>'}
-      </div>
-      <div class="toast-message">${message}</div>
-      <div class="toast-close">×</div>
+    // Add price range filter tag
+    if (priceMinValue !== '500' || priceMaxValue !== '15000') {
+      addFilterTag('Price', `₹${priceMinValue} - ₹${priceMaxValue}`, 'price');
+    }
+    
+    // Add sort filter tag
+    if (sortByValue) {
+      let sortLabel = '';
+      switch (sortByValue) {
+        case 'priceLowToHigh':
+          sortLabel = 'Price: Low to High';
+          break;
+        case 'nameAZ':
+          sortLabel = 'Alphabetical (A-Z)';
+          break;
+        case 'newest':
+          sortLabel = 'New Arrivals';
+          break;
+      }
+      addFilterTag('Sort', sortLabel, 'sortBy');
+    }
+  }
+  
+  function addFilterTag(type, value, param) {
+    const appliedFiltersContainer = document.getElementById('appliedFilters');
+    
+    const filterTag = document.createElement('div');
+    filterTag.className = 'filter-tag';
+    filterTag.innerHTML = `
+      <span><strong>${type}:</strong> ${value}</span>
+      <button type="button" onclick="removeFilter('${param}')">×</button>
     `;
     
-    Object.assign(toast.style, {
-      display: "flex",
-      alignItems: "center",
-      position: "fixed",
-      top: "20px",
-      right: "20px",
-      zIndex: "10000",
-      padding: "12px 16px",
-      backgroundColor: colorScheme.bg,
-      color: colorScheme.text,
-      borderRadius: "4px",
-      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-      minWidth: "250px",
-      maxWidth: "350px",
-      opacity: "0",
-      transform: "translateY(-20px)",
-      transition: "all 0.3s ease-in-out",
-      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-      fontSize: "14px"
-    });
-    
-    const iconStyle = toast.querySelector(".toast-icon").style;
-    Object.assign(iconStyle, {
-      marginRight: "12px",
-      fontSize: "20px"
-    });
-    
-    const messageStyle = toast.querySelector(".toast-message").style;
-    Object.assign(messageStyle, {
-      flex: "1"
-    });
-    
-    const closeStyle = toast.querySelector(".toast-close").style;
-    Object.assign(closeStyle, {
-      marginLeft: "12px",
-      cursor: "pointer",
-      fontSize: "18px",
-      fontWeight: "bold"
-    });
-    
-    toast.querySelector(".toast-close").addEventListener("click", () => {
-      toast.style.opacity = "0";
-      toast.style.transform = "translateY(-20px)";
-      setTimeout(() => toast.remove(), 300);
-    });
-    
-    document.body.appendChild(toast);
-    
-    const progressBar = document.createElement("div");
-    progressBar.className = "toast-progress";
-    Object.assign(progressBar.style, {
-      position: "absolute",
-      bottom: "0",
-      left: "0",
-      height: "3px",
-      backgroundColor: "rgba(255, 255, 255, 0.7)",
-      width: "100%",
-      transition: "width 3s linear"
-    });
-    toast.appendChild(progressBar);
-    
-    setTimeout(() => {
-      toast.style.opacity = "1";
-      toast.style.transform = "translateY(0)";
-      progressBar.style.width = "0";
-    }, 10);
-    
-    setTimeout(() => {
-      toast.style.opacity = "0";
-      toast.style.transform = "translateY(-20px)";
-      setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    appliedFiltersContainer.appendChild(filterTag);
   }
-
+  
+  function removeFilter(param) {
+    const form = document.getElementById('filterForm');
+    
+    switch (param) {
+      case 'search':
+        document.getElementById('searchInput').value = '';
+        break;
+      case 'category':
+        document.querySelectorAll('input[name="category"]')[0].checked = true;
+        break;
+      case 'price':
+        priceMin.value = 500;
+        priceMax.value = 15000;
+        updatePriceValues();
+        break;
+      case 'sortBy':
+        document.querySelectorAll('input[name="sortBy"]')[0].checked = true;
+        break;
+    }
+    
+    form.submit();
+  }
+  
+  // Wishlist functionality
   function addToWishlist(productId, event) {
     event.preventDefault();
     
-    if (!document.querySelector('link[href*="font-awesome"]')) {
-      const fontAwesomeLink = document.createElement('link');
-      fontAwesomeLink.rel = 'stylesheet';
-      fontAwesomeLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
-      document.head.appendChild(fontAwesomeLink);
-    }
-
     fetch('/addWishlist', {
       method: 'POST',
       headers: {
@@ -574,6 +677,31 @@
       showToast('Something went wrong. Please try again.', 'error');
     });
   }
+  
+  // Toast notification
+  function showToast(message, type = "info") {
+    Toastify({
+      text: message,
+      duration: 3000,
+      close: true,
+      gravity: "top",
+      position: "right",
+      backgroundColor: type === "success" ? "#4CAF50" : 
+                      type === "info" ? "#1286b4" : 
+                      type === "warning" ? "#FF9800" : "#F44336",
+    }).showToast();
+  }
+  
+  // Initialize the page
+  document.addEventListener('DOMContentLoaded', function() {
+    updateAppliedFilters();
+    
+    // Open the first filter section by default
+    const firstSection = document.querySelector('.filter-section');
+    if (firstSection) {
+      firstSection.classList.add('open');
+    }
+  });
 </script>
 
 <%- include('../../views/partials/user/footer') %>

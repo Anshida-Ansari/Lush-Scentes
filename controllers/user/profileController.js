@@ -246,12 +246,15 @@ const userProfile = async (req, res) => {
         }
 
         
-        const paginatedWalletHistory = userData.walletHistory
-            ? userData.walletHistory.slice(walletSkip, walletSkip + walletLimit).reverse() 
-            : [];
-        const totalWalletTransactions = userData.walletHistory ? userData.walletHistory.length : 0;
-        const totalWalletPages = Math.ceil(totalWalletTransactions / walletLimit);
+        const sortedWalletHistory = userData.walletHistory
+        ? [...userData.walletHistory].sort((a, b) => new Date(b.date) - new Date(a.date))
+        : [];
 
+    // Paginate the sorted wallet history
+    const paginatedWalletHistory = sortedWalletHistory.slice(walletSkip, walletSkip + walletLimit);
+
+    const totalWalletTransactions = userData.walletHistory ? userData.walletHistory.length : 0;
+    const totalWalletPages = Math.ceil(totalWalletTransactions / walletLimit);
 
         res.render('profile', {
             user: { ...userData, walletHistory: paginatedWalletHistory },

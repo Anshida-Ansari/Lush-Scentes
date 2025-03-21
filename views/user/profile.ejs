@@ -471,6 +471,56 @@
     font-weight: 600;
 }
         }
+        /* Pagination Styles */
+.pagination-container {
+    margin-top: 20px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.pagination .page-item {
+    margin: 0;
+}
+
+.pagination .page-link {
+    border: 1px solid #dee2e6;
+    color: var(--secondary-color);
+    background-color: #fff;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.pagination .page-link:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    cursor: not-allowed;
+}
+
+.pagination .ellipsis {
+    padding: 8px 12px;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
     </style>
 
 
@@ -758,28 +808,56 @@
                             <% } %>
                         </div>
                 
-                        <!-- Pagination Controls -->
-                        <% if (pagination.totalOrderPages > 1) { %> <!-- Fixed typo: totalPages to totalOrderPages -->
-                            <nav aria-label="Order pagination">
+                        <!-- Updated Pagination Controls -->
+                        <% if (pagination.totalOrderPages > 1) { %>
+                            <nav aria-label="Order pagination" class="pagination-container">
                                 <ul class="pagination justify-content-center mt-4">
                                     <!-- Previous Button -->
                                     <li class="page-item <%= pagination.orderPage === 1 ? 'disabled' : '' %>">
                                         <a class="page-link" href="?page=<%= pagination.orderPage - 1 %>&limit=<%= pagination.orderLimit %>" aria-label="Previous">
-                                            <span aria-hidden="true">« Previous</span>
+                                            <i class="fas fa-chevron-left"></i>
                                         </a>
                                     </li>
                 
-                                    <!-- Page Numbers -->
-                                    <% for (let i = 1; i <= pagination.totalOrderPages; i++) { %> <!-- Fixed typo: totalPages to totalOrderPages -->
+                                    <!-- First Page -->
+                                    <% if (pagination.orderPage > 3) { %>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=1&limit=<%= pagination.orderLimit %>">1</a>
+                                        </li>
+                                        <% if (pagination.orderPage > 4) { %>
+                                            <li class="page-item disabled">
+                                                <span class="ellipsis">...</span>
+                                            </li>
+                                        <% } %>
+                                    <% } %>
+                
+                                    <!-- Pages Around Current Page -->
+                                    <% 
+                                        const startPage = Math.max(1, pagination.orderPage - 2);
+                                        const endPage = Math.min(pagination.totalOrderPages, pagination.orderPage + 2);
+                                        for (let i = startPage; i <= endPage; i++) { 
+                                    %>
                                         <li class="page-item <%= pagination.orderPage === i ? 'active' : '' %>">
                                             <a class="page-link" href="?page=<%= i %>&limit=<%= pagination.orderLimit %>"><%= i %></a>
+                                        </li>
+                                    <% } %>
+                
+                                    <!-- Last Page with Ellipsis -->
+                                    <% if (pagination.orderPage < pagination.totalOrderPages - 2) { %>
+                                        <% if (pagination.orderPage < pagination.totalOrderPages - 3) { %>
+                                            <li class="page-item disabled">
+                                                <span class="ellipsis">...</span>
+                                            </li>
+                                        <% } %>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=<%= pagination.totalOrderPages %>&limit=<%= pagination.orderLimit %>"><%= pagination.totalOrderPages %></a>
                                         </li>
                                     <% } %>
                 
                                     <!-- Next Button -->
                                     <li class="page-item <%= pagination.orderPage === pagination.totalOrderPages ? 'disabled' : '' %>">
                                         <a class="page-link" href="?page=<%= pagination.orderPage + 1 %>&limit=<%= pagination.orderLimit %>" aria-label="Next">
-                                            <span aria-hidden="true">Next »</span>
+                                            <i class="fas fa-chevron-right"></i>
                                         </a>
                                     </li>
                                 </ul>
