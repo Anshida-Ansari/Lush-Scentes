@@ -94,7 +94,9 @@ router.get('/edit-address/:id',userAuth,checkoutController.loadcheckoutEditAddre
 router.post('/edit-address/:id', checkoutController.editAddressCheckout);
 router.get('/thank-you', userAuth, checkoutController.loadThankYouPage);
 router.get('/download-invoice/:orderId',userAuth,checkoutController.downloadInvoice);
-
+router.post('/handle-payment-failure', checkoutController.handlePaymentFailure);
+router.post('/retry-payment', checkoutController.retryPayment);
+router.get('/transaction-failure', checkoutController.loadTransactionFailurePage);
 
 
 router.post('/create-razorpay-order',checkoutController.createRazorpayOrder)

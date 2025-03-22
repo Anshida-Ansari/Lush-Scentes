@@ -652,7 +652,7 @@
                                         <div class="card-body">
                                             <div class="row align-items-center">
                                                 <div class="col-md-3">
-                                                    <p class="mb-0 text-muted">Order #<%= order._id %></p>
+                                                    <p class="mb-0 text-muted">Order #<%= order.orderId %></p>
                                                     <small class="text-muted">
                                                         <%= new Date(order.createdOn).toLocaleDateString() %>
                                                     </small>
@@ -667,7 +667,8 @@
                                                     <span class="badge 
                                                         <%= order.status === 'Delivered' ? 'bg-success' : 
                                                             order.status === 'Processing' ? 'bg-warning' : 
-                                                            order.status === 'Cancelled' ? 'bg-danger' : 'bg-secondary' %>">
+                                                            order.status === 'Cancelled' ? 'bg-danger' : 
+                                                            order.status === 'Payment Pending' ? 'bg-warning' : 'bg-secondary' %>">
                                                         <%= order.status || 'Processing' %>
                                                     </span>
                                                 </div>
@@ -682,7 +683,7 @@
                                                     </a>
                                                 </div>
                                             </div>
-
+                
                                             <div class="collapse mt-3" id="orderDetails<%= order._id %>">
                                                 <div class="card card-body">
                                                     <h6 class="mb-3">Shipping Address:</h6>
@@ -706,7 +707,7 @@
                                                         <p class="text-muted">Address not available</p>
                                                     <% } %>
                                                     <hr>
-
+                
                                                     <h6>Order Items:</h6>
                                                     <% if (order.orderedItems && order.orderedItems.length > 0) { %>
                                                         <% order.orderedItems.forEach(product => { %>
@@ -731,7 +732,7 @@
                                                                 </div>
                                                                 <div class="d-flex align-items-center">
                                                                     <p class="mb-0 me-3">₹<%= product.price ? product.price.toFixed(2) : '0.00' %></p>
-
+                
                                                                     <% if ((order.status === 'Delivered') && 
                                                                         (product.cancelStatus !== 'Cancelled') && 
                                                                         (product.returnStatus === 'Not Requested' || product.returnStatus === undefined)) { %>
@@ -740,7 +741,7 @@
                                                                             Return Product
                                                                         </button>
                                                                     <% } %>
-
+                
                                                                     <% if ((product.status === 'Pending' || product.status === 'Processing' || 
                                                                         (order.status === 'Pending' || order.status === 'Processing') && !product.status) && 
                                                                         (!product.cancelStatus || product.cancelStatus !== 'Cancelled')) { %>
@@ -755,18 +756,23 @@
                                                     <% } else { %>
                                                         <p>No items found in this order.</p>
                                                     <% } %>
-
+                
                                                     <hr>
                                                     <div class="d-flex justify-content-between">
                                                         <strong>Total:</strong>
                                                         <strong>₹<%= order.finalAmount ? order.finalAmount.toFixed(2) : '0.00' %></strong>
                                                     </div>
-
+                
                                                     <div class="mt-3">
                                                         <% if (order.status === 'Pending' || order.status === 'Processing') { %>
                                                             <button class="btn btn-danger btn-sm"
                                                                 onclick="openCancelModal('<%= order.orderId %>')">
                                                                 Cancel Order
+                                                            </button>
+                                                        <% } else if (order.status === 'Payment Pending') { %>
+                                                            <button class="btn btn-warning btn-sm"
+                                                                onclick="retryPayment('<%= order.orderId %>')">
+                                                                Retry Payment
                                                             </button>
                                                         <% } else { %>
                                                             <span class="badge <%= order.status === 'Cancelled' ? 'bg-danger' : (order.status === 'Delivered' ? 'bg-success' : 'bg-secondary') %>">
@@ -785,19 +791,16 @@
                                 </div>
                             <% } %>
                         </div>
-
-                        <!-- Updated Pagination Controls -->
+                
+                        <!-- Pagination Controls -->
                         <% if (pagination.totalOrderPages > 1) { %>
                             <nav aria-label="Order pagination" class="pagination-container">
                                 <ul class="pagination justify-content-center mt-4">
-                                    <!-- Previous Button -->
                                     <li class="page-item <%= pagination.orderPage === 1 ? 'disabled' : '' %>">
                                         <a class="page-link" href="?tab=orders&page=<%= pagination.orderPage - 1 %>&limit=<%= pagination.orderLimit %>" aria-label="Previous">
                                             <i class="fas fa-chevron-left"></i>
                                         </a>
                                     </li>
-
-                                    <!-- First Page -->
                                     <% if (pagination.orderPage > 3) { %>
                                         <li class="page-item">
                                             <a class="page-link" href="?tab=orders&page=1&limit=<%= pagination.orderLimit %>">1</a>
@@ -808,8 +811,6 @@
                                             </li>
                                         <% } %>
                                     <% } %>
-
-                                    <!-- Pages Around Current Page -->
                                     <% 
                                         const startPage = Math.max(1, pagination.orderPage - 2);
                                         const endPage = Math.min(pagination.totalOrderPages, pagination.orderPage + 2);
@@ -819,8 +820,6 @@
                                             <a class="page-link" href="?tab=orders&page=<%= i %>&limit=<%= pagination.orderLimit %>"><%= i %></a>
                                         </li>
                                     <% } %>
-
-                                    <!-- Last Page with Ellipsis -->
                                     <% if (pagination.orderPage < pagination.totalOrderPages - 2) { %>
                                         <% if (pagination.orderPage < pagination.totalOrderPages - 3) { %>
                                             <li class="page-item disabled">
@@ -831,8 +830,6 @@
                                             <a class="page-link" href="?tab=orders&page=<%= pagination.totalOrderPages %>&limit=<%= pagination.orderLimit %>"><%= pagination.totalOrderPages %></a>
                                         </li>
                                     <% } %>
-
-                                    <!-- Next Button -->
                                     <li class="page-item <%= pagination.orderPage === pagination.totalOrderPages ? 'disabled' : '' %>">
                                         <a class="page-link" href="?tab=orders&page=<%= pagination.orderPage + 1 %>&limit=<%= pagination.orderLimit %>" aria-label="Next">
                                             <i class="fas fa-chevron-right"></i>
@@ -998,11 +995,148 @@
         </div>
     </div>
 
+<script defer src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        async function retryPayment(orderId) {
+    try {
+        const response = await fetch('/retry-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId })
+        });
+        const data = await response.json();
+
+        if (data.success && data.paymentMethod === 'razorpay') {
+            const rzp = new Razorpay({
+                ...data.razorpayOptions,
+                handler: async (response) => {
+                    const verifyResponse = await fetch('/verify-razorpay-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            orderId,
+                            razorpayOrderId: response.razorpay_order_id,
+                            razorpayPaymentId: response.razorpay_payment_id,
+                            razorpaySignature: response.razorpay_signature
+                        })
+                    });
+                    const verifyData = await verifyResponse.json();
+                    if (verifyData.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Payment Successful',
+                            text: 'Redirecting to thank you page...'
+                        }).then(() => {
+                            window.location.href = `/thank-you?orderId=${orderId}`;
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Payment Verification Failed',
+                            text: verifyData.message
+                        });
+                    }
+                }
+            });
+
+            rzp.on('payment.failed', async (response) => {
+                await fetch('/handle-payment-failure', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        orderId,
+                        failureReason: response.error.description
+                    })
+                });
+                window.location.href = `/transaction-failure?orderId=${orderId}`;
+            });
+
+            rzp.open();
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message || 'Failed to initiate retry payment.'
+            });
+        }
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while retrying payment.'
+        });
+    }
+}
+
+function handleRazorpayRetry(options) {
+    if (typeof Razorpay === 'undefined') {
+        console.error('Razorpay script not loaded');
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Payment gateway script failed to load. Please refresh the page and try again.'
+        });
+        return;
+    }
+
+    const rzp = new Razorpay(options);
+    rzp.open();
+
+    rzp.on('payment.failed', async (response) => {
+        console.log('Payment failed:', response);
+        await fetch('/handle-payment-failure', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                orderId: options.order_id,
+                failureReason: response.error.description
+            })
+        });
+        window.location.href = `/transaction-failure?orderId=${options.notes.orderId}`;
+    });
+
+    rzp.on('payment.success', async (response) => {
+        console.log('Payment successful:', response);
+        try {
+            const verifyResponse = await fetch('/verify-razorpay-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    orderId: options.notes.orderId,
+                    razorpayOrderId: response.razorpay_order_id,
+                    razorpayPaymentId: response.razorpay_payment_id,
+                    razorpaySignature: response.razorpay_signature
+                })
+            });
+            const verifyData = await verifyResponse.json();
+            console.log('Payment verification response:', verifyData);
+
+            if (verifyData.success) {
+                window.location.href = `/thank-you?orderId=${options.notes.orderId}`;
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Payment Verification Failed',
+                    text: verifyData.message || 'Failed to verify payment. Please contact support.'
+                });
+            }
+        } catch (error) {
+            console.error('Error verifying payment:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred while verifying the payment.'
+            });
+        }
+    });
+}
         window.openCancelModal = function (orderId) {
             Swal.fire({
                 title: 'Cancel Order',

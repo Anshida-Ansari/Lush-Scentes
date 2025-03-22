@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Failure - Lush Scents</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <script defer src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        .failure-container {
+            text-align: center;
+            padding: 50px 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .failure-illustration img {
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
+        .failure-message {
+            font-size: 2rem;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .breadcrumb a {
+            color: #000000; 
+            text-decoration: none; 
+            border-bottom: 2px solid transparent; 
+            transition: border-bottom 0.3s ease;
+        }
+        .breadcrumb a:hover {
+            color: #c6214d;
+            border-bottom: 2px solid #ff5733; 
+        }
+        .breadcrumb .text-black {
+            color: #000000; 
+        }
+        .btn-primary:hover {
+            background-color: #e04e2d; 
+            border-color: #e04e2d;
+        }
+    </style>
+</head>
+<body>
+    <div class="site-wrap">
+        <%- include('../../views/partials/user/header') %>
+
+        <div class="bg-light py-3">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12 mb-0 breadcrumb">
+                        <a href="/">Home</a> <span class="mx-2 mb-0">/</span>
+                        <a href="/cart">Cart</a> <span class="mx-2 mb-0">/</span>
+                        <a href="/checkout">Checkout</a> <span class="mx-2 mb-0">/</span>
+                        <strong class="text-black">Transaction Failure</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="site-section">
+            <div class="container">
+                <div class="failure-container">
+                    <div class="failure-illustration">
+                        <img src="images/payment-failure-illustration.jpeg" alt="Payment Failure Illustration">
+                    </div>
+                    <h2 class="failure-message">Payment Failed!</h2>
+                    <p>We’re sorry, but there was an issue processing your payment for Order #<%= orderId %>. Please try again or check your payment details.</p>
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="retryPayment('<%= orderId %>')">Retry Payment</button>
+                        <a href="/userProfile?tab=orders" class="btn">View Order Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="site-footer custom-border-top">
+            <%- include('../../views/partials/user/footer') %>
+        </footer>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script>
+        async function retryPayment(orderId) {
+            try {
+                console.log('Initiating retry payment for orderId:', orderId);
+                const response = await fetch('/retry-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderId })
+                });
+                console.log('Fetch response status:', response.status);
+                console.log('Fetch response ok:', response.ok);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (data.success && data.paymentMethod === 'razorpay') {
+                    const rzp = new Razorpay({
+                        ...data.razorpayOptions,
+                        handler: async (response) => {
+                            console.log('Razorpay payment response:', response);
+                            const verifyResponse = await fetch('/verify-razorpay-payment', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    orderId,
+                                    razorpayOrderId: response.razorpay_order_id,
+                                    razorpayPaymentId: response.razorpay_payment_id,
+                                    razorpaySignature: response.razorpay_signature
+                                })
+                            });
+                            const verifyData = await verifyResponse.json();
+                            console.log('Verification response:', verifyData);
+                            if (verifyData.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Payment Successful',
+                                    text: 'Redirecting to thank you page...'
+                                }).then(() => {
+                                    console.log('Redirecting to thank-you page with orderId:', orderId);
+                                    window.location.href = `/thank-you?orderId=${orderId}`;
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Payment Verification Failed',
+                                    text: verifyData.message || 'Unable to verify payment. Please try again.'
+                                });
+                            }
+                        }
+                    });
+
+                    rzp.on('payment.failed', async (response) => {
+                        console.log('Payment failed:', response);
+                        await fetch('/handle-payment-failure', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                orderId,
+                                failureReason: response.error.description
+                            })
+                        });
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Payment Failed Again',
+                            text: 'Please try again or use a different payment method.'
+                        }).then(() => {
+                            window.location.reload(); // Reload to stay on failure page
+                        });
+                    });
+
+                    console.log('Opening Razorpay payment modal');
+                    rzp.open();
+                } else {
+                    console.log('Retry payment failed:', data.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Failed to initiate retry payment.'
+                    });
+                }
+            } catch (error) {
+                console.error('Error in retryPayment:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while retrying payment: ' + error.message
+                });
+            }
+        }
+    </script>
+</body>
+</html>

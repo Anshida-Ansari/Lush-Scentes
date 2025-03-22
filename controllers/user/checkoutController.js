@@ -294,6 +294,9 @@ const createRazorpayOrder = async (req, res) => {
     }
 };
 
+
+
+
 const verifyRazorpayPayment = async (req, res) => {
     try {
         const { orderId, razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
@@ -310,8 +313,12 @@ const verifyRazorpayPayment = async (req, res) => {
         const order = await Order.findOneAndUpdate(
             { orderId },
             {
-                status: 'Pending', // Changed from 'Processing' to 'Pending'
-                paymentDetails: { razorpayOrderId, razorpayPaymentId, razorpaySignature, succeededAt: new Date() }
+                status: 'Pending', 
+                'paymentDetails.razorpayOrderId': razorpayOrderId,
+                'paymentDetails.razorpayPaymentId': razorpayPaymentId,
+                'paymentDetails.razorpaySignature': razorpaySignature,
+                'paymentDetails.succeededAt': new Date(),
+                'paymentDetails.failureReason': null 
             },
             { new: true }
         );
@@ -327,16 +334,71 @@ const verifyRazorpayPayment = async (req, res) => {
     }
 };
 
+
 const loadThankYouPage = async (req, res) => {
     try {
+        console.log('Accessing /thank-you route');
         const { orderId } = req.query;
-        const order = await Order.findOne({ orderId }).populate('orderedItems.product');
-        if (!order) return res.status(404).render('error', { message: 'Order not found' });
+        console.log('Order ID from query:', orderId);
 
-        res.render('thankyou', { order, orderDate: order.createdOn.toLocaleDateString() });
+        if (!orderId) {
+            console.log('Order ID not provided');
+            return res.status(400).render('error', { message: 'Order ID is required' });
+        }
+
+        console.log('Fetching order from database...');
+        const order = await Order.findOne({ orderId })
+            .populate('orderedItems.product'); 
+
+        if (!order) {
+            console.log('Order not found for orderId:', orderId);
+            return res.status(404).render('error', { message: 'Order not found' });
+        }
+
+        console.log('Order found:', order);
+
+        if (order.status === 'Payment Pending') {
+            console.log('Updating order status to Pending for orderId:', orderId);
+            order.status = 'Pending';
+            await order.save();
+            console.log('Order status updated:', order);
+        }
+
+        const orderDate = order.createdAt
+            ? order.createdAt.toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+              })
+            : 'Date not available'; 
+
+        console.log('Formatted order date:', orderDate);
+
+        const orderData = {
+            orderId: order.orderId,
+            paymentMethod: order.paymentMethod || 'Razorpay',
+            status: order.status || 'Pending',
+            totalPrice: order.totalPrice || 0,
+            discount: order.discount || 0,
+            finalAmount: order.finalAmount || 0,
+            orderedItems: order.orderedItems
+                ? order.orderedItems.map(item => ({
+                      name: item.name || (item.product ? item.product.name : 'Unnamed Item'),
+                      price: item.price || 0,
+                      variant: {
+                          size: item.variant?.size || 'N/A',
+                          quantity: item.variant?.quantity || 1
+                      },
+                      productImage: item.productImage || (item.product?.image ? [item.product.image] : [])
+                  }))
+                : []
+        };
+
+        console.log('Rendering thank-you page with data:', orderData);
+        res.render('thankyou', { order: orderData, orderDate });
     } catch (error) {
-        console.error('Error loading thank you page:', error);
-        res.status(500).render('error', { message: 'Server error' });
+        console.error('Error loading thank-you page:', error);
+        res.status(500).render('error', { message: 'Server error: ' + error.message });
     }
 };
 
@@ -489,6 +551,105 @@ const handlePaymentDismissal = async (req, res) => {
     }
 };
 
+
+
+const handlePaymentFailure = async (req, res) => {
+    try {
+        const { orderId, failureReason } = req.body;
+
+        const order = await Order.findOneAndUpdate(
+            { orderId },
+            {
+                status: 'Payment Pending',
+                'paymentDetails.failureReason': failureReason,
+                'paymentDetails.succeededAt': null
+            },
+            { new: true }
+        );
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        res.status(200).json({ success: true, message: 'Payment failure recorded' });
+    } catch (error) {
+        console.error('Error handling payment failure:', error);
+        res.status(500).json({ success: false, message: 'Failed to handle payment failure' });
+    }
+};
+
+const retryPayment = async (req, res) => {
+    try {
+        const { orderId } = req.body;
+
+        if (!orderId) {
+            return res.status(400).json({ success: false, message: 'Order ID is required' });
+        }
+
+        const order = await Order.findOne({ orderId });
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        if (!['Payment Pending', 'Pending'].includes(order.status)) {
+            return res.status(400).json({ success: false, message: 'Order is not eligible for retry' });
+        }
+
+        const razorpayOrder = await razorpayInstance.orders.create({
+            amount: Math.round(order.finalAmount * 100), 
+            currency: 'INR',
+            receipt: order.orderId
+        });
+
+        const razorpayOptions = {
+            key: process.env.RAZORPAY_KEY_ID,
+            amount: razorpayOrder.amount,
+            currency: 'INR',
+            name: 'Lush Scents',
+            description: `Retry Payment for Order #${order.orderId}`,
+            order_id: razorpayOrder.id,
+            prefill: {
+                name: req.session.user ? req.session.user.name : '',
+                email: req.session.user ? req.session.user.email : '',
+                contact: req.session.user ? req.session.user.mobile : ''
+            },
+            notes: {
+                orderId: order.orderId
+            },
+            theme: {
+                color: '#ff5733'
+            }
+        };
+
+        res.status(200).json({
+            success: true,
+            paymentMethod: 'razorpay',
+            razorpayOptions
+        });
+    } catch (error) {
+        console.error('Error in retryPayment:', error);
+        res.status(500).json({ success: false, message: 'Server error: ' + error.message });
+    }
+};
+const loadTransactionFailurePage = async (req, res) => {
+    try {
+        const { orderId } = req.query;
+
+        if (!orderId) {
+            return res.status(400).render('error', { message: 'Order ID is required' });
+        }
+
+        const order = await Order.findOne({ orderId });
+        if (!order) {
+            return res.status(404).render('error', { message: 'Order not found' });
+        }
+
+        res.render('transaction-failure', { orderId });
+    } catch (error) {
+        res.status(500).render('error', { message: 'Server error' });
+    }
+};
+
 const downloadInvoice = async (req, res) => {
     try {
         const orderId = req.params.orderId;
@@ -589,5 +750,8 @@ module.exports = {
     cancelProduct,
     returnProduct,
     handlePaymentDismissal,
-    downloadInvoice
+    downloadInvoice,
+    handlePaymentFailure,
+    retryPayment,
+    loadTransactionFailurePage
 };
