@@ -1,47 +1,88 @@
-
 const Product = require('../../models/productSchema');
 const Category = require('../../models/categorySchema');
 const User = require('../../models/userSchema');
-
-
+const Offer = require('../../models/offerSchema')
 
 const productDetails = async (req, res) => {
-    try {
-      const userId = req.session.user;
-      const userData = await User.findById(userId);
-  
-      const productId = req.query.id;
-      const product = await Product.findById(productId).populate('category').populate('reviews.user');
-      console.log('product is:', product);
-  
-      const relatedProduct = await Product.find({ category: product.category, _id: { $ne: product._id } });
-  
-      if (!product) {
-        console.error('Product not found');
-        return res.redirect('/pageNotFound');
-      }
-  
-      const findCategory = product.category || {};
-      const categoryOffer = findCategory.categoryOffer || 0;
-      const productOffer = product.productOffer || 0;
-      const totalOffer = categoryOffer + productOffer;
-  
-      const totalRatings = product.reviews.reduce((sum, review) => sum + review.rating, 0);
-      const averageRating = product.reviews.length > 0 ? (totalRatings / product.reviews.length).toFixed(1) : 0;
-  
-      res.render('product-details', {
-        user: userData,
-        product: product,
-        totalOffer: totalOffer,
-        category: findCategory,
-        relatedProduct,
-        averageRating: averageRating,
-      });
-    } catch (error) {
-      console.error('Error fetching product details:', error);
-      res.redirect('/pageNotFound');
+  try {
+    const userId = req.session.user;
+    const userData = await User.findById(userId);
+
+    const productId = req.query.id;
+    const product = await Product.findById(productId)
+      .populate('category')
+      .populate('reviews.user');
+    console.log('Product:', product);
+
+    if (!product) {
+      console.error('Product not found');
+      return res.redirect('/pageNotFound');
     }
-  };
+
+    const relatedProducts = await Product.find({
+      category: product.category,
+      _id: { $ne: product._id },
+    });
+
+  
+    const currentDate = new Date();
+    const offers = await Offer.find({
+      status: true,
+      startDate: { $lte: currentDate },
+      endDate: { $gte: currentDate },
+      $or: [
+        { productId: product._id }, 
+        { categoryId: product.category._id }, 
+      ],
+    });
+
+    let appliedOffer = null;
+    let highestDiscount = 0;
+    let offerType = null;
+
+    offers.forEach((offer) => {
+      if (offer.discount > highestDiscount) {
+        highestDiscount = offer.discount;
+        appliedOffer = offer.name;
+        offerType = offer.type;
+      }
+    });
+
+    const variantsWithDiscount = product.variants.map((variant) => {
+      const regularPrice = variant.regularPrice;
+      const discountAmount = (highestDiscount / 100) * regularPrice;
+      const discountedPrice = regularPrice - discountAmount;
+
+      return {
+        ...variant._doc,
+        regularPrice,
+        discountedPrice: discountedPrice.toFixed(2),
+        discountPercentage: highestDiscount,
+      };
+    });
+
+    const totalRatings = product.reviews.reduce((sum, review) => sum + review.rating, 0);
+    const averageRating = product.reviews.length > 0 ? (totalRatings / product.reviews.length).toFixed(1) : 0;
+
+    res.render('product-details', {
+      user: userData,
+      product: {
+        ...product._doc,
+        variants: variantsWithDiscount,
+      },
+      appliedOffer,
+      offerType,
+      highestDiscount,
+      category: product.category,
+      relatedProduct: relatedProducts,
+      averageRating,
+    });
+  } catch (error) {
+    console.error('Error fetching product details:', error);
+    res.redirect('/pageNotFound');
+  }
+};
+
 const getProductStock = async (req, res) => {
     try {
         const { id: productId } = req.params;
