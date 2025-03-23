@@ -30,17 +30,14 @@ const loadHomePage = async (req, res) => {
         const user = req.session.user
         const categories = await Category.find({ isListed: true })
         
-        // Find products that match all criteria
         let productData = await Product.find({
             isBlocked: false,
             category: { $in: categories.map(category => category._id) },
             totalStock: { $gt: 0 }
         }).populate('category')
         
-        // Sort by creation date (newest first)
         productData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         
-        // Get featured products (most recent ones)
         const featuredProducts = productData.slice(0, 4)
 
         if (user) {

@@ -6,14 +6,16 @@
             padding: 40px 0;
             background-color: white;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
+            color: #000; 
+            }
 
         .cart-header {
             text-transform: uppercase;
-            font-size: 14px;
+            font-size: 18px;
             letter-spacing: 1px;
             margin-bottom: 30px;
-            font-weight: 500;
+            font-weight: 600;
+            color: #000;
         }
 
         .cart-table {
@@ -25,6 +27,7 @@
             padding: 20px 0;
             border-bottom: 1px solid #e5e5e5;
             vertical-align: top;
+            color: #000;
         }
 
         .cart-table tr:last-child td {
@@ -45,17 +48,19 @@
             font-size: 14px;
             margin: 0 0 5px 0;
             font-weight: 400;
+            color: #000;
         }
 
         .product-variant {
             font-size: 12px;
-            color: #666;
+            color: #000;
             margin: 0;
         }
 
         .product-price {
             font-size: 14px;
             text-align: right;
+            color: #000;
         }
 
         .quantity-input {
@@ -69,6 +74,8 @@
             font-size: 14px;
             padding: 5px;
             width: 100%;
+            color: #000;
+            
         }
 
         .quantity-input .btn {
@@ -80,7 +87,7 @@
         }
 
         .remove-btn {
-            color: #666;
+            color: #000;
             background: none;
             border: none;
             font-size: 16px;
@@ -98,6 +105,7 @@
             letter-spacing: 1px;
             margin-bottom: 20px;
             font-weight: 500;
+            color: #000;
         }
 
         .summary-item {
@@ -105,6 +113,7 @@
             justify-content: space-between;
             margin-bottom: 15px;
             font-size: 14px;
+            color: #000;
         }
 
         .summary-item.total {
@@ -135,18 +144,19 @@
             padding: 10px;
             border: 1px solid #e5e5e5;
             margin-bottom: 20px;
+            color: #000;
         }
 
         .btn-continue {
             background: none;
             border: none;
-            color: #666;
+            color: #000;
             text-decoration: underline;
             padding: 0;
             font-size: 14px;
         }
 
-        /* Add to your existing styles */
+       
         .quantity-control {
             display: flex;
             align-items: center;
@@ -188,10 +198,44 @@
             color: #666;
             margin: 0;
         }
+        .bg-light {
+        background-color: #f8f9fa;
+        margin-bottom: 24px;
+    }
+        .breadcrumb a {
+            color: #000000; 
+            text-decoration: none; 
+            border-bottom: 2px solid transparent; 
+            transition: border-bottom 0.3s ease;
+        }
+        .breadcrumb a:hover {
+            color: #c6214d;
+            border-bottom: 2px solid #ff5733; 
+        }
+        .breadcrumb .text-black {
+            color: #000000; 
+        }
+        .btn-primary:hover {
+            background-color: #e04e2d; 
+            border-color: #e04e2d;
+        }
     </style>
 
 <div class="cart-section">
+    <div class="bg-light py-3">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 mb-0 breadcrumb">
+                    <a href="/">Home</a> <span class="mx-2 mb-0">/</span>
+                    <a href="/shop">Shop</a> <span class="mx-2 mb-0">/</span>
+                    <strong><a href="/cart">Cart</a> <span class="mx-2 mb-0"></span></strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div class="container">
+        
         <h1 class="cart-header">My Shopping Bag</h1>
         <div class="row">
             <div class="col-md-8">
@@ -277,247 +321,283 @@
     </div>
 </div>
 
-
  <script>
     document.addEventListener('DOMContentLoaded', function () {
-    function updateCartTotals() {
-        let subtotal = 0;
-        document.querySelectorAll('.quantity-input').forEach(input => {
-            const price = parseFloat(input.dataset.price);
-            const quantity = parseInt(input.value);
-            const itemTotal = price * quantity;
-            subtotal += itemTotal;
-
-            const totalCell = input.closest('tr').querySelector('.product-price');
-            if (totalCell) {
-                totalCell.textContent = `$${itemTotal.toFixed(2)}`;
-            }
-        });
-
-        const discount = 0;
-        const total = subtotal - discount;
-
-        const subtotalElement = document.querySelector('.summary-item:nth-child(2) span:last-child');
-        const totalElement = document.querySelector('.summary-item.total span:last-child');
-
-        if (subtotalElement) subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
-        if (totalElement) totalElement.textContent = `$${total.toFixed(2)}`;
-    }
-
-    function showStockLimitMessage(productId, size, stock) {
-        const messageElement = document.getElementById(`stock-msg-${productId}-${size}`);
-        if (messageElement) {
-            messageElement.textContent = `Stock limit: ${stock}`;
-        }
-
-        Swal.fire({
-            title: 'Stock Limit Reached',
-            text: `Only ${stock} items available in stock`,
-            icon: 'warning',
-            confirmButtonColor: '#3085d6'
-        });
-
-        setTimeout(() => {
-            if (messageElement) {
-                messageElement.textContent = '';
-            }
-        }, 3000);
-    }
-
-    async function updateCartItem(productId, size, quantity) {
-        try {
-            const response = await fetch(`/update/${productId}/${size}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ quantity })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                updateCartTotals();
-            } else if (response.status === 400 && data.message === 'Stock limit reached') {
-                const input = document.querySelector(`.quantity-input[data-product-id="${productId}"][data-size="${size}"]`);
-                if (input) {
-                    input.value = data.availableStock;
-                    updateItemTotal(input);
+        function updateCartTotals() {
+            let subtotal = 0;
+            document.querySelectorAll('.quantity-input').forEach(input => {
+                const price = parseFloat(input.dataset.price);
+                const quantity = parseInt(input.value);
+                const itemTotal = price * quantity;
+                subtotal += itemTotal;
+    
+                const totalCell = input.closest('tr').querySelector('.product-price');
+                if (totalCell) {
+                    totalCell.textContent = `$${itemTotal.toFixed(2)}`;
                 }
-                showStockLimitMessage(productId, size, data.availableStock);
-            } else {
-                throw new Error(data.message || 'Error updating cart');
+            });
+    
+            const discount = 0;
+            const total = subtotal - discount;
+    
+            const subtotalElement = document.querySelector('.summary-item:nth-child(2) span:last-child');
+            const totalElement = document.querySelector('.summary-item.total span:last-child');
+    
+            if (subtotalElement) subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+            if (totalElement) totalElement.textContent = `$${total.toFixed(2)}`;
+        }
+    
+        function showStockLimitMessage(productId, size, stock) {
+            const messageElement = document.getElementById(`stock-msg-${productId}-${size}`);
+            if (messageElement) {
+                messageElement.textContent = `Stock limit: ${stock}`;
             }
-        } catch (error) {
-            console.error('Error updating cart:', error);
+    
             Swal.fire({
-                title: 'Error',
-                text: error.message || 'Failed to update cart',
-                icon: 'error',
+                title: 'Stock Limit Reached',
+                text: `Only ${stock} items available in stock`,
+                icon: 'warning',
+                confirmButtonColor: '#3085d6'
+            });
+    
+            setTimeout(() => {
+                if (messageElement) {
+                    messageElement.textContent = '';
+                }
+            }, 3000);
+        }
+    
+        function showQuantityLimitMessage() {
+            Swal.fire({
+                title: 'Quantity Limit Reached',
+                text: 'Maximum quantity allowed is 5 items.',
+                icon: 'warning',
                 confirmButtonColor: '#3085d6'
             });
         }
-    }
-
-    function updateItemTotal(input) {
-        const price = parseFloat(input.dataset.price);
-        const quantity = parseInt(input.value);
-        const total = price * quantity;
-        const totalCell = input.closest('tr').querySelector('.product-price');
-        if (totalCell) {
-            totalCell.textContent = `$${total.toFixed(2)}`;
-        }
-        updateCartTotals();
-    }
-
-    document.querySelectorAll('.decrement').forEach(button => {
-        button.addEventListener('click', function () {
-            const productId = this.dataset.productId;
-            const size = this.dataset.size;
-            const input = this.nextElementSibling;
-            let value = parseInt(input.value);
-            if (value > 1) {
-                input.value = value - 1;
-                updateCartItem(productId, size, value - 1);
-            }
-        });
-    });
-
-    document.querySelectorAll('.increment').forEach(button => {
-        button.addEventListener('click', function () {
-            const productId = this.dataset.productId;
-            const size = this.dataset.size;
-            const input = this.previousElementSibling;
-            const stock = parseInt(input.dataset.stock);
-            let value = parseInt(input.value);
-
-            if (value < stock) {
-                input.value = value + 1;
-                updateCartItem(productId, size, value + 1);
-            } else {
-                showStockLimitMessage(productId, size, stock);
-            }
-        });
-    });
-
-    document.querySelectorAll('.remove-btn').forEach(button => {
-        button.addEventListener('click', async function () {
-            const productId = this.dataset.productId;
-            const size = this.dataset.size;
-            const row = this.closest('tr');
-
-            const result = await Swal.fire({
-                title: 'Remove Item',
-                text: 'Are you sure you want to remove this item from your cart?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, remove it!',
-                cancelButtonText: 'Cancel'
-            });
-
-            if (result.isConfirmed) {
-                try {
-                    const response = await fetch(`/update/${productId}/${size}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        }
-                    });
-                    const data = await response.json();
-
-                    if (response.ok) {
-                        row.remove();
-                        updateCartTotals();
-
-                        const remainingRows = document.querySelectorAll('.cart-table tbody tr').length;
-                        if (remainingRows === 0) {
-                            const tbody = document.querySelector('.cart-table tbody');
-                            tbody.innerHTML = `
-                                <tr>
-                                    <td colspan="5" class="text-center">Your shopping bag is empty</td>
-                                </tr>
-                            `;
-                            document.querySelector('.btn-checkout').disabled = true;
-                        }
-
-                        await Swal.fire({
-                            title: 'Removed!',
-                            text: 'Item has been removed from your cart.',
-                            icon: 'success',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                    } else {
-                        throw new Error(data.message || 'Failed to remove item');
+    
+        async function updateCartItem(productId, size, quantity) {
+            try {
+                const response = await fetch(`/update/${productId}/${size}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ quantity })
+                });
+    
+                const data = await response.json();
+    
+                if (response.ok) {
+                    updateCartTotals();
+                } else if (response.status === 400 && data.message === 'Stock limit reached') {
+                    const input = document.querySelector(`.quantity-input[data-product-id="${productId}"][data-size="${size}"]`);
+                    if (input) {
+                        input.value = data.availableStock;
+                        updateItemTotal(input);
                     }
-                } catch (error) {
-                    console.error('Error removing item:', error);
-                    await Swal.fire({
-                        title: 'Error!',
-                        text: 'Failed to remove item from cart. Please try again.',
+                    showStockLimitMessage(productId, size, data.availableStock);
+                } else {
+                    throw new Error(data.message || 'Error updating cart');
+                }
+            } catch (error) {
+                console.error('Error updating cart:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message || 'Failed to update cart',
+                    icon: 'error',
+                    confirmButtonColor: '#3085d6'
+                });
+            }
+        }
+    
+        function updateItemTotal(input) {
+            const price = parseFloat(input.dataset.price);
+            const quantity = parseInt(input.value);
+            const total = price * quantity;
+            const totalCell = input.closest('tr').querySelector('.product-price');
+            if (totalCell) {
+                totalCell.textContent = `$${total.toFixed(2)}`;
+            }
+            updateCartTotals();
+        }
+    
+        document.querySelectorAll('.decrement').forEach(button => {
+            button.addEventListener('click', function () {
+                const productId = this.dataset.productId;
+                const size = this.dataset.size;
+                const input = this.nextElementSibling;
+                let value = parseInt(input.value);
+                if (value > 1) {
+                    input.value = value - 1;
+                    updateCartItem(productId, size, value - 1);
+                }
+            });
+        });
+    
+        document.querySelectorAll('.increment').forEach(button => {
+            button.addEventListener('click', function () {
+                const productId = this.dataset.productId;
+                const size = this.dataset.size;
+                const input = this.previousElementSibling;
+                const stock = parseInt(input.dataset.stock);
+                let value = parseInt(input.value);
+                const maxQuantity = 5;
+    
+                if (value < maxQuantity && value < stock) {
+                    input.value = value + 1;
+                    updateCartItem(productId, size, value + 1);
+                } else if (value >= maxQuantity) {
+                    input.value = maxQuantity; // Ensure value doesn't exceed 5
+                    showQuantityLimitMessage();
+                } else {
+                    showStockLimitMessage(productId, size, stock);
+                }
+            });
+        });
+    
+        // Handle manual input changes
+        document.querySelectorAll('.quantity-input').forEach(input => {
+            input.addEventListener('input', function () {
+                const productId = this.dataset.productId;
+                const size = this.dataset.size;
+                const stock = parseInt(this.dataset.stock);
+                let value = parseInt(this.value);
+                const maxQuantity = 5;
+    
+                if (isNaN(value) || value < 1) {
+                    this.value = 1;
+                    value = 1;
+                } else if (value > maxQuantity) {
+                    this.value = maxQuantity;
+                    showQuantityLimitMessage();
+                    value = maxQuantity;
+                } else if (value > stock) {
+                    this.value = stock;
+                    showStockLimitMessage(productId, size, stock);
+                    value = stock;
+                }
+    
+                updateCartItem(productId, size, value);
+            });
+        });
+    
+        document.querySelectorAll('.remove-btn').forEach(button => {
+            button.addEventListener('click', async function () {
+                const productId = this.dataset.productId;
+                const size = this.dataset.size;
+                const row = this.closest('tr');
+    
+                const result = await Swal.fire({
+                    title: 'Remove Item',
+                    text: 'Are you sure you want to remove this item from your cart?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, remove it!',
+                    cancelButtonText: 'Cancel'
+                });
+    
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`/update/${productId}/${size}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }
+                        });
+                        const data = await response.json();
+    
+                        if (response.ok) {
+                            row.remove();
+                            updateCartTotals();
+    
+                            const remainingRows = document.querySelectorAll('.cart-table tbody tr').length;
+                            if (remainingRows === 0) {
+                                const tbody = document.querySelector('.cart-table tbody');
+                                tbody.innerHTML = `
+                                    <tr>
+                                        <td colspan="5" class="text-center">Your shopping bag is empty</td>
+                                    </tr>
+                                `;
+                                document.querySelector('.btn-checkout').disabled = true;
+                            }
+    
+                            await Swal.fire({
+                                title: 'Removed!',
+                                text: 'Item has been removed from your cart.',
+                                icon: 'success',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            throw new Error(data.message || 'Failed to remove item');
+                        }
+                    } catch (error) {
+                        console.error('Error removing item:', error);
+                        await Swal.fire({
+                            title: 'Error!',
+                            text: 'Failed to remove item from cart. Please try again.',
+                            icon: 'error',
+                            confirmButtonColor: '#3085d6'
+                        });
+                    }
+                }
+            });
+        });
+    
+        document.querySelector('.btn-checkout').addEventListener('click', async function () {
+            if (!this.disabled) {
+                const cartItems = [];
+                document.querySelectorAll('.cart-table tbody tr').forEach(row => {
+                    const productId = row.querySelector('.quantity-btn').dataset.productId;
+                    const size = row.querySelector('.quantity-btn').dataset.size;
+                    const quantityInput = row.querySelector('.quantity-input');
+                    const quantity = parseInt(quantityInput.value);
+                    const price = parseFloat(quantityInput.dataset.price);
+                    const isBlocked = row.querySelector('.product-variant span') !== null;
+    
+                    cartItems.push({ productId, size, quantity, price, isBlocked });
+                });
+    
+                const hasBlockedItems = cartItems.some(item => item.isBlocked);
+                if (hasBlockedItems) {
+                    Swal.fire({
+                        title: 'Checkout Blocked',
+                        text: 'Your cart contains blocked items that are no longer available. Please remove them to proceed.',
                         icon: 'error',
                         confirmButtonColor: '#3085d6'
                     });
+                    return;
                 }
+    
+                Swal.fire({
+                    title: 'Proceeding to Checkout',
+                    text: 'Please wait...',
+                    icon: 'info',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    willOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                window.location.href = '/checkout';
+            } else {
+                Swal.fire({
+                    title: 'Cart Empty',
+                    text: 'Please add items to your cart before checking out.',
+                    icon: 'info',
+                    confirmButtonColor: '#3085d6'
+                });
             }
         });
-    });
-
-    document.querySelector('.btn-checkout').addEventListener('click', async function () {
-  if (!this.disabled) {
     
-    const cartItems = [];
-    document.querySelectorAll('.cart-table tbody tr').forEach(row => {
-      const productId = row.querySelector('.quantity-btn').dataset.productId;
-      const size = row.querySelector('.quantity-btn').dataset.size;
-      const quantityInput = row.querySelector('.quantity-input');
-      const quantity = parseInt(quantityInput.value);
-      const price = parseFloat(quantityInput.dataset.price);
-      const isBlocked = row.querySelector('.product-variant span') !== null; 
-
-      cartItems.push({ productId, size, quantity, price, isBlocked });
-    });
-
+        function loadShop() {
+            window.location.href = '/shop';
+        }
     
-    const hasBlockedItems = cartItems.some(item => item.isBlocked);
-    if (hasBlockedItems) {
-      Swal.fire({
-        title: 'Checkout Blocked',
-        text: 'Your cart contains blocked items that are no longer available. Please remove them to proceed.',
-        icon: 'error',
-        confirmButtonColor: '#3085d6'
-      });
-      return;
-    }
-
-    Swal.fire({
-      title: 'Proceeding to Checkout',
-      text: 'Please wait...',
-      icon: 'info',
-      showConfirmButton: false,
-      allowOutsideClick: false,
-      willOpen: () => {
-        Swal.showLoading();
-      }
+        updateCartTotals();
     });
-    window.location.href = '/checkout';
-  } else {
-    Swal.fire({
-      title: 'Cart Empty',
-      text: 'Please add items to your cart before checking out.',
-      icon: 'info',
-      confirmButtonColor: '#3085d6'
-    });
-  }
-});
-
-    function loadShop() {
-        window.location.href = '/shop';
-    }
-
-    updateCartTotals();
-});
- </script>
+    </script>
     <%- include('../../views/partials/user/footer') %>

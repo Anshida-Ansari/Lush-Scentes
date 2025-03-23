@@ -602,7 +602,7 @@
                                 <i class="fas fa-plus me-2"></i>Add New Address
                             </a>
                         </div>
-
+                
                         <div class="row">
                             <% if (userAddress && userAddress.address && userAddress.address.length > 0) { %>
                                 <% userAddress.address.forEach(address => { %>
@@ -639,6 +639,29 @@
                                 </div>
                             <% } %>
                         </div>
+                
+                        <!-- Address Pagination Controls -->
+                        <% if (userAddress && userAddress.address && userAddress.address.length > 0) { %>
+                            <nav aria-label="Address pagination" class="mt-4">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item <%= addressPagination.addressPage === 1 ? 'disabled' : '' %>">
+                                        <a class="page-link" href="/userprofile?tab=address&addressPage=<%= addressPagination.addressPage - 1 %>&page=<%= pagination.orderPage %>&walletPage=<%= walletPagination.walletPage %>">
+                                            Previous
+                                        </a>
+                                    </li>
+                                    <li class="page-item disabled">
+                                        <span class="page-link">
+                                            Page <%= addressPagination.addressPage %> of <%= addressPagination.totalAddressPages %>
+                                        </span>
+                                    </li>
+                                    <li class="page-item <%= addressPagination.addressPage === addressPagination.totalAddressPages ? 'disabled' : '' %>">
+                                        <a class="page-link" href="/userprofile?tab=address&addressPage=<%= addressPagination.addressPage + 1 %>&page=<%= pagination.orderPage %>&walletPage=<%= walletPagination.walletPage %>">
+                                            Next
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        <% } %>
                     </div>
                 </div>
 

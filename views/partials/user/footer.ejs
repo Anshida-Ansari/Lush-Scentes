@@ -1,78 +1,161 @@
 
+
+<style>
+  .site-footer a {
+  text-decoration: none;
+  color: inherit; 
+}
+
+.site-footer a:hover {
+  color: #007bff;
+}
+/* Footer Styling */
+.site-footer {
+  background-color: #fff; /* White background to match the screenshot */
+  padding: 60px 0 40px;
+  color: #333; /* Dark gray text color */
+  font-size: 0.9rem;
+}
+
+.site-footer .footer-heading {
+  font-size: 1.2rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #000; /* Black headings to match the screenshot */
+  margin-bottom: 20px;
+}
+
+.site-footer ul.list-unstyled li {
+  margin-bottom: 10px;
+}
+
+.site-footer ul.list-unstyled li a {
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+.site-footer a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.site-footer a:hover {
+  color: #007bff; /* Blue hover color to match your UI */
+}
+
+/* Ensure the Colorlib link retains its text-primary color */
+.site-footer a.text-primary {
+  color: #007bff;
+}
+
+.site-footer a.text-primary:hover {
+  color: #0056b3; /* Slightly darker blue on hover */
+}
+
+/* Contact Info Styling with Icons */
+.site-footer .block-5 ul li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.site-footer .block-5 ul li.address:before,
+.site-footer .block-5 ul li.phone:before,
+.site-footer .block-5 ul li.email:before {
+  color: #e83e8c; /* Pink color to match the icons in the screenshot */
+  font-size: 1rem;
+}
+
+.site-footer .block-5 ul li.address:before {
+  content: "\f3c5"; /* Font Awesome map marker icon */
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+}
+
+.site-footer .block-5 ul li.phone:before {
+  content: "\f879"; /* Font Awesome phone icon */
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+}
+
+.site-footer .block-5 ul li.email:before {
+  content: "\f0e0"; /* Font Awesome email icon */
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+}
+
+/* Copyright Section */
+.site-footer .row.pt-5.mt-5 {
+  border-top: 1px solid #ddd;
+  padding-top: 20px;
+  margin-top: 40px;
+}
+
+.site-footer .row.pt-5.mt-5 p {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.site-footer .icon-heart {
+  color: #e83e8c; /* Pink color to match the screenshot */
+}
+
+</style>
 <footer class="site-footer custom-border-top">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-6 col-lg-3 mb-4 mb-lg-0">
-          <h3 class="footer-heading mb-4">Promo</h3>
-          <a href="#" class="block-6">
-            <img src="images/about_1.jpg" alt="Image placeholder" class="img-fluid rounded mb-4">
-            <h3 class="font-weight-light  mb-0">Finding Your Perfect Shirts This Summer</h3>
-            <p>Promo from  July 15 &mdash; 25, 2025</p>
-          </a>
-        </div>
-        <div class="col-lg-5 ml-auto mb-5 mb-lg-0">
-          <div class="row">
-            <div class="col-md-12">
-              <h3 class="footer-heading mb-4">Quick Links</h3>
-            </div>
-            <div class="col-md-6 col-lg-4">
-              <ul class="list-unstyled">
-                <li><a href="#">Sell online</a></li>
-                <li><a href="#">Features</a></li>
-                <li><a href="#">Shopping cart</a></li>
-                <li><a href="#">Store builder</a></li>
-              </ul>
-            </div>
-            <div class="col-md-6 col-lg-4">
-              <ul class="list-unstyled">
-                <li><a href="#">Mobile commerce</a></li>
-                <li><a href="#">Dropshipping</a></li>
-                <li><a href="#">Website development</a></li>
-              </ul>
-            </div>
-            <div class="col-md-6 col-lg-4">
-              <ul class="list-unstyled">
-                <li><a href="#">Point of sale</a></li>
-                <li><a href="#">Hardware</a></li>
-                <li><a href="#">Software</a></li>
-              </ul>
-            </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-5 ml-auto mb-5 mb-lg-0">
+        <div class="row">
+          <div class="col-md-12">
+            <h3 class="footer-heading mb-4">Quick Links</h3>
           </div>
-        </div>
-        
-        <div class="col-md-6 col-lg-3">
-          <div class="block-5 mb-5">
-            <h3 class="footer-heading mb-4">Contact Info</h3>
+          <div class="col-md-6 col-lg-4">
             <ul class="list-unstyled">
-              <li class="address">203 Fake St. Mountain View, San Francisco, California, USA</li>
-              <li class="phone"><a href="tel://23923929210">+2 392 3929 210</a></li>
-              <li class="email">emailaddress@domain.com</li>
+              <li><a href="#">Sell online</a></li>
+              <li><a href="#">Features</a></li>
+              <li><a href="#">Shopping cart</a></li>
+              <li><a href="#">Store builder</a></li>
             </ul>
           </div>
-
-          <div class="block-7">
-            <form action="#" method="post">
-              <label for="email_subscribe" class="footer-heading">Subscribe</label>
-              <div class="form-group">
-                <input type="text" class="form-control py-4" id="email_subscribe" placeholder="Email">
-                <input type="submit" class="btn btn-sm btn-primary" value="Send">
-              </div>
-            </form>
+          <div class="col-md-6 col-lg-4">
+            <ul class="list-unstyled">
+              <li><a href="#">Mobile commerce</a></li>
+              <li><a href="#">Dropshipping</a></li>
+              <li><a href="#">Website development</a></li>
+            </ul>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <ul class="list-unstyled">
+              <li><a href="#">Point of sale</a></li>
+              <li><a href="#">Hardware</a></li>
+              <li><a href="#">Software</a></li>
+            </ul>
           </div>
         </div>
       </div>
-      <div class="row pt-5 mt-5 text-center">
-        <div class="col-md-12">
-          <p>
-          <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-          Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="icon-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank" class="text-primary">Colorlib</a>
-          <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-          </p>
+      <div class="col-md-6 col-lg-3">
+        <div class="block-5 mb-5">
+          <h3 class="footer-heading mb-4">Contact Info</h3>
+          <ul class="list-unstyled">
+            <li class="address">203 Fake St. Mountain View, San Francisco, California, USA</li>
+            <li class="phone"><a href="tel://23923929210">+751 033 7540</a></li>
+            <li class="email">lushscentes@gmail.com</li>
+          </ul>
         </div>
-        
+       
+        </div>
       </div>
     </div>
-  </footer>
+    <div class="row pt-5 mt-5 text-center">
+      <div class="col-md-12">
+        <p>
+          Copyright ©<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="icon-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank" class="text-primary">Colorlib</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
 </div>
 
 <script src="js/jquery-3.3.1.min.js"></script>

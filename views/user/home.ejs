@@ -2022,6 +2022,26 @@
   color: #999;
   margin-right: 10px;
 }
+.section-title {
+  font-size: 24px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #000;
+  margin-bottom: 0;
+}
+
+.mb-5 {
+  margin-bottom: 3rem;
+}
+.section-title {
+  font-size: 24px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #000;
+  margin-bottom: 0;
+}
 </style>
 <div class="hero-carousel" style="position: relative; width: 100%; height: 100vh; overflow: hidden;">
   <!-- Carousel container -->
@@ -2132,31 +2152,48 @@
   </div>
 </div>
 
-    
 <div class="site-section product-showcase">
   <div class="container">
-    <div class="row">
-         
-      <% for( let i = 0; i < products.length; i++ ) { %>
-
-      <div class="col-lg-4 col-md-6 item-entry mb-4">
-                  
-        <a href="/productDetailsPage?id=<%=products[i]._id%>" class="product-item md-height bg-gray d-block">
-          <img src="<%=products[i].productImage[0]%>" alt="<%=products[i].productName%>" class="img-fluid">
-        </a>      
-        <h2 class="item-title"><%=products[i].productName%></h2>
-        <strong class="item-price"><del><%=products[i].regularPrice%></del><%=products[i].salesPrice%></strong>
-      </div>
-  
-      <% } %>
-
+    <div class="site-section py-5">
+      <div class="container">
+        <div class="title-section text-center mb-5">
+          <h2 class="text-uppercase position-relative">
+            <span class="d-block" style="font-size: 1rem; color: #777; letter-spacing: 3px; margin-bottom: 10px;">Explore</span>
+            FEATURED PRODUCTS
+          </h2>
+        </div>
     </div>
-    
-   
+    <div class="row">
+      <% for(let i = 0; i < featuredProducts.length; i++) { %>
+        <div class="col-lg-4 col-md-6 item-entry mb-4">
+          <a href="/productDetailsPage?id=<%= featuredProducts[i]._id %>" class="product-item md-height bg-gray d-block">
+            <img src="<%= featuredProducts[i].productImage[0] %>" alt="<%= featuredProducts[i].productName %>" class="img-fluid">
+          </a>      
+          <h2 class="item-title"><%= featuredProducts[i].productName %></h2>
+          <strong class="item-price">
+            <% if (featuredProducts[i].variants && featuredProducts[i].variants.length > 0) { %>
+              <% 
+                // Find the Small size variant
+                const smallVariant = featuredProducts[i].variants.find(variant => 
+                  variant.size && (variant.size.toLowerCase() === 'small' || variant.size.toLowerCase() === 's')
+                );
+                // If Small size not found, fall back to the first variant
+                const variant = smallVariant || featuredProducts[i].variants[0];
+              %>
+              <% if (variant.salesPrice && variant.regularPrice && variant.salesPrice < variant.regularPrice) { %>
+                <del>₹<%= variant.regularPrice %></del> ₹<%= variant.salesPrice %>
+              <% } else { %>
+                ₹<%= variant.regularPrice || 'N/A' %>
+              <% } %>
+            <% } else { %>
+              Price not available
+            <% } %>
+          </strong>
+        </div>
+      <% } %>
+    </div>
   </div>
 </div>
-
-   
 
 
    

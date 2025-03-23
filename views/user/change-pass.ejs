@@ -1,8 +1,22 @@
+
+<%- include('../../views/partials/user/header') %>
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Change Password</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        .error-message {
+            color: #e53e3e; 
+            font-size: 0.875rem; 
+            margin-top: 0.25rem; 
+            display: none; 
+        }
+        .input-error {
+            border-color: #e53e3e; 
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
     <div class="min-h-screen flex items-center justify-center">
@@ -13,7 +27,7 @@
                     <%= message %>
                 </div>
             <% } %>
-            <form action="/change-pass" method="POST">
+            <form action="/change-pass" method="POST" id="changePassForm" novalidate>
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
                         Email Address
@@ -23,6 +37,7 @@
                            name="email" 
                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                            required>
+                    <p id="emailError" class="error-message"></p>
                 </div>
                 <button type="submit" 
                         class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
@@ -31,5 +46,57 @@
             </form>
         </div>
     </div>
+
+    <script>
+        const form = document.getElementById('changePassForm');
+        const emailInput = document.getElementById('email');
+        const emailError = document.getElementById('emailError');
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        const validateEmail = () => {
+            const emailValue = emailInput.value.trim();
+            let isValid = true;
+            let errorMessage = '';
+
+            if (!emailValue) {
+                errorMessage = 'Email is required';
+                isValid = false;
+            }
+            else if (!emailRegex.test(emailValue)) {
+                errorMessage = 'Please enter a valid email address';
+                isValid = false;
+            }
+
+            if (!isValid) {
+                emailError.textContent = errorMessage;
+                emailError.style.display = 'block';
+                emailInput.classList.add('input-error');
+            } else {
+                emailError.textContent = '';
+                emailError.style.display = 'none';
+                emailInput.classList.remove('input-error');
+            }
+
+            return isValid;
+        };
+
+        emailInput.addEventListener('input', validateEmail);
+
+        form.addEventListener('submit', (e) => {
+            const isEmailValid = validateEmail();
+
+            if (!isEmailValid) {
+                e.preventDefault(); 
+            }
+        });
+
+        emailInput.addEventListener('focus', () => {
+            emailError.textContent = '';
+            emailError.style.display = 'none';
+            emailInput.classList.remove('input-error');
+        });
+    </script>
 </body>
 </html>
+<%- include('../../views/partials/user/footer') %>

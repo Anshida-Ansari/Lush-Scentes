@@ -188,7 +188,6 @@ const resetPassword = async (req, res) => {
 
 
 
-
 const userProfile = async (req, res) => {
     try {
         console.log('Session user:', req.session.user);
@@ -202,12 +201,25 @@ const userProfile = async (req, res) => {
         const walletLimit = 5;
         const walletSkip = (walletPage - 1) * walletLimit;
 
+        const addressPage = parseInt(req.query.addressPage) || 1;
+        const addressLimit = 2;
+        const addressSkip = (addressPage - 1) * addressLimit;
+
         const activeTab = req.query.tab || 'profile';
 
         const userData = await User.findById(userId).lean();
         if (!userData) throw new Error('User not found');
 
         const addressData = await Address.findOne({ userID: userId });
+        let paginatedAddresses = [];
+        let totalAddresses = 0;
+        let totalAddressPages = 0;
+
+        if (addressData && addressData.address && addressData.address.length > 0) {
+            totalAddresses = addressData.address.length;
+            totalAddressPages = Math.ceil(totalAddresses / addressLimit);
+            paginatedAddresses = addressData.address.slice(addressSkip, addressSkip + addressLimit);
+        }
 
         const totalOrders = await Order.countDocuments({ userId: userId });
         const totalOrderPages = Math.ceil(totalOrders / orderLimit);
@@ -253,7 +265,7 @@ const userProfile = async (req, res) => {
 
         res.render('profile', {
             user: { ...userData, walletHistory: paginatedWalletHistory },
-            userAddress: addressData,
+            userAddress: { ...addressData, address: paginatedAddresses },
             orders: orders,
             pagination: {
                 orderPage,
@@ -266,6 +278,12 @@ const userProfile = async (req, res) => {
                 walletLimit,
                 totalWalletTransactions,
                 totalWalletPages
+            },
+            addressPagination: {
+                addressPage,
+                addressLimit,
+                totalAddresses,
+                totalAddressPages
             },
             activeTab 
         });
