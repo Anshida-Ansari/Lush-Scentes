@@ -45,8 +45,8 @@ router.get('/product', isAuthenticated, productController.getAllProducts)
 router.get('/blockProduct', isAuthenticated, productController.blockProduct)
 router.get('/unblockProduct', isAuthenticated, productController.unblockProduct)
 router.get('/editProduct', isAuthenticated, productController.getEditProduct)
-router.put('/editProduct/:id', upload.fields([{ name: 'images', maxCount: 4 }]),productController.editProduct);
-router.post('/editProduct/:id', isAuthenticated, upload.single('productImage'), productController.editProduct)
+// router.put('/editProduct/:id', upload.fields([{ name: 'images', maxCount: 4 }]),productController.editProduct);
+router.post('/editProduct/:id', isAuthenticated, upload.array('productImage',4), productController.editProduct)
 router.post('/deleteSingleImage', isAuthenticated, productController.deleteSingleImage)
 
 router.get('/order', isAuthenticated, orderController.getListOfOrders)
@@ -66,7 +66,7 @@ router.delete('/offer-remove/:offerId',isAuthenticated,offerController.removeOff
 router.get('/coupon',isAuthenticated,couponController.loadCoupon)
 router.post('/coupon',isAuthenticated,couponController.createCoupon)
 router.put('/coupon/:couponId',isAuthenticated,couponController.editCoupon)
-router.delete('/coupon/:couponId',isAuthenticated,couponController.deleteCoupon)
+router.delete('/coupon/:couponId',isAuthenticated,couponController.deleteCoupon)    
 
 
 module.exports = router

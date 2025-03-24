@@ -238,50 +238,47 @@
 <body>
     <section class="content-main">
         <div class="row">
-            <div class="col-9">
+            <div class="col-12">
                 <div class="content-header">
                     <h2 class="content-title">Add New Product</h2>
                 </div>
             </div>
-            <div class="col-lg-6">
+            <div class="col-12">
                 <div class="card mb-4">
                     <div class="card-body">
                         <form method="post" action="/admin/addProducts" id="productForm" enctype="multipart/form-data">
-                            <div class="mb-4">
-                                <label for="product_name" class="form-label">Product Name</label>
-                                <input type="text" placeholder="Enter product name" name="productName" class="form-control" id="product_name" required>
-                                <div id="productName-error" class="error-message"></div>
-                            </div>
+                            <div class="row">
+                                <!-- Left column - Basic Info -->
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <label for="product_name" class="form-label">Product Name</label>
+                                        <input type="text" placeholder="Enter product name" name="productName" class="form-control" id="product_name" required>
+                                        <div id="productName-error" class="error-message"></div>
+                                    </div>
 
-                            <div class="mb-4">
-                                <label class="form-label">Description</label>
-                                <textarea placeholder="Enter product description" id="descriptionid" name="description" class="form-control" rows="4" required></textarea>
-                                <div id="description-error" class="error-message"></div>
-                            </div>
+                                    <div class="mb-4">
+                                        <label class="form-label">Description</label>
+                                        <textarea placeholder="Enter product description" id="descriptionid" name="description" class="form-control" rows="4" required></textarea>
+                                        <div id="description-error" class="error-message"></div>
+                                    </div>
 
-                            <!-- Category Selection -->
-                            <div class="card mb-4">
-                                <div class="card-body">
-                                    <div class="row gx-2">
-                                        <div class="col-sm-6 mb-3">
-                                            <label class="form-label">Category</label>
-                                            <select class="form-select" id="category" name="category" required>
-                                                <option value="">Select Category</option>
-                                                <% for(let i=0; i<cat.length; i++) { %>
-                                                    <option value="<%=cat[i].name%>"><%=cat[i].name%></option>
-                                                <% } %>
-                                            </select>
-                                            <div id="category-error" class="error-message"></div>
-                                        </div>
+                                    <!-- Category Selection -->
+                                    <div class="mb-4">
+                                        <label class="form-label">Category</label>
+                                        <select class="form-select" id="category" name="category" required>
+                                            <option value="">Select Category</option>
+                                            <% for(let i=0; i<cat.length; i++) { %>
+                                                <option value="<%=cat[i].name%>"><%=cat[i].name%></option>
+                                            <% } %>
+                                        </select>
+                                        <div id="category-error" class="error-message"></div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Image Upload Section -->
-                            <div class="mb-4">
-                                <label class="form-label">Upload Product Images</label>
-                                <div class="row">
-                                    <div class="col-12 mb-3">
+                                <!-- Right column - Image Upload -->
+                                <div class="col-md-6">
+                                    <div class="mb-4">
+                                        <label class="form-label">Upload Product Images</label>
                                         <div class="image-upload-container">
                                             <div id="imagesPreviewContainer" class="d-flex flex-wrap mb-2"></div>
                                             <input
@@ -297,23 +294,24 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Image Cropping Modal -->
-                                <div class="modal fade" id="imageCropModal" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="cropModalLabel">Crop Image</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+
+                            <!-- Image Cropping Modal -->
+                            <div class="modal fade" id="imageCropModal" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="cropModalLabel">Crop Image</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="img-container">
+                                                <img id="cropImage" src="" alt="Image to crop" />
                                             </div>
-                                            <div class="modal-body">
-                                                <div class="img-container">
-                                                    <img id="cropImage" src="" alt="Image to crop" />
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                <button type="button" class="btn btn-primary" id="cropButton">Crop & Save</button>
-                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="button" class="btn btn-primary" id="cropButton">Crop & Save</button>
                                         </div>
                                     </div>
                                 </div>
@@ -325,63 +323,68 @@
                                     <h4>Product Sizes</h4>
                                 </div>
                                 <div class="card-body">
-                                    <div id="variants">
-                                        <div class="variant-item mb-3 p-3 border rounded" id="variant-0">
-                                            <div class="d-flex justify-content-between mb-2">
-                                                <h5>Size Variant #1</h5>
-                                                <button type="button" class="btn-remove-variant" onclick="removeVariant(0)">×</button>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-3 mb-2">
-                                                    <label class="form-label">Size</label>
-                                                    <select class="form-select variant-size" required>
-                                                        <option value="">Select Size</option>
-                                                        <option value="15ml">15ml</option>
-                                                        <option value="50ml" selected>50ml</option>
-                                                        <option value="100ml">100ml</option>
-                                                    </select>
+                                    <div id="variants" class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <div class="variant-item p-3 border rounded" id="variant-0">
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <h5>Size Variant #1</h5>
+                                                    <button type="button" class="btn-remove-variant" onclick="removeVariant(0)">×</button>
                                                 </div>
-                                                <div class="col-md-3 mb-2">
-                                                    <label class="form-label">Quantity</label>
-                                                    <input type="number" class="form-control variant-quantity" placeholder="Quantity" min="0" required>
-                                                </div>
-                                                <div class="col-md-3 mb-2">
-                                                    <label class="form-label">Regular Price</label>
-                                                    <input type="number" class="form-control variant-regular-price" placeholder="$" required>
-                                                </div>
-                                                <div class="col-md-3 mb-2">
-                                                    <label class="form-label">Sale Price</label>
-                                                    <input type="number" class="form-control variant-sales-price" placeholder="$">
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-2">
+                                                        <label class="form-label">Size</label>
+                                                        <select class="form-select variant-size" required>
+                                                            <option value="">Select Size</option>
+                                                            <option value="15ml">15ml</option>
+                                                            <option value="50ml" selected>50ml</option>
+                                                            <option value="100ml">100ml</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6 mb-2">
+                                                        <label class="form-label">Quantity</label>
+                                                        <input type="number" class="form-control variant-quantity" placeholder="Quantity" min="0" required>
+                                                    </div>
+                                                    <div class="col-md-6 mb-2">
+                                                        <label class="form-label">Regular Price</label>
+                                                        <input type="number" class="form-control variant-regular-price" placeholder="$" required>
+                                                    </div>
+                                                    <div class="col-md-6 mb-2">
+                                                        <label class="form-label">Sale Price</label>
+                                                        <input type="number" class="form-control variant-sales-price" placeholder="$">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
+                                        
                                         <!-- Variant 2 -->
-                                        <div class="variant-item mb-3 p-3 border rounded" id="variant-1">
-                                            <div class="d-flex justify-content-between mb-2">
-                                                <h5>Size Variant #2</h5>
-                                                <button type="button" class="btn-remove-variant" onclick="removeVariant(1)">×</button>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-3 mb-2">
-                                                    <label class="form-label">Size</label>
-                                                    <select class="form-select variant-size" required>
-                                                        <option value="">Select Size</option>
-                                                        <option value="15ml">15ml</option>
-                                                        <option value="50ml">50ml</option>
-                                                        <option value="100ml" selected>100ml</option>
-                                                    </select>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="variant-item p-3 border rounded" id="variant-1">
+                                                <div class="d-flex justify-content-between mb-2">
+                                                    <h5>Size Variant #2</h5>
+                                                    <button type="button" class="btn-remove-variant" onclick="removeVariant(1)">×</button>
                                                 </div>
-                                                <div class="col-md-3 mb-2">
-                                                    <label class="form-label">Quantity</label>
-                                                    <input type="number" class="form-control variant-quantity" placeholder="Quantity" min="0" required>
-                                                </div>
-                                                <div class="col-md-3 mb-2">
-                                                    <label class="form-label">Regular Price</label>
-                                                    <input type="number" class="form-control variant-regular-price" placeholder="$" required>
-                                                </div>
-                                                <div class="col-md-3 mb-2">
-                                                    <label class="form-label">Sale Price</label>
-                                                    <input type="number" class="form-control variant-sales-price" placeholder="$">
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-2">
+                                                        <label class="form-label">Size</label>
+                                                        <select class="form-select variant-size" required>
+                                                            <option value="">Select Size</option>
+                                                            <option value="15ml">15ml</option>
+                                                            <option value="50ml">50ml</option>
+                                                            <option value="100ml" selected>100ml</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6 mb-2">
+                                                        <label class="form-label">Quantity</label>
+                                                        <input type="number" class="form-control variant-quantity" placeholder="Quantity" min="0" required>
+                                                    </div>
+                                                    <div class="col-md-6 mb-2">
+                                                        <label class="form-label">Regular Price</label>
+                                                        <input type="number" class="form-control variant-regular-price" placeholder="$" required>
+                                                    </div>
+                                                    <div class="col-md-6 mb-2">
+                                                        <label class="form-label">Sale Price</label>
+                                                        <input type="number" class="form-control variant-sales-price" placeholder="$">
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -399,10 +402,11 @@
                             </div>
                         </form>
                     </div>
-                </div>
+                </div>  
             </div>
         </div>
     </section>
+
 
     <script>
         let uploadedImages = [];

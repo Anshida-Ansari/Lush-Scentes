@@ -86,7 +86,7 @@ const createCoupon = async(req,res)=>{
         }
         const parsedMinimumPrice = parseFloat(minimumPrice);
         if (isNaN(parsedMinimumPrice) || parsedMinimumPrice <= 0 || parsedMinimumPrice > 100000) {
-            return res.status(statusCode.BAD_REQUEST).json({
+            return res.status(201).json({
                 status: false,
                 message: 'Invalid minimum amount. Please enter a valid number greater than 0 and less than or equal to 100,000'
             });
