@@ -64,7 +64,6 @@
                                         <th>Min. Purchase</th>
                                         <th>Expiry Date</th>
                                         <th>Status</th>
-                                        <th>Usage</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -90,13 +89,7 @@
                                                         <span class="badge bg-danger">Expired</span>
                                                     <% } %>
                                                 </td>
-                                                <td>
-                                                    <% if (coupon.userId && coupon.userId.length > 0) { %>
-                                                        <span class="badge bg-info"><%= coupon.userId.length %> uses</span>
-                                                    <% } else { %>
-                                                        <span class="badge bg-light text-dark">0 uses</span>
-                                                    <% } %>
-                                                </td>
+                                                
                                                 <td>
                                                     <div class="d-flex gap-1">
                                                         <button class="btn btn-sm btn-primary" 
