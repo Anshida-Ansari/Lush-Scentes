@@ -440,195 +440,209 @@ const createDateFilter = (filter, startDate, endDate) => {
   
   const downloadExcelReport = async (req, res) => {
     try {
-        const { filter = 'daily', startDate, endDate } = req.query;
-        const dateFilter = createDateFilter(filter, startDate, endDate);
-        
-        const queryFilter = {
-            ...dateFilter,
-            status: 'Delivered' 
-        };
-
-        const orders = await Order.find(queryFilter).populate('orderedItems.product');
-        const summary = await Order.aggregate([
-            { $match: queryFilter },
-            {
-                $group: {
-                    _id: null,
-                    totalOrders: { $sum: 1 },
-                    totalAmount: { $sum: '$totalPrice' },
-                    totalDiscount: { $sum: '$discount' },
-                    finalAmount: { $sum: '$finalAmount' }
-                }
-            }
-        ]);
-
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('Sales Report');
-
-        worksheet.addRow(['Sales Report']);
-        worksheet.addRow(['Filter:', filter]);
-        worksheet.addRow(['Date Range:', `${format(dateFilter.createdOn.$gte, 'yyyy-MM-dd')} to ${format(dateFilter.createdOn.$lte, 'yyyy-MM-dd')}`]);
-        worksheet.addRow([]);
-
-        worksheet.columns = [
-            { header: 'Order ID', key: 'orderId', width: 20 },
-            { header: 'Date', key: 'date', width: 15 },
-            { header: 'Product', key: 'product', width: 25 },
-            { header: 'Quantity', key: 'quantity', width: 10 },
-            { header: 'Price', key: 'price', width: 12 },
-            { header: 'Discount', key: 'discount', width: 12 },
-            { header: 'Final Amount', key: 'finalAmount', width: 12 },
-            { header: 'Coupon', key: 'coupon', width: 15 }
-        ];
-
-        orders.forEach(order => {
-            order.orderedItems.forEach(item => {
-                console.log('Item debug:', item); 
-                worksheet.addRow({
-                    orderId: order.orderId,
-                    date: format(order.createdOn, 'yyyy-MM-dd'),
-                    product: item.name || item.product?.productName || 'N/A',
-                    quantity: item.variant?.quantity || 0, 
-                    price: item.price || item.variant?.salesPrice || item.variant?.regularPrice || 0,
-                    discount: order.discount,
-                    finalAmount: order.finalAmount,
-                    coupon: order.couponCode || 'N/A'
-                });
-            });
-        });
-
-        worksheet.addRow([]);
-        worksheet.addRow(['Summary']);
-        const sum = summary[0] || {};
-        worksheet.addRow(['Total Orders:', sum.totalOrders || 0]);
-        worksheet.addRow(['Total Amount:', sum.totalAmount || 0]);
-        worksheet.addRow(['Total Discount:', sum.totalDiscount || 0]);
-        worksheet.addRow(['Final Amount:', sum.finalAmount || 0]);
-
-        ['price', 'discount', 'finalAmount'].forEach(key => {
-            worksheet.getColumn(key).numFmt = '₹#,##0.00';
-        });
-
-        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        res.setHeader('Content-Disposition', 'attachment; filename=SalesReport.xlsx');
-        await workbook.xlsx.write(res);
-        res.end();
-    } catch (error) {
-        console.error('Error generating Excel:', error);
-        res.redirect('/admin/pageerror');
-    }
-};
-  
-
-
-const downloadPDFReport = async (req, res) => {
-  try {
       const { filter = 'daily', startDate, endDate } = req.query;
       const dateFilter = createDateFilter(filter, startDate, endDate);
-      
-      
+  
       const queryFilter = {
-          ...dateFilter,
-          status: 'Delivered' 
+        ...dateFilter,
+        status: 'Delivered',
       };
-
-      console.log('Date Filter in PDF:', queryFilter);
-
+  
       const orders = await Order.find(queryFilter).populate('orderedItems.product');
-      console.log('Orders fetched for PDF:', orders.map(order => ({
+      const summary = await Order.aggregate([
+        { $match: queryFilter },
+        {
+          $group: {
+            _id: null,
+            totalOrders: { $sum: 1 },
+            totalAmount: { $sum: '$totalPrice' },
+            totalDiscount: { $sum: '$discount' },
+            finalAmount: { $sum: '$finalAmount' },
+          },
+        },
+      ]);
+  
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Sales Report');
+  
+      worksheet.addRow(['Sales Report']);
+      worksheet.addRow(['Filter:', filter]);
+      worksheet.addRow([
+        'Date Range:',
+        `${format(dateFilter.createdOn.$gte, 'yyyy-MM-dd')} to ${format(dateFilter.createdOn.$lte, 'yyyy-MM-dd')}`,
+      ]);
+      worksheet.addRow([]);
+  
+      // Add 'Status' column to the worksheet
+      worksheet.columns = [
+        { header: 'Order ID', key: 'orderId', width: 20 },
+        { header: 'Date', key: 'date', width: 15 },
+        { header: 'Product', key: 'product', width: 25 },
+        { header: 'Quantity', key: 'quantity', width: 10 },
+        { header: 'Price', key: 'price', width: 12 },
+        { header: 'Discount', key: 'discount', width: 12 },
+        { header: 'Final Amount', key: 'finalAmount', width: 12 },
+        { header: 'Coupon', key: 'coupon', width: 15 },
+        { header: 'Status', key: 'status', width: 15 }, // New column for status
+      ];
+  
+      orders.forEach((order) => {
+        order.orderedItems.forEach((item) => {
+          console.log('Item debug:', item);
+          worksheet.addRow({
+            orderId: order.orderId,
+            date: format(order.createdOn, 'yyyy-MM-dd'),
+            product: item.name || item.product?.productName || 'N/A',
+            quantity: item.variant?.quantity || 0,
+            price: item.price || item.variant?.salesPrice || item.variant?.regularPrice || 0,
+            discount: order.discount,
+            finalAmount: order.finalAmount,
+            coupon: order.couponCode || 'N/A',
+            status: order.status || 'N/A', // Add status field
+          });
+        });
+      });
+  
+      worksheet.addRow([]);
+      worksheet.addRow(['Summary']);
+      const sum = summary[0] || {};
+      worksheet.addRow(['Total Orders:', sum.totalOrders || 0]);
+      worksheet.addRow(['Total Amount:', sum.totalAmount || 0]);
+      worksheet.addRow(['Total Discount:', sum.totalDiscount || 0]);
+      worksheet.addRow(['Final Amount:', sum.finalAmount || 0]);
+  
+      ['price', 'discount', 'finalAmount'].forEach((key) => {
+        worksheet.getColumn(key).numFmt = '₹#,##0.00';
+      });
+  
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename=SalesReport.xlsx');
+      await workbook.xlsx.write(res);
+      res.end();
+    } catch (error) {
+      console.error('Error generating Excel:', error);
+      res.redirect('/admin/pageerror');
+    }
+  };
+
+
+  const downloadPDFReport = async (req, res) => {
+    try {
+      const { filter = 'daily', startDate, endDate } = req.query;
+      const dateFilter = createDateFilter(filter, startDate, endDate);
+  
+      const queryFilter = {
+        ...dateFilter,
+        status: 'Delivered',
+      };
+  
+      console.log('Date Filter in PDF:', queryFilter);
+  
+      const orders = await Order.find(queryFilter).populate('orderedItems.product');
+      console.log(
+        'Orders fetched for PDF:',
+        orders.map((order) => ({
           orderId: order.orderId,
           createdOn: order.createdOn,
           orderedItems: order.orderedItems,
           totalPrice: order.totalPrice,
           discount: order.discount,
           finalAmount: order.finalAmount,
-          couponCode: order.couponCode
-      })));
-
+          couponCode: order.couponCode,
+          status: order.status, 
+        }))
+      );
+  
       const summary = await Order.aggregate([
-          { $match: queryFilter },
-          {
-              $group: {
-                  _id: null,
-                  totalOrders: { $sum: 1 },
-                  totalAmount: { $sum: '$totalPrice' },
-                  totalDiscount: { $sum: '$discount' },
-                  finalAmount: { $sum: '$finalAmount' }
-              }
-          }
+        { $match: queryFilter },
+        {
+          $group: {
+            _id: null,
+            totalOrders: { $sum: 1 },
+            totalAmount: { $sum: '$totalPrice' },
+            totalDiscount: { $sum: '$discount' },
+            finalAmount: { $sum: '$finalAmount' },
+          },
+        },
       ]);
       console.log('Summary for PDF:', summary);
-
+  
       const doc = new PDFDocument({ margin: 30 });
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', 'attachment; filename=SalesReport.pdf');
       doc.pipe(res);
-
+  
       doc.fontSize(20).text('Sales Report', { align: 'center' });
-      doc.fontSize(12)
-         .text(`Filter: ${filter}`)
-         .text(`Date Range: ${format(dateFilter.createdOn.$gte, 'yyyy-MM-dd')} to ${format(dateFilter.createdOn.$lte, 'yyyy-MM-dd')}`);
+      doc
+        .fontSize(12)
+        .text(`Filter: ${filter}`)
+        .text(
+          `Date Range: ${format(dateFilter.createdOn.$gte, 'yyyy-MM-dd')} to ${format(dateFilter.createdOn.$lte, 'yyyy-MM-dd')}`
+        );
       doc.moveDown();
-
-      const tableData = orders.flatMap(order => 
-          order.orderedItems.map(item => ({
-              orderId: order.orderId.slice(0, 12),
-              date: format(order.createdOn, 'yyyy-MM-dd'),
-              product: item.name || item.product?.productName || 'N/A',
-              qty: item.variant?.quantity || 0, 
-              price: `₹${(item.price || item.variant?.salesPrice || item.variant?.regularPrice || 0).toFixed(2)}`,
-              discount: `₹${order.discount.toFixed(2)}`,
-              final: `₹${order.finalAmount.toFixed(2)}`
-          }))
+  
+      const tableData = orders.flatMap((order) =>
+        order.orderedItems.map((item) => ({
+          orderId: order.orderId.slice(0, 12),
+          date: format(order.createdOn, 'yyyy-MM-dd'),
+          product: item.name || item.product?.productName || 'N/A',
+          qty: item.variant?.quantity || 0,
+          price: `₹${(item.price || item.variant?.salesPrice || item.variant?.regularPrice || 0).toFixed(2)}`,
+          discount: `₹${order.discount.toFixed(2)}`,
+          final: `₹${order.finalAmount.toFixed(2)}`,
+          status: order.status || 'N/A', 
+        }))
       );
-
+  
       console.log('Table Data:', tableData);
-
+  
       if (tableData.length === 0) {
-          doc.fontSize(12).text('No delivered orders found for the selected date range.', { align: 'center' });
+        doc.fontSize(12).text('No delivered orders found for the selected date range.', { align: 'center' });
       } else {
-          const table = {
-              headers: [
-                  { label: 'Order ID', property: 'orderId', width: 100 },
-                  { label: 'Date', property: 'date', width: 80 },
-                  { label: 'Product', property: 'product', width: 120 },
-                  { label: 'Qty', property: 'qty', width: 40 },
-                  { label: 'Price', property: 'price', width: 60 },
-                  { label: 'Discount', property: 'discount', width: 60 },
-                  { label: 'Final', property: 'final', width: 60 }
-              ],
-              datas: tableData
-          };
-
-          await doc.table(table, {
-              prepareHeader: () => doc.font('Helvetica-Bold').fontSize(10),
-              prepareRow: () => doc.font('Helvetica').fontSize(9)
-          });
+        const table = {
+          headers: [
+            { label: 'Order ID', property: 'orderId', width: 90 },
+            { label: 'Date', property: 'date', width: 70 },
+            { label: 'Product', property: 'product', width: 110 },
+            { label: 'Qty', property: 'qty', width: 40 },
+            { label: 'Price', property: 'price', width: 60 },
+            { label: 'Discount', property: 'discount', width: 60 },
+            { label: 'Final', property: 'final', width: 60 },
+            { label: 'Status', property: 'status', width: 60 }, 
+          ],
+          datas: tableData,
+        };
+  
+        await doc.table(table, {
+          prepareHeader: () => doc.font('Helvetica-Bold').fontSize(10),
+          prepareRow: () => doc.font('Helvetica').fontSize(9),
+        });
       }
-
-      doc.moveDown()
-         .fontSize(12)
-         .text('Summary', { underline: true })
-         .fontSize(11);
+  
+      doc
+        .moveDown()
+        .fontSize(12)
+        .text('Summary', { underline: true })
+        .fontSize(11);
       const sum = summary[0] || {};
-      doc.text(`Total Orders: ${sum.totalOrders || 0}`)
-         .text(`Total Amount: ₹${(sum.totalAmount || 0).toFixed(2)}`)
-         .text(`Total Discount: ₹${(sum.totalDiscount || 0).toFixed(2)}`)
-         .text(`Final Amount: ₹${(sum.finalAmount || 0).toFixed(2)}`);
-
+      doc
+        .text(`Total Orders: ${sum.totalOrders || 0}`)
+        .text(`Total Amount: ₹${(sum.totalAmount || 0).toFixed(2)}`)
+        .text(`Total Discount: ₹${(sum.totalDiscount || 0).toFixed(2)}`)
+        .text(`Final Amount: ₹${(sum.finalAmount || 0).toFixed(2)}`);
+  
       doc.end();
-  } catch (error) {
+    } catch (error) {
       console.error('Error generating PDF:', {
-          message: error.message,
-          stack: error.stack,
-          filter,
-          startDate,
-          endDate
+        message: error.message,
+        stack: error.stack,
+        filter,
+        startDate,
+        endDate,
       });
       res.redirect('/admin/pageerror');
-  }
-};
-
+    }
+  };
 
 
 const logout = async (req, res) => {
