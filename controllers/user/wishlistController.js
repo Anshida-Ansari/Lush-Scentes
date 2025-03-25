@@ -16,8 +16,6 @@ const loadWishlist = async (req,res)=>{
         }
 
         const wishlist = await Wishlist.findOne({userId:userId}).populate('products.productId')
-        console.log('Wishlist:', wishlist);
-
         const products = wishlist ? wishlist.products : [];
 
         res.render('wishlist',{

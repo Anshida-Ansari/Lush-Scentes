@@ -24,9 +24,18 @@
 
   .shop-header {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
+  }
+
+  .search-container input:focus {
+    border-color: #e34298;
+    box-shadow: 0 0 5px rgba(227, 66, 152, 0.3);
+  }
+
+  .search-container button:hover {
+    background-color: #d13b8a;
   }
 
   .filter-button {
@@ -274,11 +283,11 @@
     width: 100%;
     height: 5px;
     -webkit-appearance: none;
-    appearance: none; /* Ensure consistent behavior across browsers */
+    appearance: none;
     background: transparent;
     margin: 0;
-    pointer-events: auto; /* Ensure sliders are interactive */
-    z-index: 2; /* Ensure sliders are above the track */
+    pointer-events: auto;
+    z-index: 2;
   }
 
   .price-range input[type="range"]::-webkit-slider-thumb {
@@ -313,7 +322,7 @@
     height: 5px;
     background: #e34298;
     border-radius: 5px;
-    z-index: 1; /* Ensure track is below sliders */
+    z-index: 1;
   }
 
   .price-values {
@@ -435,26 +444,31 @@
     padding: 0;
     margin-left: 5px;
   }
+
   .bg-light {
-        background-color: #f8f9fa;
-        margin-bottom: 24px;
-    }
-        .breadcrumb a {
-            color: #000000; 
-            text-decoration: none; 
-            border-bottom: 2px solid transparent; 
-            transition: border-bottom 0.3s ease;
-        }
-        .breadcrumb a:hover {
-            color: #c6214d;
-            border-bottom: 2px solid #ff5733; 
-        }
-        .breadcrumb .text-black {
-            color: #000000; 
-        }
-        .btn-primary:hover {
-            background-color: #e04e2d; 
-        }
+    background-color: #f8f9fa;
+    margin-bottom: 24px;
+  }
+
+  .breadcrumb a {
+    color: #000000;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: border-bottom 0.3s ease;
+  }
+
+  .breadcrumb a:hover {
+    color: #c6214d;
+    border-bottom: 2px solid #ff5733;
+  }
+
+  .breadcrumb .text-black {
+    color: #000000;
+  }
+
+  .btn-primary:hover {
+    background-color: #e04e2d;
+  }
 
   /* Pagination Styles */
   .pagination {
@@ -492,7 +506,6 @@
     cursor: not-allowed;
     border-color: #ddd;
   }
-  
 
   /* Responsive Design */
   @media (max-width: 992px) {
@@ -523,20 +536,19 @@
       grid-template-columns: 1fr; /* 1 product per row on small screens */
     }
   }
-  
 </style>
 
 <div class="site-wrap">
   <div class="bg-light py-3">
     <div class="container">
-        <div class="row">
-            <div class="col-md-12 mb-0 breadcrumb">
-                <a href="/">Home</a> <span class="mx-2 mb-0">/</span>
-                <strong><a href="/shop">Shop</a> <span class="mx-2 mb-0"></span></strong>
-            </div>
+      <div class="row">
+        <div class="col-md-12 mb-0 breadcrumb">
+          <a href="/">Home</a> <span class="mx-2 mb-0">/</span>
+          <strong><a href="/shop">Shop</a> <span class="mx-2 mb-0"></span></strong>
         </div>
+      </div>
     </div>
-</div>
+  </div>
   <div class="shop-container">
     <!-- Filter Section -->
     <div class="filter-section-container">
@@ -631,6 +643,24 @@
     <div class="products-section">
       <!-- Shop Header -->
       <div class="shop-header">
+        <div class="search-container" style="flex: 1; margin-right: 20px;">
+          <form id="searchForm" action="/shop" method="get" style="display: flex; align-items: center;">
+            <input 
+              type="text" 
+              name="search" 
+              id="searchHeaderInput" 
+              placeholder="Search products..." 
+              value="<%= query.search || '' %>"
+              style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px 0 0 4px; outline: none;"
+            >
+            <button 
+              type="submit" 
+              style="padding: 8px 15px; background-color: #e34298; color: white; border: none; border-radius: 0 4px 4px 0; cursor: pointer;"
+            >
+              <i class="fas fa-search"></i>
+            </button>
+          </form>
+        </div>
         <div class="products-count"><%= totalProducts %> products</div>
       </div>
 
@@ -862,6 +892,7 @@ function clearFilters() {
   priceMin.value = 500;
   priceMax.value = 15000;
   document.getElementById('searchInput').value = '';
+  document.getElementById('searchHeaderInput').value = '';
   updatePriceRange();
   document.querySelectorAll('.category-link').forEach(link => {
     link.classList.remove('active');
@@ -932,6 +963,7 @@ function removeFilter(param) {
   switch (param) {
     case 'search':
       document.getElementById('searchInput').value = '';
+      document.getElementById('searchHeaderInput').value = '';
       break;
     case 'category':
       document.getElementById('categoryInput').value = '';
@@ -1013,6 +1045,13 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('filterForm').addEventListener('submit', function(event) {
     const formData = new FormData(this);
     console.log('Form submitted with data:', Object.fromEntries(formData));
+  });
+
+  document.getElementById('searchForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const searchValue = document.getElementById('searchHeaderInput').value;
+    document.getElementById('searchInput').value = searchValue;
+    document.getElementById('filterForm').submit();
   });
 });
 </script>

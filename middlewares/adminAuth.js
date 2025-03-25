@@ -1,3 +1,6 @@
+const User = require('../models/userSchema')
+
+
 const isAuthenticated=(req,res,next)=>{
     if(req.session.admin){
         next()

@@ -144,7 +144,7 @@
         <div class="d-flex align-items-center justify-content-between">
           <div class="logo">
             <div class="site-logo">
-              <a href="index.html" class="js-logo-clone">LUSH Scents</a>
+              <a href="/shop" class="js-logo-clone">LUSH Scents</a>
             </div>
           </div>
           <div class="main-nav d-none d-lg-block">
@@ -152,25 +152,12 @@
               <ul class="site-menu js-clone-nav d-none d-lg-block">
                 <li class="has-children active">
                   <a href="/">Home</a>
-                  <ul class="dropdown">
-                    <li><a href="#">Menu One</a></li>
-                    <li><a href="#">Menu Two</a></li>
-                    <li><a href="#">Menu Three</a></li>
-                    <li class="has-children">
-                      <a href="#">Sub Menu</a>
-                      <ul class="dropdown">
-                        <li><a href="#">Menu One</a></li>
-                        <li><a href="#">Menu Two</a></li>
-                        <li><a href="#">Menu Three</a></li>
-                      </ul>
-                    </li>
-                  </ul>
+                  
                 </li>
                 
                 <li><a href="/shop">Shop</a></li>
                 <!-- <li><a href="#">About Us</a></li>
                 <li><a href="#">New Arrivals</a></li> -->
-                <!-- <li><a href="contact.html">Contact</a></li> -->
                 <% if(locals.user){ %>
                   <li class="dropdown">
                       <a href="#" class="site-menu-link"><%=locals.user.name%></a>

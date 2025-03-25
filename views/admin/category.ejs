@@ -214,63 +214,101 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script>
-        function handleFormSubmit(event) {
-            event.preventDefault();
+       function handleFormSubmit(event) {
+    event.preventDefault();
 
-            const name = document.getElementsByName('name')[0].value.trim();
-            const description = document.getElementById('descriptionId').value.trim();
+    const name = document.getElementsByName('name')[0].value.trim();
+    const description = document.getElementById('descriptionId').value.trim();
 
-            clearErrorMessages();
+    clearErrorMessages();
 
-            if (!name || !description) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Missing Fields',
-                    text: 'Name and Description are required'
-                });
-                return false;
-            }
+    // Regex to allow only letters and spaces
+    const alphaOnlyRegex = /^[A-Za-z\s]+$/;
 
-            fetch('/admin/addCategory', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ name, description })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => {
-                        throw new Error(err.error);
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: data.message || 'Category added successfully'
-                }).then(() => {
-                    location.reload();
-                });
-            })
-            .catch(error => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message || 'An error occurred while adding the category'
-                });
+    // Validate name field
+    if (!name) {
+        showError('name-error', 'Name is required');
+        Swal.fire({
+            icon: 'warning',
+            title: 'Missing Field',
+            text: 'Name is required'
+        });
+        return false;
+    }
+
+    if (!alphaOnlyRegex.test(name)) {
+        showError('name-error', 'Name can only contain letters and spaces');
+        Swal.fire({
+            icon: 'warning',
+            title: 'Invalid Input',
+            text: 'Name can only contain letters and spaces'
+        });
+        return false;
+    }
+
+    // Validate description field
+    if (!description) {
+        showError('description-error', 'Description is required');
+        Swal.fire({
+            icon: 'warning',
+            title: 'Missing Field',
+            text: 'Description is required'
+        });
+        return false;
+    }
+
+    fetch('/admin/addCategory', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name, description })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => {
+                throw new Error(err.error);
             });
         }
+        return response.json();
+    })
+    .then(data => {
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: data.message || 'Category added successfully'
+        }).then(() => {
+            location.reload();
+        });
+    })
+    .catch(error => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'An error occurred while adding the category'
+        });
+    });
+}
 
-        function clearErrorMessages() {
-            const errorElements = document.getElementsByClassName('error-message');
-            Array.from(errorElements).forEach((element) => {
-                element.innerHTML = '';
-                element.style.display = 'none';
-            });
-        }
+function showError(elementId, message) {
+    const errorElement = document.getElementById(elementId);
+    errorElement.innerHTML = message;
+    errorElement.style.display = 'block';
+    const inputElement = document.getElementById(elementId.replace('-error', ''));
+    inputElement.classList.add('error');
+}
+
+function clearErrorMessages() {
+    const errorElements = document.getElementsByClassName('error-message');
+    Array.from(errorElements).forEach((element) => {
+        element.innerHTML = '';
+        element.style.display = 'none';
+    });
+    const inputElements = document.getElementsByClassName('form-control');
+    Array.from(inputElements).forEach((element) => {
+        element.classList.remove('error');
+    });
+}
 
         async function addOffer(categoryId) {
             const { value: amount } = await Swal.fire({

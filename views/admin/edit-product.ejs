@@ -288,7 +288,7 @@
                             </div>
 
                             <div class="text-end">
-                                <button type="button" class="btn btn-danger me-2" id="deleteProductBtn">Delete Product</button>
+                                <!-- <button type="button" class="btn btn-danger me-2" id="deleteProductBtn">Delete Product</button> -->
                                 <button type="submit" class="btn btn-primary">Update Product</button>
                             </div>
                         </form>
@@ -334,7 +334,7 @@
             document.getElementById('addVariant').addEventListener('click', addSizeVariant);
             document.getElementById('cropButton').addEventListener('click', cropImage);
             document.getElementById('productForm').addEventListener('submit', handleFormSubmit);
-            document.getElementById('deleteProductBtn').addEventListener('click', confirmDeleteProduct);
+            // document.getElementById('deleteProductBtn').addEventListener('click', confirmDeleteProduct);
         }
 
         function setupLiveValidation() {
@@ -608,90 +608,76 @@
         }
 
         async function handleFormSubmit(e) {
-            e.preventDefault();
-            let isValid = true;
-            const inputs = ['product_name', 'descriptionid', 'category'];
+    e.preventDefault();
+    let isValid = true;
+    const inputs = ['product_name', 'descriptionid', 'category'];
 
-            inputs.forEach(id => {
-                const input = document.getElementById(id);
-                if (!input.value.trim()) {
-                    input.classList.add('is-invalid');
-                    document.getElementById(`${id}-error`).style.display = 'block';
-                    isValid = false;
-                }
-            });
+    // Validate form fields
+    inputs.forEach(id => {
+        const input = document.getElementById(id);
+        if (!input.value.trim()) {
+            input.classList.add('is-invalid');
+            document.getElementById(`${id}-error`).style.display = 'block';
+            isValid = false;
+        }
+    });
 
-            if (selectedProductImages.length < 1) {
-                document.getElementById('images-error').style.display = 'block';
-                isValid = false;
-            }
+    if (selectedProductImages.length < 1) {
+        document.getElementById('images-error').style.display = 'block';
+        isValid = false;
+    }
 
-            if (!validateVariants()) {
-                isValid = false;
-            }
+    if (!validateVariants()) {
+        isValid = false;
+    }
 
-            if (!isValid) {
-                return;
-            }
+    if (!isValid) {
+        return;
+    }
 
-            try {
-                // Step 1: Prepare the text data (excluding images)
-                const textData = {
-                    productName: document.getElementById('product_name').value,
-                    description: document.getElementById('descriptionid').value,
-                    category: document.getElementById('category').value,
-                    variants: JSON.parse(document.getElementById('variants-data').value),
-                    imageUrls: selectedProductImages.filter(image => typeof image === 'string'),
-                };
+    try {
+        // Step 1: Prepare the FormData object with all data
+        const formData = new FormData();
+        formData.append('productName', document.getElementById('product_name').value);
+        formData.append('description', document.getElementById('descriptionid').value);
+        formData.append('category', document.getElementById('category').value);
+        formData.append('variants', document.getElementById('variants-data').value);
 
-                console.log('Text Data (before sending):', textData);
-
-                // Step 2: Send the text data via a PUT request
-                const textResponse = await fetch(`/admin/editProductText/<%= product._id %>`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(textData),
-                });
-
-                if (!textResponse.ok) {
-                    const errorData = await textResponse.json();
-                    throw new Error(errorData.error || 'Failed to update text data');
-                }
-
-                // Step 3: If there are new images, send them in a separate POST request
-                const newImages = selectedProductImages.filter(image => typeof image !== 'string');
-                if (newImages.length > 0) {
-                    const imageFormData = new FormData();
-                    newImages.forEach(image => {
-                        imageFormData.append('productImages', image);
-                    });
-
-                    console.log('Image FormData (before sending):');
-                    for (let [key, value] of imageFormData.entries()) {
-                        console.log(`${key}:`, value);
-                    }
-
-                    const imageResponse = await fetch(`/admin/editProductImages/<%= product._id %>`, {
-                        method: 'POST',
-                        body: imageFormData,
-                    });
-
-                    if (!imageResponse.ok) {
-                        const errorData = await imageResponse.json();
-                        throw new Error(errorData.error || 'Failed to upload images');
-                    }
-                }
-
-                // Step 4: Redirect to the product page on success
-                window.location.href = '/admin/product';
-            } catch (error) {
-                console.error('Error submitting form:', error);
-                alert('An error occurred while submitting the form: ' + error.message);
-            }
+        // Add existing image URLs (if any)
+        const imageUrls = selectedProductImages.filter(image => typeof image === 'string');
+        if (imageUrls.length > 0) {
+            formData.append('imageUrls', imageUrls);
         }
 
+        // Add new images (if any)
+        const newImages = selectedProductImages.filter(image => typeof image !== 'string');
+        newImages.forEach(image => {
+            formData.append('productImages', image);
+        });
+
+        console.log('FormData (before sending):');
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}:`, value);
+        }
+
+        // Step 2: Send the FormData via a POST request to /admin/editProduct/:id
+        const response = await fetch(`/admin/editProduct/<%= product._id %>`, {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to update product');
+        }
+
+        // Step 3: Redirect to the product page on success
+        window.location.href = '/admin/product';
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        alert('An error occurred while submitting the form: ' + error.message);
+    }
+}
         function confirmDeleteProduct() {
             if (confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
                 deleteProduct();

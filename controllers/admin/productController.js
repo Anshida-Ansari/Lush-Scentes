@@ -426,196 +426,14 @@ const getEditProduct = async (req, res) => {
 //     return res.status(500).json({ success: false, error: 'Server error' });
 //   }
 // };
-// const editProduct = async (req, res) => {
-//   try {
-//     const id = req.params.id;
-//     const { productName, description, category, regularPrice, salesPrice, variants } = req.body;
-//     const imageUrls = req.body.imageUrls ? (Array.isArray(req.body.imageUrls) ? req.body.imageUrls : req.body.imageUrls.split(',')) : [];
-
-//     // Log the incoming request body for debugging
-//     console.log('Request Body:', req.body);
-//     console.log('Variants (raw):', variants);
-
-//     // Validate and parse variants
-//     let parsedVariants = [];
-//     if (variants) {
-//       try {
-//         // Trim the variants string to remove any leading/trailing whitespace
-//         const trimmedVariants = variants.trim();
-//         if (!trimmedVariants) {
-//           throw new Error('Variants data is empty');
-//         }
-//         console.log('Trimmed Variants:', trimmedVariants); // Debug log
-//         parsedVariants = JSON.parse(trimmedVariants);
-//         if (!Array.isArray(parsedVariants)) {
-//           throw new Error('Variants must be an array');
-//         }
-//         if (parsedVariants.length === 0) {
-//           throw new Error('At least one variant is required');
-//         }
-//         const sizes = new Set();
-//         for (let variant of parsedVariants) {
-//           if (!variant.size) {
-//             return res.status(400).json({ error: 'Each variant must have a size' });
-//           }
-//           if (sizes.has(variant.size)) {
-//             return res.status(400).json({ error: 'Each size variant must be unique' });
-//           }
-//           sizes.add(variant.size);
-//           if (!variant.quantity || variant.quantity < 0) {
-//             return res.status(400).json({ error: 'Invalid quantity in variants' });
-//           }
-//           variant.quantity = parseInt(variant.quantity);
-//           variant.regularPrice = parseFloat(variant.regularPrice) || 0;
-//           variant.salesPrice = parseFloat(variant.salesPrice) || 0;
-//         }
-//       } catch (e) {
-//         console.error('Error parsing variants:', e.message);
-//         console.error('Variants raw data:', variants);
-//         return res.status(400).json({ error: 'Invalid variants data format: ' + e.message });
-//       }
-//     } else {
-//       return res.status(400).json({ error: 'Variants are required' });
-//     }
-
-//     const existingProduct = await Product.findOne({
-//       productName,
-//       _id: { $ne: id },
-//     });
-
-//     if (existingProduct) {
-//       return res.status(400).json({
-//         error: 'Product with this name already exists. Please try with another name.',
-//       });
-//     }
-
-//     const currentProduct = await Product.findById(id).populate('category');
-//     if (!currentProduct) {
-//       return res.status(404).json({ error: 'Product not found' });
-//     }
-
-//     let updatedImages = [...imageUrls]; // Start with existing images from imageUrls
-//     if (req.files && req.files.productImages && req.files.productImages.length > 0) {
-//       const newImages = [];
-//       for (let file of req.files.productImages) {
-//         try {
-//           const uploadResult = await handleUpload(file.path); // Upload to Cloudinary
-//           newImages.push(uploadResult.secure_url);
-//         } catch (uploadError) {
-//           console.error('Error uploading image to Cloudinary:', uploadError);
-//           return res.status(500).json({ error: 'Failed to upload image to Cloudinary: ' + uploadError.message });
-//         }
-//       }
-//       updatedImages = [...updatedImages, ...newImages];
-//     }
-
-//     if (updatedImages.length === 0) {
-//       return res.status(400).json({
-//         error: 'Product must have at least one image',
-//       });
-//     }
-
-//     const updateFields = {
-//       productName: productName || currentProduct.productName,
-//       description: description || currentProduct.description,
-//       category: category || currentProduct.category._id,
-//       regularPrice: parseFloat(regularPrice) || currentProduct.regularPrice,
-//       salesPrice: parseFloat(salesPrice) || currentProduct.salesPrice || 0,
-//       productImage: updatedImages,
-//       variants: parsedVariants.map(variant => ({
-//         size: variant.size,
-//         quantity: variant.quantity,
-//         regularPrice: variant.regularPrice,
-//         salesPrice: variant.salesPrice,
-//       })),
-//       totalStock: parsedVariants.reduce((total, variant) => total + variant.quantity, 0),
-//     };
-
-//     const updatedProduct = await Product.findByIdAndUpdate(id, updateFields, {
-//       new: true,
-//       runValidators: true,
-//     });
-
-//     res.redirect('/admin/product');
-//   } catch (error) {
-//     console.error('Error in editProduct:', error.message);
-//     console.error('Stack trace:', error.stack);
-//     res.status(500).json({ error: 'An error occurred while updating the product: ' + error.message });
-//   }
-// };
-
-// const deleteSingleImage = async (req, res) => {
-//   try {
-//     const { imageNameToServer, productIdToServer } = req.body;
-
-//     const product = await Product.findByIdAndUpdate(
-//       productIdToServer,
-//       { $pull: { productImage: imageNameToServer } },
-//       { new: true }
-//     );
-
-//     if (!product) {
-//       return res.status(404).json({
-//         success: false,
-//         message: 'Product not found',
-//       });
-//     }
-
-//     const publicId = imageNameToServer.split('/').pop().split('.')[0];
-
-//     try {
-//       await cloudinary.uploader.destroy(`perfume_images/${publicId}`);
-//       console.log(`Image ${publicId} deleted from Cloudinary successfully`);
-//     } catch (cloudinaryError) {
-//       console.error("Error deleting from Cloudinary:", cloudinaryError);
-//       return res.status(500).json({
-//         success: false,
-//         message: 'Error deleting image from Cloudinary',
-//       });
-//     }
-
-//     res.send({
-//       status: true,
-//       message: "Image deleted successfully",
-//     });
-//   } catch (error) {
-//     console.error("Error in deleteSingleImage:", error);
-//     return res.status(500).json({
-//       success: false,
-//       message: 'Server error',
-//     });
-//   }
-// };
-
-// const softDeleteProduct = async (req, res) => {
-//   try {
-//     const { productId } = req.params;
-//     const product = await Product.findById(productId);
-//     if (!product) {
-//       return res.status(404).json({ success: false, error: 'Product not found' });
-//     }
-//     product.isDeleted = true;
-//     await product.save();
-//     return res.status(200).json({ success: true, message: 'Product soft deleted' });
-//   } catch (error) {
-//     console.error('Error soft deleting product:', error);
-//     return res.status(500).json({ success: false, error: 'Server error' });
-//   }
-// };
-
 const editProduct = async (req, res) => {
   try {
     const id = req.params.id;
     const { productName, description, category, regularPrice, salesPrice, variants } = req.body;
-    const imageUrls = req.body.imageUrls
-      ? Array.isArray(req.body.imageUrls)
-        ? req.body.imageUrls
-        : req.body.imageUrls.split(',')
-      : [];
+    const imageUrls = req.body.imageUrls ? (Array.isArray(req.body.imageUrls) ? req.body.imageUrls : req.body.imageUrls.split(',')) : [];
 
-    // Log the incoming request body and files for debugging
+    // Log the incoming request body for debugging
     console.log('Request Body:', req.body);
-    console.log('Request Files:', req.files);
     console.log('Variants (raw):', variants);
 
     // Validate and parse variants
@@ -677,9 +495,9 @@ const editProduct = async (req, res) => {
     }
 
     let updatedImages = [...imageUrls]; // Start with existing images from imageUrls
-    if (req.files && req.files.length > 0) {
+    if (req.files && req.files.productImages && req.files.productImages.length > 0) {
       const newImages = [];
-      for (let file of req.files) {
+      for (let file of req.files.productImages) {
         try {
           const uploadResult = await handleUpload(file.path); // Upload to Cloudinary
           newImages.push(uploadResult.secure_url);
@@ -784,6 +602,188 @@ const softDeleteProduct = async (req, res) => {
     return res.status(500).json({ success: false, error: 'Server error' });
   }
 };
+
+// const editProduct = async (req, res) => {
+//   try {
+//     const id = req.params.id;
+//     const { productName, description, category, regularPrice, salesPrice, variants } = req.body;
+//     const imageUrls = req.body.imageUrls
+//       ? Array.isArray(req.body.imageUrls)
+//         ? req.body.imageUrls
+//         : req.body.imageUrls.split(',')
+//       : [];
+
+//     // Log the incoming request body and files for debugging
+//     console.log('Request Body:', req.body);
+//     console.log('Request Files:', req.files);
+//     console.log('Variants (raw):', variants);
+
+//     // Validate and parse variants
+//     let parsedVariants = [];
+//     if (variants) {
+//       try {
+//         // Trim the variants string to remove any leading/trailing whitespace
+//         const trimmedVariants = variants.trim();
+//         if (!trimmedVariants) {
+//           throw new Error('Variants data is empty');
+//         }
+//         console.log('Trimmed Variants:', trimmedVariants); // Debug log
+//         parsedVariants = JSON.parse(trimmedVariants);
+//         if (!Array.isArray(parsedVariants)) {
+//           throw new Error('Variants must be an array');
+//         }
+//         if (parsedVariants.length === 0) {
+//           throw new Error('At least one variant is required');
+//         }
+//         const sizes = new Set();
+//         for (let variant of parsedVariants) {
+//           if (!variant.size) {
+//             return res.status(400).json({ error: 'Each variant must have a size' });
+//           }
+//           if (sizes.has(variant.size)) {
+//             return res.status(400).json({ error: 'Each size variant must be unique' });
+//           }
+//           sizes.add(variant.size);
+//           if (!variant.quantity || variant.quantity < 0) {
+//             return res.status(400).json({ error: 'Invalid quantity in variants' });
+//           }
+//           variant.quantity = parseInt(variant.quantity);
+//           variant.regularPrice = parseFloat(variant.regularPrice) || 0;
+//           variant.salesPrice = parseFloat(variant.salesPrice) || 0;
+//         }
+//       } catch (e) {
+//         console.error('Error parsing variants:', e.message);
+//         console.error('Variants raw data:', variants);
+//         return res.status(400).json({ error: 'Invalid variants data format: ' + e.message });
+//       }
+//     } else {
+//       return res.status(400).json({ error: 'Variants are required' });
+//     }
+
+//     const existingProduct = await Product.findOne({
+//       productName,
+//       _id: { $ne: id },
+//     });
+
+//     if (existingProduct) {
+//       return res.status(400).json({
+//         error: 'Product with this name already exists. Please try with another name.',
+//       });
+//     }
+
+//     const currentProduct = await Product.findById(id).populate('category');
+//     if (!currentProduct) {
+//       return res.status(404).json({ error: 'Product not found' });
+//     }
+
+//     let updatedImages = [...imageUrls]; // Start with existing images from imageUrls
+//     if (req.files && req.files.length > 0) {
+//       const newImages = [];
+//       for (let file of req.files) {
+//         try {
+//           const uploadResult = await handleUpload(file.path); // Upload to Cloudinary
+//           newImages.push(uploadResult.secure_url);
+//         } catch (uploadError) {
+//           console.error('Error uploading image to Cloudinary:', uploadError);
+//           return res.status(500).json({ error: 'Failed to upload image to Cloudinary: ' + uploadError.message });
+//         }
+//       }
+//       updatedImages = [...updatedImages, ...newImages];
+//     }
+
+//     if (updatedImages.length === 0) {
+//       return res.status(400).json({
+//         error: 'Product must have at least one image',
+//       });
+//     }
+
+//     const updateFields = {
+//       productName: productName || currentProduct.productName,
+//       description: description || currentProduct.description,
+//       category: category || currentProduct.category._id,
+//       regularPrice: parseFloat(regularPrice) || currentProduct.regularPrice,
+//       salesPrice: parseFloat(salesPrice) || currentProduct.salesPrice || 0,
+//       productImage: updatedImages,
+//       variants: parsedVariants.map(variant => ({
+//         size: variant.size,
+//         quantity: variant.quantity,
+//         regularPrice: variant.regularPrice,
+//         salesPrice: variant.salesPrice,
+//       })),
+//       totalStock: parsedVariants.reduce((total, variant) => total + variant.quantity, 0),
+//     };
+
+//     const updatedProduct = await Product.findByIdAndUpdate(id, updateFields, {
+//       new: true,
+//       runValidators: true,
+//     });
+
+//     res.redirect('/admin/product');
+//   } catch (error) {
+//     console.error('Error in editProduct:', error.message);
+//     console.error('Stack trace:', error.stack);
+//     res.status(500).json({ error: 'An error occurred while updating the product: ' + error.message });
+//   }
+// };
+
+// const deleteSingleImage = async (req, res) => {
+//   try {
+//     const { imageNameToServer, productIdToServer } = req.body;
+
+//     const product = await Product.findByIdAndUpdate(
+//       productIdToServer,
+//       { $pull: { productImage: imageNameToServer } },
+//       { new: true }
+//     );
+
+//     if (!product) {
+//       return res.status(404).json({
+//         success: false,
+//         message: 'Product not found',
+//       });
+//     }
+
+//     const publicId = imageNameToServer.split('/').pop().split('.')[0];
+
+//     try {
+//       await cloudinary.uploader.destroy(`perfume_images/${publicId}`);
+//       console.log(`Image ${publicId} deleted from Cloudinary successfully`);
+//     } catch (cloudinaryError) {
+//       console.error("Error deleting from Cloudinary:", cloudinaryError);
+//       return res.status(500).json({
+//         success: false,
+//         message: 'Error deleting image from Cloudinary',
+//       });
+//     }
+
+//     res.send({
+//       status: true,
+//       message: "Image deleted successfully",
+//     });
+//   } catch (error) {
+//     console.error("Error in deleteSingleImage:", error);
+//     return res.status(500).json({
+//       success: false,
+//       message: 'Server error',
+//     });
+//   }
+// };
+
+// const softDeleteProduct = async (req, res) => {
+//   try {
+//     const { productId } = req.params;
+//     const product = await Product.findById(productId);
+//     if (!product) {
+//       return res.status(404).json({ success: false, error: 'Product not found' });
+//     }
+//     product.isDeleted = true;
+//     await product.save();
+//     return res.status(200).json({ success: true, message: 'Product soft deleted' });
+//   } catch (error) {
+//     console.error('Error soft deleting product:', error);
+//     return res.status(500).json({ success: false, error: 'Server error' });
+//   }
+// };
 // const editProduct = async (req, res) => {
 //   try {
 //     const id = req.params.id;
