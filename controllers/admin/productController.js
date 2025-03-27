@@ -7,6 +7,8 @@ const sharp = require('sharp')
 const product = require('../../models/productSchema')
 const cloudinary = require('cloudinary').v2;
 const { handleUpload } = require('../../config/cloudinary');
+
+
 const getProductAddPage = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -160,59 +162,55 @@ const addProducts = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   try {
-      const search = req.query.search || "";
-      const page = parseInt(req.query.page) || 1;
-      const limit = 6;
+    const search = req.query.search || "";
+    const page = parseInt(req.query.page) || 1;
+    const limit = 6;
 
-      console.log('Fetching products - Search:', search, 'Page:', page, 'Limit:', limit);
 
-      const productData = await Product.find({
-          $or: [
-              {
-                  productName: {
-                      $regex: new RegExp('.*' + search + '.*', 'i'),
-                  },
-              },
-          ],
-      })
-          .populate('category')
-          .sort({ createdAt: -1 })
-          .limit(limit)
-          .skip((page - 1) * limit);
+    const productData = await Product.find({
+      $or: [
+        {
+          productName: {
+            $regex: new RegExp('.*' + search + '.*', 'i'),
+          },
+        },
+      ],
+    })
+      .populate('category')
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip((page - 1) * limit);
 
-      console.log('Product data fetched:', productData.length, 'products');
 
-      const totalProducts = await Product.countDocuments({
-          $or: [
-              {
-                  productName: {
-                      $regex: new RegExp('.*' + search + '.*', 'i'),
-                  },
-              },
-          ],
-      });
+    const totalProducts = await Product.countDocuments({
+      $or: [
+        {
+          productName: {
+            $regex: new RegExp('.*' + search + '.*', 'i'),
+          },
+        },
+      ],
+    });
 
-      console.log('Total products count:', totalProducts);
 
-      const totalPages = Math.ceil(totalProducts / limit);
-      const category = await Category.find({ isListed: true });
+    const totalPages = Math.ceil(totalProducts / limit);
+    const category = await Category.find({ isListed: true });
 
-      console.log('Categories fetched:', category.length);
 
-      res.render('products', {
-          data: productData,
-          currentPage: page,
-          totalPages: totalPages,
-          cat: category,
-      });
+    res.render('products', {
+      data: productData,
+      currentPage: page,
+      totalPages: totalPages,
+      cat: category,
+    });
   } catch (error) {
-      console.error('Error in getAllProducts:', {
-          message: error.message,
-          stack: error.stack,
-          search: req.query.search,
-          page: req.query.page,
-      });
-      return res.redirect('/admin/pageerror');
+    console.error('Error in getAllProducts:', {
+      message: error.message,
+      stack: error.stack,
+      search: req.query.search,
+      page: req.query.page,
+    });
+    return res.redirect('/admin/pageerror');
   }
 };
 const blockProduct = async (req, res) => {
@@ -244,6 +242,7 @@ const unblockProduct = async (req, res) => {
 
 const getEditProduct = async (req, res) => {
   try {
+    console.log('i am reached here ')
     const id = req.query.id;
     const product = await Product.findOne({ _id: id });
     const category = await Category.find({});
@@ -259,135 +258,94 @@ const getEditProduct = async (req, res) => {
 };
 
 
+
+
 const editProduct = async (req, res) => {
+  console.log('editProduct: Request received');
   try {
-    const id = req.params.id;
-    const { productName, description, category, regularPrice, salesPrice, variants } = req.body;
+   
+    const productId = req.params.id;
+    const { productName, description, category } = req.body;
 
-    let imageUrls = [];
-    if (req.body.imageUrls) {
-      if (Array.isArray(req.body.imageUrls)) {
-        imageUrls = req.body.imageUrls;
-      } else if (typeof req.body.imageUrls === 'string') {
-        imageUrls = req.body.imageUrls.includes(',') ? req.body.imageUrls.split(',') : [req.body.imageUrls];
+    let variants;
+    if (!req.body.variants || typeof req.body.variants !== 'string') {
+      throw new Error('Variants field is missing or invalid');
+    }
+
+    const sanitizedVariants = req.body.variants.trim().replace(/[\n\r\t]/g, '');
+
+    try {
+      variants = JSON.parse(sanitizedVariants);
+      console.log("Parsed variants:", variants);
+    } catch (parseError) {
+      console.error("Variants parsing error:", parseError);
+      throw new Error('Invalid variants data: ' + parseError.message);
+    }
+
+    if (!Array.isArray(variants) || variants.length === 0) {
+      throw new Error('Variants must be a non-empty array');
+    }
+
+    const validSizes = ['15ml', '50ml', '100ml'];
+    for (const variant of variants) {
+      if (!validSizes.includes(variant.size)) throw new Error(`Invalid size: ${variant.size}`);
+      if (typeof variant.quantity !== 'number' || variant.quantity < 0) throw new Error('Quantity must be a non-negative number');
+      if (typeof variant.regularPrice !== 'number' || variant.regularPrice <= 0) throw new Error('Regular price must be a positive number');
+      if (variant.salesPrice && (typeof variant.salesPrice !== 'number' || variant.salesPrice < 0 || variant.salesPrice >= variant.regularPrice)) {
+        throw new Error('Sales price must be a positive number less than regular price');
       }
     }
 
-    console.log('Request Body:', req.body);
-    console.log('Files:', req.files);
-    console.log('Variants (raw):', variants);
-
-    let parsedVariants = [];
-    if (variants) {
-      try {
-        const trimmedVariants = variants.trim();
-        if (!trimmedVariants) {
-          throw new Error('Variants data is empty');
-        }
-        console.log('Trimmed Variants:', trimmedVariants);
-        parsedVariants = JSON.parse(trimmedVariants);
-        if (!Array.isArray(parsedVariants)) {
-          throw new Error('Variants must be an array');
-        }
-        if (parsedVariants.length === 0) {
-          throw new Error('At least one variant is required');
-        }
-        const sizes = new Set();
-        for (let variant of parsedVariants) {
-          if (!variant.size) {
-            return res.status(400).json({ error: 'Each variant must have a size' });
-          }
-          if (sizes.has(variant.size)) {
-            return res.status(400).json({ error: 'Each size variant must be unique' });
-          }
-          sizes.add(variant.size);
-          if (!variant.quantity || variant.quantity < 0) {
-            return res.status(400).json({ error: 'Invalid quantity in variants' });
-          }
-          variant.quantity = parseInt(variant.quantity);
-          variant.regularPrice = parseFloat(variant.regularPrice) || 0;
-          variant.salesPrice = parseFloat(variant.salesPrice) || 0;
-        }
-      } catch (e) {
-        console.error('Error parsing variants:', e.message);
-        console.error('Variants raw data:', variants);
-        return res.status(400).json({ error: 'Invalid variants data format: ' + e.message });
-      }
-    } else {
-      return res.status(400).json({ error: 'Variants are required' });
-    }
-
-    const existingProduct = await Product.findOne({
-      productName,
-      _id: { $ne: id },
-    });
-
-    if (existingProduct) {
-      return res.status(400).json({
-        error: 'Product with this name already exists. Please try with another name.',
-      });
-    }
-
-    const currentProduct = await Product.findById(id).populate('category');
-    if (!currentProduct) {
-      return res.status(404).json({ error: 'Product not found' });
-    }
-
-    let updatedImages = [...imageUrls];
+    const newImageUrls = [];
     if (req.files && req.files.length > 0) {
-      const newImages = [];
-      for (let file of req.files) {
-        try {
-          const uploadResult = await handleUpload(file.path);
-          newImages.push(uploadResult.secure_url);
-          console.log(`Uploaded image to Cloudinary: ${uploadResult.secure_url}`);
-        } catch (uploadError) {
-          console.error('Error uploading image to Cloudinary:', uploadError);
-          return res.status(500).json({ error: 'Failed to upload image to Cloudinary: ' + uploadError.message });
-        }
+      for (const file of req.files) {
+        const b64 = Buffer.from(file.buffer).toString("base64");
+        const dataURI = "data:" + file.mimetype + ";base64," + b64;
+        console.log("Uploading to Cloudinary:", dataURI.substring(0, 50));
+        const uploadResponse = await handleUpload(dataURI);
+        console.log("Cloudinary upload response:", uploadResponse);
+        newImageUrls.push(uploadResponse.secure_url);
       }
-      updatedImages = [...updatedImages, ...newImages];
     }
 
-    if (updatedImages.length === 0) {
-      return res.status(400).json({
-        error: 'Product must have at least one image',
-      });
+    const existingImageUrls = req.body.imageUrls ? [].concat(req.body.imageUrls) : [];
+    const finalImageUrls = [...existingImageUrls, ...newImageUrls];
+    console.log("Final image URLs to save:", finalImageUrls);
+
+    if (finalImageUrls.length === 0) {
+      throw new Error('At least one product image is required');
     }
 
-    const updateFields = {
-      productName: productName || currentProduct.productName,
-      description: description || currentProduct.description,
-      category: category || currentProduct.category._id,
-      regularPrice: parseFloat(regularPrice) || currentProduct.regularPrice,
-      salesPrice: parseFloat(salesPrice) || currentProduct.salesPrice || 0,
-      productImage: updatedImages,
-      variants: parsedVariants.map(variant => ({
-        size: variant.size,
-        quantity: variant.quantity,
-        regularPrice: variant.regularPrice,
-        salesPrice: variant.salesPrice,
-      })),
-      totalStock: parsedVariants.reduce((total, variant) => total + variant.quantity, 0),
-      status: parsedVariants.reduce((total, variant) => total + variant.quantity, 0) > 0 ? 'Available' : 'Out of stock',
-    };
+    const totalStock = variants.reduce((sum, variant) => sum + variant.quantity, 0);
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      {
+        productName,
+        description,
+        category,
+        productImage: finalImageUrls,
+        variants,
+        totalStock,
+        status: totalStock > 0 ? 'Available' : 'Out of stock',
+      },
+      { new: true, runValidators: true }
+    );
 
-    console.log('Update Fields:', updateFields);
+    if (!updatedProduct) {
+      console.error("Database update failed: Product not found for ID:", productId);
+      throw new Error('Product not found or update failed');
+    }
 
-    const updatedProduct = await Product.findByIdAndUpdate(id, updateFields, {
-      new: true,
-      runValidators: true,
-    });
-
-    console.log('Updated Product:', updatedProduct);
-
-    res.redirect('/admin/product');
+    console.log("Updated product:", updatedProduct);
+    return res.status(200).json({ message: "Product Updated Successfully", updatedProduct });
   } catch (error) {
-    console.error('Error in editProduct:', error.message);
-    console.error('Stack trace:', error.stack);
-    res.status(500).json({ error: 'An error occurred while updating the product: ' + error.message });
+    console.error("Error in editProduct:", error.message, error.stack);
+    return res.status(500).json({ error: error.message || "Internal Server Error" });
   }
 };
+
+
+
 const deleteSingleImage = async (req, res) => {
   try {
     const { imageNameToServer, productIdToServer } = req.body;
@@ -430,22 +388,7 @@ const deleteSingleImage = async (req, res) => {
     });
   }
 };
-
-const softDeleteProduct = async (req, res) => {
-  try {
-    const { productId } = req.params;
-    const product = await Product.findById(productId);
-    if (!product) {
-      return res.status(404).json({ success: false, error: 'Product not found' });
-    }
-    product.isDeleted = true;
-    await product.save();
-    return res.status(200).json({ success: true, message: 'Product soft deleted' });
-  } catch (error) {
-    console.error('Error soft deleting product:', error);
-    return res.status(500).json({ success: false, error: 'Server error' });
-  }
-};
+;
 
 
 
@@ -458,6 +401,6 @@ module.exports = {
   getEditProduct,
   editProduct,
   deleteSingleImage,
-  softDeleteProduct
+
 
 } 

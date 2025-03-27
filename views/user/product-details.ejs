@@ -390,40 +390,7 @@
 
     <!-- Write a Review Section -->
     <div class="container">
-      <div class="row mt-5">
-        <div class="col-md-12">
-          <div class="review-form-container p-4 rounded shadow-sm bg-light">
-            <h4 class="mb-4 border-bottom pb-2">Write a Review</h4>
-            <% if (user) { %>
-              <form id="reviewForm" class="mb-0">
-                <input type="hidden" name="productId" value="<%= product._id %>">
-                <div class="form-group mb-3">
-                  <label for="rating" class="fw-bold mb-2">Rating</label>
-                  <div class="star-rating">
-                    <select id="rating" name="rating" class="form-select" required>
-                      <option value="">Select Rating</option>
-                      <option value="1">1 Star</option>
-                      <option value="2">2 Stars</option>
-                      <option value="3">3 Stars</option>
-                      <option value="4">4 Stars</option>
-                      <option value="5">5 Stars</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="form-group mb-3">
-                  <label for="review" class="fw-bold mb-2">Your Review</label>
-                  <textarea id="review" name="review" class="form-control" rows="4" required placeholder="Share your experience with this product..."></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary px-4">Submit Review</button>
-              </form>
-            <% } else { %>
-              <div class="alert alert-info">
-                Please <a href="/login" class="fw-bold text-decoration-none">log in</a> to submit a review.
-              </div>
-            <% } %>
-          </div>
-        </div>
-      </div>
+      
 
       <!-- Customer Reviews Section -->
       <div class="row mt-5">

@@ -17,8 +17,8 @@ async function handleUpload(file) {
     });
     return res;
   } catch (error) {
-    console.error('Error in cloudinary upload:', error);
-    throw error;
+    console.error('Error in Cloudinary upload:', error.message, error.stack);
+    throw new Error('Failed to upload image to Cloudinary: ' + error.message);
   }
 }
 module.exports = {handleUpload};
