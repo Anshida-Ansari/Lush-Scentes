@@ -254,7 +254,18 @@ const userProfile = async (req, res) => {
             } else {
                 order.addressDetails = null;
             }
+            for (let item of order.orderedItems) {
+                const product = item.product;
+                if (product && product.reviews) {
+                    const hasReviewed = product.reviews.some(review => review.user.toString() === userId.toString());
+                    item.hasReviewed = hasReviewed; 
+                } else {
+                    item.hasReviewed = false;
+                }
+            }
+
         }
+        
 
         const sortedWalletHistory = userData.walletHistory
             ? [...userData.walletHistory].sort((a, b) => new Date(b.date) - new Date(a.date))

@@ -8,6 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
@@ -552,11 +553,16 @@
                 <div class="side-nav p-3">
                     <h5 class="mb-3">Account Settings</h5>
                     <div class="nav flex-column">
-                        <a class="nav-link <%= activeTab === 'profile' ? 'active' : '' %>" href="?tab=profile"><i class="fas fa-user me-2"></i> Profile</a>
-                        <a class="nav-link <%= activeTab === 'address' ? 'active' : '' %>" href="?tab=address"><i class="fas fa-map-marker-alt me-2"></i> Address</a>
-                        <a class="nav-link <%= activeTab === 'orders' ? 'active' : '' %>" href="?tab=orders"><i class="fas fa-shopping-bag me-2"></i> Orders</a>
-                        <a class="nav-link <%= activeTab === 'wallet' ? 'active' : '' %>" href="?tab=wallet"><i class="fas fa-wallet me-2"></i> Wallet Status</a>
-                        <a class="nav-link <%= activeTab === 'wallet-history' ? 'active' : '' %>" href="?tab=wallet-history"><i class="fas fa-clock me-2"></i> Wallet History</a>
+                        <a class="nav-link <%= activeTab === 'profile' ? 'active' : '' %>" href="?tab=profile"><i
+                                class="fas fa-user me-2"></i> Profile</a>
+                        <a class="nav-link <%= activeTab === 'address' ? 'active' : '' %>" href="?tab=address"><i
+                                class="fas fa-map-marker-alt me-2"></i> Address</a>
+                        <a class="nav-link <%= activeTab === 'orders' ? 'active' : '' %>" href="?tab=orders"><i
+                                class="fas fa-shopping-bag me-2"></i> Orders</a>
+                        <a class="nav-link <%= activeTab === 'wallet' ? 'active' : '' %>" href="?tab=wallet"><i
+                                class="fas fa-wallet me-2"></i> Wallet Status</a>
+                        <a class="nav-link <%= activeTab === 'wallet-history' ? 'active' : '' %>"
+                            href="?tab=wallet-history"><i class="fas fa-clock me-2"></i> Wallet History</a>
                         <a class="nav-link" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
                     </div>
                 </div>
@@ -570,19 +576,25 @@
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Name</label>
-                                    <h6><%= user.name %></h6>
+                                    <h6>
+                                        <%= user.name %>
+                                    </h6>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Email Address</label>
                                 <div class="input-group">
-                                    <h6><%= user.email %></h6>
+                                    <h6>
+                                        <%= user.email %>
+                                    </h6>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Phone Number</label>
                                 <div class="input-group">
-                                    <h6><%= user.phone %></h6>
+                                    <h6>
+                                        <%= user.phone %>
+                                    </h6>
                                 </div>
                             </div>
                             <div class="mb-4">
@@ -601,21 +613,23 @@
                                 <i class="fas fa-plus me-2"></i>Add New Address
                             </a>
                         </div>
-                
+
                         <div class="row">
-                            <% if (userAddress && userAddress.address && userAddress.address.length > 0) { %>
-                                <% userAddress.address.forEach(address => { %>
+                            <% if (userAddress && userAddress.address && userAddress.address.length> 0) { %>
+                                <% userAddress.address.forEach(address=> { %>
                                     <div class="col-md-6 mb-3">
                                         <div class="card">
                                             <div class="card-body">
-                                                <h6 class="card-title"><%= address.addressType %></h6>
+                                                <h6 class="card-title">
+                                                    <%= address.addressType %>
+                                                </h6>
                                                 <p class="card-text">
                                                     <%= address.name %><br>
-                                                    <%= address.landMark %><br>
-                                                    <%= address.city %>, <%= address.state %><br>
-                                                    PIN: <%= address.pincode %><br>
-                                                    Phone: <%= address.phoneNumber %><br>
-                                                    Alt Phone: <%= address.altPhone %>
+                                                        <%= address.landMark %><br>
+                                                            <%= address.city %>, <%= address.state %><br>
+                                                                    PIN: <%= address.pincode %><br>
+                                                                        Phone: <%= address.phoneNumber %><br>
+                                                                            Alt Phone: <%= address.altPhone %>
                                                 </p>
                                                 <div class="d-flex gap-2">
                                                     <a href="/editAddress?id=<%= address._id %>"
@@ -631,36 +645,41 @@
                                             </div>
                                         </div>
                                     </div>
-                                <% }) %>
-                            <% } else { %>
-                                <div class="col-12">
-                                    <p class="text-muted">No addresses found. Add a new address to get started.</p>
-                                </div>
-                            <% } %>
+                                    <% }) %>
+                                        <% } else { %>
+                                            <div class="col-12">
+                                                <p class="text-muted">No addresses found. Add a new address to get
+                                                    started.</p>
+                                            </div>
+                                            <% } %>
                         </div>
-                
+
                         <!-- Address Pagination Controls -->
-                        <% if (userAddress && userAddress.address && userAddress.address.length > 0) { %>
+                        <% if (userAddress && userAddress.address && userAddress.address.length> 0) { %>
                             <nav aria-label="Address pagination" class="mt-4">
                                 <ul class="pagination justify-content-center">
                                     <li class="page-item <%= addressPagination.addressPage === 1 ? 'disabled' : '' %>">
-                                        <a class="page-link" href="/userprofile?tab=address&addressPage=<%= addressPagination.addressPage - 1 %>&page=<%= pagination.orderPage %>&walletPage=<%= walletPagination.walletPage %>">
+                                        <a class="page-link"
+                                            href="/userprofile?tab=address&addressPage=<%= addressPagination.addressPage - 1 %>&page=<%= pagination.orderPage %>&walletPage=<%= walletPagination.walletPage %>">
                                             Previous
                                         </a>
                                     </li>
                                     <li class="page-item disabled">
                                         <span class="page-link">
-                                            Page <%= addressPagination.addressPage %> of <%= addressPagination.totalAddressPages %>
+                                            Page <%= addressPagination.addressPage %> of <%=
+                                                    addressPagination.totalAddressPages %>
                                         </span>
                                     </li>
-                                    <li class="page-item <%= addressPagination.addressPage === addressPagination.totalAddressPages ? 'disabled' : '' %>">
-                                        <a class="page-link" href="/userprofile?tab=address&addressPage=<%= addressPagination.addressPage + 1 %>&page=<%= pagination.orderPage %>&walletPage=<%= walletPagination.walletPage %>">
+                                    <li
+                                        class="page-item <%= addressPagination.addressPage === addressPagination.totalAddressPages ? 'disabled' : '' %>">
+                                        <a class="page-link"
+                                            href="/userprofile?tab=address&addressPage=<%= addressPagination.addressPage + 1 %>&page=<%= pagination.orderPage %>&walletPage=<%= walletPagination.walletPage %>">
                                             Next
                                         </a>
                                     </li>
                                 </ul>
                             </nav>
-                        <% } %>
+                            <% } %>
                     </div>
                 </div>
 
@@ -668,13 +687,14 @@
                     <div class="profile-card bg-white p-4 rounded">
                         <h4 class="mb-4">My Orders</h4>
                         <div class="order-list">
-                            <% if (orders && orders.length > 0) { %>
-                                <% orders.forEach(order => { %>
+                            <% if (orders && orders.length> 0) { %>
+                                <% orders.forEach(order=> { %>
                                     <div class="order-item card mb-3">
                                         <div class="card-body">
                                             <div class="row align-items-center">
                                                 <div class="col-md-3">
-                                                    <p class="mb-0 text-muted">Order #<%= order.orderId %></p>
+                                                    <p class="mb-0 text-muted">Order #<%= order.orderId %>
+                                                    </p>
                                                     <small class="text-muted">
                                                         <%= new Date(order.createdOn).toLocaleDateString() %>
                                                     </small>
@@ -683,10 +703,13 @@
                                                     <p class="mb-0">
                                                         <%= order.orderedItems ? order.orderedItems.length : 0 %> items
                                                     </p>
-                                                    <p class="mb-0">₹<%= order.finalAmount ? order.finalAmount.toFixed(2) : '0.00' %></p>
+                                                    <p class="mb-0">₹<%= order.finalAmount ?
+                                                            order.finalAmount.toFixed(2) : '0.00' %>
+                                                    </p>
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <span class="badge 
+                                                    <span
+                                                        class="badge 
                                                         <%= order.status === 'Delivered' ? 'bg-success' : 
                                                             order.status === 'Processing' ? 'bg-warning' : 
                                                             order.status === 'Cancelled' ? 'bg-danger' : 
@@ -700,12 +723,13 @@
                                                         data-bs-target="#orderDetails<%= order._id %>">
                                                         View Details
                                                     </button>
-                                                    <a href="/download-invoice/<%= order.orderId %>" class="btn btn-sm btn-outline-secondary" target="_blank">
+                                                    <a href="/download-invoice/<%= order.orderId %>"
+                                                        class="btn btn-sm btn-outline-secondary" target="_blank">
                                                         Download Invoice
                                                     </a>
                                                 </div>
                                             </div>
-                
+
                                             <div class="collapse mt-3" id="orderDetails<%= order._id %>">
                                                 <div class="card card-body">
                                                     <h6 class="mb-3">Shipping Address:</h6>
@@ -713,163 +737,321 @@
                                                         <div class="address-card p-3 mb-3 bg-light rounded">
                                                             <div class="row">
                                                                 <div class="col-md-6">
-                                                                    <p class="mb-1"><strong>Name:</strong> <%= order.addressDetails.name %></p>
-                                                                    <p class="mb-1"><strong>Landmark:</strong> <%= order.addressDetails.landMark %></p>
-                                                                    <p class="mb-1"><strong>City, State - Pincode:</strong> <%= order.addressDetails.city %>, <%= order.addressDetails.state %> - <%= order.addressDetails.pincode %></p>
+                                                                    <p class="mb-1"><strong>Name:</strong>
+                                                                        <%= order.addressDetails.name %>
+                                                                    </p>
+                                                                    <p class="mb-1"><strong>Landmark:</strong>
+                                                                        <%= order.addressDetails.landMark %>
+                                                                    </p>
+                                                                    <p class="mb-1"><strong>City, State -
+                                                                            Pincode:</strong>
+                                                                        <%= order.addressDetails.city %>, <%=
+                                                                                order.addressDetails.state %> - <%=
+                                                                                    order.addressDetails.pincode %>
+                                                                    </p>
                                                                 </div>
                                                                 <div class="col-md-6">
-                                                                    <p class="mb-1"><strong>Phone:</strong> <%= order.addressDetails.phoneNumber %></p>
+                                                                    <p class="mb-1"><strong>Phone:</strong>
+                                                                        <%= order.addressDetails.phoneNumber %>
+                                                                    </p>
                                                                     <% if (order.addressDetails.altPhone) { %>
-                                                                        <p class="mb-1"><strong>Alt Phone:</strong> <%= order.addressDetails.altPhone %></p>
-                                                                    <% } %>
+                                                                        <p class="mb-1"><strong>Alt Phone:</strong>
+                                                                            <%= order.addressDetails.altPhone %>
+                                                                        </p>
+                                                                        <% } %>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    <% } else { %>
-                                                        <p class="text-muted">Address not available</p>
-                                                    <% } %>
-                                                    <hr>
-                                            
-                                                    <h6>Order Items:</h6>
-                                                    <% if (order.orderedItems && order.orderedItems.length > 0) { %>
-                                                        <% order.orderedItems.forEach(product => { %>
-                                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                                <div class="d-flex align-items-center">
-                                                                    <% if (product.productImage && product.productImage.length > 0) { %>
-                                                                        <img src="<%= product.productImage[0] %>"
-                                                                            alt="<%= product.name %>"
-                                                                            style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
-                                                                    <% } else { %>
-                                                                        <img src="/images/placeholder.jpg"
-                                                                            alt="<%= product.name %>"
-                                                                            style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
-                                                                    <% } %>
-                                                                    <div>
-                                                                        <p class="mb-0">
-                                                                            <%= product.name || 'Product Name Not Available' %>
-                                                                        </p>
-                                                                        <small class="text-muted">Quantity: <%= product.variant.quantity || 1 %></small>
-                                                                        <small class="text-muted d-block">Status: <%= product.status || order.status %></small>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="d-flex align-items-center">
-                                                                    <p class="mb-0 me-3">₹<%= product.price ? product.price.toFixed(2) : '0.00' %></p>
-                                            
-                                                                    <% if ((order.status === 'Delivered') && 
-                                                                        (product.cancelStatus !== 'Cancelled') && 
-                                                                        (product.returnStatus === 'Not Requested' || product.returnStatus === undefined)) { %>
-                                                                        <button class="btn btn-warning btn-sm"
-                                                                            onclick="openReturnModal('<%= order.orderId %>', '<%= product._id %>', '<%= product.name %>')">
-                                                                            Return Product
-                                                                        </button>
-                                                                    <% } %>
-                                            
-                                                                    <% if ((product.status === 'Pending' || product.status === 'Processing' || 
-                                                                        (order.status === 'Pending' || order.status === 'Processing') && !product.status) && 
-                                                                        (!product.cancelStatus || product.cancelStatus !== 'Cancelled')) { %>
-                                                                        <button class="btn btn-danger btn-sm"
-                                                                            onclick="openCancelProductModal('<%= order.orderId %>', '<%= product._id %>', '<%= encodeURIComponent(product.name).replace(/'/g, '\\\'').replace(/"/g, '\\\"') %>')">
-                                                                            Cancel Product
-                                                                        </button>
-                                                                    <% } %>
-                                                                </div>
-                                                            </div>
-                                                        <% }); %>
-                                                    <% } else { %>
-                                                        <p>No items found in this order.</p>
-                                                    <% } %>
-                                            
-                                                    <hr>
-                                                    <div class="d-flex justify-content-between">
-                                                        <strong>Total:</strong>
-                                                        <strong>₹<%= order.finalAmount ? order.finalAmount.toFixed(2) : '0.00' %></strong>
-                                                    </div>
-                                            
-                                                    <!-- Add Payment Method Here -->
-                                                    <div class="d-flex justify-content-between mt-2">
-                                                        <strong>Payment Method:</strong>
-                                                        <span>
-                                                            <%= order.paymentMethod === 'razorpay' ? 'Razorpay' : 
-                                                                order.paymentMethod === 'Cash on Delivery' ? 'Cash on Delivery' : 
-                                                                order.paymentMethod === 'wallet' ? 'Wallet' : 'Unknown' %>
-                                                        </span>
-                                                    </div>
-                                            
-                                                    <div class="mt-3">
-                                                        <% if (order.status === 'Pending' || order.status === 'Processing') { %>
-                                                            <button class="btn btn-danger btn-sm"
-                                                                onclick="openCancelModal('<%= order.orderId %>')">
-                                                                Cancel Order
-                                                            </button>
-                                                        <% } else if (order.status === "Payment Pending") { %>
-                                                            <button class="btn btn-warning btn-sm"
-                                                                onclick="retryPayment('<%= order.orderId %>')">
-                                                                Retry Payment
-                                                            </button>
                                                         <% } else { %>
-                                                            <span class="badge <%= order.status === 'Cancelled' ? 'bg-danger' : (order.status === 'Delivered' ? 'bg-success' : 'bg-secondary') %>">
-                                                                <%= order.status %>
-                                                            </span>
-                                                        <% } %>
-                                                    </div>
+                                                            <p class="text-muted">Address not available</p>
+                                                            <% } %>
+                                                                <hr>
+
+                                                                <h6>Order Items:</h6>
+                                                                <% if (order.orderedItems && order.orderedItems.length>
+                                                                    0) { %>
+                                                                    <% order.orderedItems.forEach(product=> { %>
+                                                                        <div
+                                                                            class="d-flex justify-content-between align-items-center mb-2">
+                                                                            <div class="d-flex align-items-center">
+                                                                                <% if (product.productImage &&
+                                                                                    product.productImage.length> 0) { %>
+                                                                                    <img src="<%= product.productImage[0] %>"
+                                                                                        alt="<%= product.name %>"
+                                                                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
+                                                                                    <% } else { %>
+                                                                                        <img src="/images/placeholder.jpg"
+                                                                                            alt="<%= product.name %>"
+                                                                                            style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 10px;">
+                                                                                        <% } %>
+                                                                                            <div>
+                                                                                                <p class="mb-0">
+                                                                                                    <%= product.name
+                                                                                                        || 'Product Name Not Available'
+                                                                                                        %>
+                                                                                                </p>
+                                                                                                <small
+                                                                                                    class="text-muted">Quantity:
+                                                                                                    <%= product.variant.quantity
+                                                                                                        || 1 %></small>
+                                                                                                <small
+                                                                                                    class="text-muted d-block">Status:
+                                                                                                    <%= product.status
+                                                                                                        || order.status
+                                                                                                        %></small>
+                                                                                            </div>
+                                                                            </div>
+                                                                            <div class="d-flex align-items-center">
+                                                                                <p class="mb-0 me-3">₹<%= product.price
+                                                                                        ? product.price.toFixed(2)
+                                                                                        : '0.00' %>
+                                                                                </p>
+
+                                                                                <% if ((order.status==='Delivered' ) &&
+                                                                                    (product.cancelStatus !=='Cancelled'
+                                                                                    ) &&
+                                                                                    (product.returnStatus==='Not Requested'
+                                                                                    ||
+                                                                                    product.returnStatus===undefined)) {
+                                                                                    %>
+                                                                                    <button
+                                                                                        class="btn btn-warning btn-sm me-2"
+                                                                                        onclick="openReturnModal('<%= order.orderId %>', '<%= product._id %>', '<%= product.name %>')">
+                                                                                        Return Product
+                                                                                    </button>
+                                                                                    <% } %>
+
+                                                                                        <% if
+                                                                                            ((product.status==='Pending'
+                                                                                            ||
+                                                                                            product.status==='Processing'
+                                                                                            || (order.status==='Pending'
+                                                                                            ||
+                                                                                            order.status==='Processing'
+                                                                                            ) && !product.status) &&
+                                                                                            (!product.cancelStatus ||
+                                                                                            product.cancelStatus
+                                                                                            !=='Cancelled' )) { %>
+                                                                                            <button
+                                                                                                class="btn btn-danger btn-sm me-2"
+                                                                                                onclick="openCancelProductModal('<%= order.orderId %>', '<%= product._id %>', '<%= encodeURIComponent(product.name).replace(/'/g, '\\\'').replace(/"
+                                                                                                /g, '\\\"' ) %>')">
+                                                                                                Cancel Product
+                                                                                            </button>
+                                                                                            <% } %>
+
+                                                                                                <!-- Write Review Button -->
+                                                                                                <% if
+                                                                                                    (order.status==='Delivered'
+                                                                                                    &&
+                                                                                                    !product.hasReviewed)
+                                                                                                    { %>
+                                                                                                    <button
+                                                                                                        class="btn btn-primary btn-sm"
+                                                                                                        onclick="openReviewModal('<%= order._id %>', '<%= product.product._id %>', '<%= product.name %>')">
+                                                                                                        Write Review
+                                                                                                    </button>
+
+                                                                                                    <% } %>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <!-- Review Modal -->
+                                                                        <div class="modal fade review-modal"
+                                                                            id="reviewModal<%= order._id %>_<%= product._id %>"
+                                                                            tabindex="-1"
+                                                                            aria-labelledby="reviewModalLabel"
+                                                                            aria-hidden="true">
+                                                                            <div class="modal-dialog">
+                                                                                <div class="modal-content">
+                                                                                    <div class="modal-header">
+                                                                                        <h5 class="modal-title"
+                                                                                            id="reviewModalLabel">Write
+                                                                                            a Review for <%=
+                                                                                                product.name %>
+                                                                                        </h5>
+                                                                                        <button type="button"
+                                                                                            class="btn-close"
+                                                                                            data-bs-dismiss="modal"
+                                                                                            aria-label="Close"></button>
+                                                                                    </div>
+                                                                                    <div class="modal-body">
+                                                                                        <form
+                                                                                            id="reviewForm_<%= order._id %>_<%= product._id %>">
+                                                                                            <input type="hidden"
+                                                                                                name="productId"
+                                                                                                value="<%= product.product %>">
+                                                                                            <input type="hidden"
+                                                                                                name="orderId"
+                                                                                                value="<%= order._id %>">
+                                                                                            <div class="mb-3">
+                                                                                                <label
+                                                                                                    for="rating_<%= product._id %>"
+                                                                                                    class="form-label">Rating</label>
+                                                                                                <div class="star-rating"
+                                                                                                    id="starRating_<%= product._id %>">
+                                                                                                    <span data-value="1"
+                                                                                                        class="icon-star2"></span>
+                                                                                                    <span data-value="2"
+                                                                                                        class="icon-star2"></span>
+                                                                                                    <span data-value="3"
+                                                                                                        class="icon-star2"></span>
+                                                                                                    <span data-value="4"
+                                                                                                        class="icon-star2"></span>
+                                                                                                    <span data-value="5"
+                                                                                                        class="icon-star2"></span>
+                                                                                                </div>
+                                                                                                <input type="hidden"
+                                                                                                    name="rating"
+                                                                                                    id="rating_<%= product._id %>"
+                                                                                                    value="0" required>
+                                                                                            </div>
+                                                                                            <div class="mb-3">
+                                                                                                <label
+                                                                                                    for="review_<%= product._id %>"
+                                                                                                    class="form-label">Your
+                                                                                                    Review</label>
+                                                                                                <textarea
+                                                                                                    class="form-control"
+                                                                                                    name="review"
+                                                                                                    id="review_<%= product._id %>"
+                                                                                                    rows="4"
+                                                                                                    required></textarea>
+                                                                                            </div>
+                                                                                            <button type="submit"
+                                                                                                class="btn btn-primary">Submit
+                                                                                                Review</button>
+                                                                                        </form>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <% }); %>
+                                                                            <% } else { %>
+                                                                                <p>No items found in this order.</p>
+                                                                                <% } %>
+
+                                                                                    <hr>
+                                                                                    <div
+                                                                                        class="d-flex justify-content-between">
+                                                                                        <strong>Total:</strong>
+                                                                                        <strong>₹<%= order.finalAmount ?
+                                                                                                order.finalAmount.toFixed(2)
+                                                                                                : '0.00' %></strong>
+                                                                                    </div>
+
+                                                                                    <div
+                                                                                        class="d-flex justify-content-between mt-2">
+                                                                                        <strong>Payment Method:</strong>
+                                                                                        <span>
+                                                                                            <%= order.paymentMethod==='razorpay'
+                                                                                                ? 'Razorpay' :
+                                                                                                order.paymentMethod==='Cash on Delivery'
+                                                                                                ? 'Cash on Delivery' :
+                                                                                                order.paymentMethod==='wallet'
+                                                                                                ? 'Wallet' : 'Unknown'
+                                                                                                %>
+                                                                                        </span>
+                                                                                    </div>
+
+                                                                                    <div class="mt-3">
+                                                                                        <% if (order.status==='Pending'
+                                                                                            ||
+                                                                                            order.status==='Processing'
+                                                                                            ) { %>
+                                                                                            <button
+                                                                                                class="btn btn-danger btn-sm"
+                                                                                                onclick="openCancelModal('<%= order.orderId %>')">
+                                                                                                Cancel Order
+                                                                                            </button>
+                                                                                            <% } else if
+                                                                                                (order.status==="Payment Pending"
+                                                                                                ) { %>
+                                                                                                <button
+                                                                                                    class="btn btn-warning btn-sm"
+                                                                                                    onclick="retryPayment('<%= order.orderId %>')">
+                                                                                                    Retry Payment
+                                                                                                </button>
+                                                                                                <% } else { %>
+                                                                                                    <span
+                                                                                                        class="badge <%= order.status === 'Cancelled' ? 'bg-danger' : (order.status === 'Delivered' ? 'bg-success' : 'bg-secondary') %>">
+                                                                                                        <%= order.status
+                                                                                                            %>
+                                                                                                    </span>
+                                                                                                    <% } %>
+                                                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                <% }); %>
-                            <% } else { %>
-                                <div class="alert alert-info">
-                                    No orders found.
-                                </div>
-                            <% } %>
+                                    <% }); %>
+                                        <% } else { %>
+                                            <div class="alert alert-info">
+                                                No orders found.
+                                            </div>
+                                            <% } %>
                         </div>
-                
+
                         <!-- Pagination Controls -->
-                        <% if (pagination.totalOrderPages > 1) { %>
+                        <% if (pagination.totalOrderPages> 1) { %>
                             <nav aria-label="Order pagination" class="pagination-container">
                                 <ul class="pagination justify-content-center mt-4">
                                     <li class="page-item <%= pagination.orderPage === 1 ? 'disabled' : '' %>">
-                                        <a class="page-link" href="?tab=orders&page=<%= pagination.orderPage - 1 %>&limit=<%= pagination.orderLimit %>" aria-label="Previous">
+                                        <a class="page-link"
+                                            href="?tab=orders&page=<%= pagination.orderPage - 1 %>&limit=<%= pagination.orderLimit %>"
+                                            aria-label="Previous">
                                             <i class="fas fa-chevron-left"></i>
                                         </a>
                                     </li>
-                                    <% if (pagination.orderPage > 3) { %>
+                                    <% if (pagination.orderPage> 3) { %>
                                         <li class="page-item">
-                                            <a class="page-link" href="?tab=orders&page=1&limit=<%= pagination.orderLimit %>">1</a>
+                                            <a class="page-link"
+                                                href="?tab=orders&page=1&limit=<%= pagination.orderLimit %>">1</a>
                                         </li>
-                                        <% if (pagination.orderPage > 4) { %>
+                                        <% if (pagination.orderPage> 4) { %>
                                             <li class="page-item disabled">
                                                 <span class="ellipsis">...</span>
                                             </li>
-                                        <% } %>
-                                    <% } %>
-                                    <% 
-                                        const startPage = Math.max(1, pagination.orderPage - 2);
-                                        const endPage = Math.min(pagination.totalOrderPages, pagination.orderPage + 2);
-                                        for (let i = startPage; i <= endPage; i++) { 
-                                    %>
-                                        <li class="page-item <%= pagination.orderPage === i ? 'active' : '' %>">
-                                            <a class="page-link" href="?tab=orders&page=<%= i %>&limit=<%= pagination.orderLimit %>"><%= i %></a>
-                                        </li>
-                                    <% } %>
-                                    <% if (pagination.orderPage < pagination.totalOrderPages - 2) { %>
-                                        <% if (pagination.orderPage < pagination.totalOrderPages - 3) { %>
-                                            <li class="page-item disabled">
-                                                <span class="ellipsis">...</span>
-                                            </li>
-                                        <% } %>
-                                        <li class="page-item">
-                                            <a class="page-link" href="?tab=orders&page=<%= pagination.totalOrderPages %>&limit=<%= pagination.orderLimit %>"><%= pagination.totalOrderPages %></a>
-                                        </li>
-                                    <% } %>
-                                    <li class="page-item <%= pagination.orderPage === pagination.totalOrderPages ? 'disabled' : '' %>">
-                                        <a class="page-link" href="?tab=orders&page=<%= pagination.orderPage + 1 %>&limit=<%= pagination.orderLimit %>" aria-label="Next">
-                                            <i class="fas fa-chevron-right"></i>
-                                        </a>
-                                    </li>
+                                            <% } %>
+                                                <% } %>
+                                                    <% const startPage=Math.max(1, pagination.orderPage - 2); const
+                                                        endPage=Math.min(pagination.totalOrderPages,
+                                                        pagination.orderPage + 2); for (let i=startPage; i <=endPage;
+                                                        i++) { %>
+                                                        <li
+                                                            class="page-item <%= pagination.orderPage === i ? 'active' : '' %>">
+                                                            <a class="page-link"
+                                                                href="?tab=orders&page=<%= i %>&limit=<%= pagination.orderLimit %>">
+                                                                <%= i %>
+                                                            </a>
+                                                        </li>
+                                                        <% } %>
+                                                            <% if (pagination.orderPage < pagination.totalOrderPages -
+                                                                2) { %>
+                                                                <% if (pagination.orderPage < pagination.totalOrderPages
+                                                                    - 3) { %>
+                                                                    <li class="page-item disabled">
+                                                                        <span class="ellipsis">...</span>
+                                                                    </li>
+                                                                    <% } %>
+                                                                        <li class="page-item">
+                                                                            <a class="page-link"
+                                                                                href="?tab=orders&page=<%= pagination.totalOrderPages %>&limit=<%= pagination.orderLimit %>">
+                                                                                <%= pagination.totalOrderPages %>
+                                                                            </a>
+                                                                        </li>
+                                                                        <% } %>
+                                                                            <li
+                                                                                class="page-item <%= pagination.orderPage === pagination.totalOrderPages ? 'disabled' : '' %>">
+                                                                                <a class="page-link"
+                                                                                    href="?tab=orders&page=<%= pagination.orderPage + 1 %>&limit=<%= pagination.orderLimit %>"
+                                                                                    aria-label="Next">
+                                                                                    <i class="fas fa-chevron-right"></i>
+                                                                                </a>
+                                                                            </li>
                                 </ul>
                             </nav>
-                        <% } %>
+                            <% } %>
                     </div>
                 </div>
 
@@ -880,7 +1062,8 @@
                             <div class="mb-4">
                                 <i class="fas fa-wallet fa-3x text-primary"></i>
                             </div>
-                            <h3 class="mb-2">₹<%= user.wallet.toFixed(2)%></h3>
+                            <h3 class="mb-2">₹<%= user.wallet.toFixed(2)%>
+                            </h3>
                             <p class="text-muted">Current Balance</p>
                         </div>
                     </div>
@@ -901,83 +1084,105 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% if (user.walletHistory && user.walletHistory.length > 0) { %>
-                                        <% user.walletHistory.forEach(transaction => { %>
+                                    <% if (user.walletHistory && user.walletHistory.length> 0) { %>
+                                        <% user.walletHistory.forEach(transaction=> { %>
                                             <tr>
-                                                <td><%= transaction.transactionId %></td>
-                                                <td><%= new Date(transaction.date).toLocaleDateString() %></td>
-                                                <td><span class="badge <%= transaction.type === 'credit' ? 'bg-success' : 'bg-danger' %>"><%= transaction.type.toUpperCase() %></span></td>
-                                                <td>₹<%= transaction.amount %></td>
+                                                <td>
+                                                    <%= transaction.transactionId %>
+                                                </td>
+                                                <td>
+                                                    <%= new Date(transaction.date).toLocaleDateString() %>
+                                                </td>
+                                                <td><span
+                                                        class="badge <%= transaction.type === 'credit' ? 'bg-success' : 'bg-danger' %>">
+                                                        <%= transaction.type.toUpperCase() %>
+                                                    </span></td>
+                                                <td>₹<%= transaction.amount %>
+                                                </td>
                                                 <td><span class="badge bg-success">Completed</span></td>
                                             </tr>
-                                        <% }) %>
-                                    <% } else { %>
-                                        <tr>
-                                            <td class="text-center text-muted" colspan="5">
-                                                <i class="fas fa-history fa-3x mb-3"></i>
-                                                <h6>No transactions found</h6>
-                                            </td>
-                                        </tr>
-                                    <% } %>
+                                            <% }) %>
+                                                <% } else { %>
+                                                    <tr>
+                                                        <td class="text-center text-muted" colspan="5">
+                                                            <i class="fas fa-history fa-3x mb-3"></i>
+                                                            <h6>No transactions found</h6>
+                                                        </td>
+                                                    </tr>
+                                                    <% } %>
                                 </tbody>
                             </table>
                         </div>
 
                         <!-- Wallet History Pagination Controls -->
-                        <% if (walletPagination.totalWalletPages > 1) { %>
+                        <% if (walletPagination.totalWalletPages> 1) { %>
                             <nav aria-label="Wallet history pagination" class="pagination-container">
                                 <ul class="pagination justify-content-center mt-4">
                                     <!-- Previous Button -->
                                     <li class="page-item <%= walletPagination.walletPage === 1 ? 'disabled' : '' %>">
-                                        <a class="page-link" href="?tab=wallet-history&walletPage=<%= walletPagination.walletPage - 1 %>" aria-label="Previous">
+                                        <a class="page-link"
+                                            href="?tab=wallet-history&walletPage=<%= walletPagination.walletPage - 1 %>"
+                                            aria-label="Previous">
                                             <i class="fas fa-chevron-left"></i>
                                         </a>
                                     </li>
 
                                     <!-- First Page -->
-                                    <% if (walletPagination.walletPage > 3) { %>
+                                    <% if (walletPagination.walletPage> 3) { %>
                                         <li class="page-item">
                                             <a class="page-link" href="?tab=wallet-history&walletPage=1">1</a>
                                         </li>
-                                        <% if (walletPagination.walletPage > 4) { %>
+                                        <% if (walletPagination.walletPage> 4) { %>
                                             <li class="page-item disabled">
                                                 <span class="ellipsis">...</span>
                                             </li>
-                                        <% } %>
-                                    <% } %>
+                                            <% } %>
+                                                <% } %>
 
-                                    <!-- Pages Around Current Page -->
-                                    <% 
-                                        const startWalletPage = Math.max(1, walletPagination.walletPage - 2);
-                                        const endWalletPage = Math.min(walletPagination.totalWalletPages, walletPagination.walletPage + 2);
-                                        for (let i = startWalletPage; i <= endWalletPage; i++) { 
-                                    %>
-                                        <li class="page-item <%= walletPagination.walletPage === i ? 'active' : '' %>">
-                                            <a class="page-link" href="?tab=wallet-history&walletPage=<%= i %>"><%= i %></a>
-                                        </li>
-                                    <% } %>
+                                                    <!-- Pages Around Current Page -->
+                                                    <% const startWalletPage=Math.max(1, walletPagination.walletPage -
+                                                        2); const
+                                                        endWalletPage=Math.min(walletPagination.totalWalletPages,
+                                                        walletPagination.walletPage + 2); for (let i=startWalletPage; i
+                                                        <=endWalletPage; i++) { %>
+                                                        <li
+                                                            class="page-item <%= walletPagination.walletPage === i ? 'active' : '' %>">
+                                                            <a class="page-link"
+                                                                href="?tab=wallet-history&walletPage=<%= i %>">
+                                                                <%= i %>
+                                                            </a>
+                                                        </li>
+                                                        <% } %>
 
-                                    <!-- Last Page with Ellipsis -->
-                                    <% if (walletPagination.walletPage < walletPagination.totalWalletPages - 2) { %>
-                                        <% if (walletPagination.walletPage < walletPagination.totalWalletPages - 3) { %>
-                                            <li class="page-item disabled">
-                                                <span class="ellipsis">...</span>
-                                            </li>
-                                        <% } %>
-                                        <li class="page-item">
-                                            <a class="page-link" href="?tab=wallet-history&walletPage=<%= walletPagination.totalWalletPages %>"><%= walletPagination.totalWalletPages %></a>
-                                        </li>
-                                    <% } %>
+                                                            <!-- Last Page with Ellipsis -->
+                                                            <% if (walletPagination.walletPage <
+                                                                walletPagination.totalWalletPages - 2) { %>
+                                                                <% if (walletPagination.walletPage <
+                                                                    walletPagination.totalWalletPages - 3) { %>
+                                                                    <li class="page-item disabled">
+                                                                        <span class="ellipsis">...</span>
+                                                                    </li>
+                                                                    <% } %>
+                                                                        <li class="page-item">
+                                                                            <a class="page-link"
+                                                                                href="?tab=wallet-history&walletPage=<%= walletPagination.totalWalletPages %>">
+                                                                                <%= walletPagination.totalWalletPages %>
+                                                                            </a>
+                                                                        </li>
+                                                                        <% } %>
 
-                                    <!-- Next Button -->
-                                    <li class="page-item <%= walletPagination.walletPage === walletPagination.totalWalletPages ? 'disabled' : '' %>">
-                                        <a class="page-link" href="?tab=wallet-history&walletPage=<%= walletPagination.walletPage + 1 %>" aria-label="Next">
-                                            <i class="fas fa-chevron-right"></i>
-                                        </a>
-                                    </li>
+                                                                            <!-- Next Button -->
+                                                                            <li
+                                                                                class="page-item <%= walletPagination.walletPage === walletPagination.totalWalletPages ? 'disabled' : '' %>">
+                                                                                <a class="page-link"
+                                                                                    href="?tab=wallet-history&walletPage=<%= walletPagination.walletPage + 1 %>"
+                                                                                    aria-label="Next">
+                                                                                    <i class="fas fa-chevron-right"></i>
+                                                                                </a>
+                                                                            </li>
                                 </ul>
                             </nav>
-                        <% } %>
+                            <% } %>
                     </div>
                 </div>
             </div>
@@ -1027,148 +1232,259 @@
         </div>
     </div>
 
-<script defer src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="/js/bootstrap.min.js"></script>
+    <script defer src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        async function retryPayment(orderId) {
-    try {
-        const response = await fetch('/retry-payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ orderId })
-        });
-        const data = await response.json();
+        window.openReviewModal = function (orderId, productId, productName) {
+            Swal.fire({
+                title: `Write a Review for ${productName}`,
+                html: `
+                <div style="text-align: left; margin-bottom: 15px;">
+                    <label for="swal-rating" style="font-weight: 500; color: #555;">Rating</label>
+                    <div id="starRating" style="font-size: 24px; color: #e4e5e9; cursor: pointer; margin-top: 5px;">
+                        <i data-value="1" class="fas fa-star" style="margin-right: 5px;"></i>
+                        <i data-value="2" class="fas fa-star" style="margin-right: 5px;"></i>
+                        <i data-value="3" class="fas fa-star" style="margin-right: 5px;"></i>
+                        <i data-value="4" class="fas fa-star" style="margin-right: 5px;"></i>
+                        <i data-value="5" class="fas fa-star" style="margin-right: 5px;"></i>
+                    </div>
+                    <input type="hidden" id="swal-rating" value="0">
+                </div>
+                <div style="text-align: left;">
+                    <label for="swal-review" style="font-weight: 500; color: #555;">Your Review</label>
+                    <textarea id="swal-review" class="swal2-textarea" placeholder="Write your review here..." style="resize: none; height: 100px;"></textarea>
+                </div>
+            `,
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Submit Review',
+                confirmButtonColor: '#7971ea',
+                cancelButtonText: 'Cancel',
+                showLoaderOnConfirm: true,
+                didOpen: () => {
+                    // Star Rating Functionality
+                    const stars = document.querySelectorAll('#starRating i');
+                    const ratingInput = document.querySelector('#swal-rating');
+                    stars.forEach(star => {
+                        star.addEventListener('click', function () {
+                            const rating = this.getAttribute('data-value');
+                            ratingInput.value = rating;
 
-        if (data.success && data.paymentMethod === 'razorpay') {
-            const rzp = new Razorpay({
-                ...data.razorpayOptions,
-                handler: async (response) => {
+                            // Update star visuals
+                            stars.forEach(s => {
+                                if (s.getAttribute('data-value') <= rating) {
+                                    s.style.color = '#ffc107'; // Filled star color
+                                } else {
+                                    s.style.color = '#e4e5e9'; // Empty star color
+                                }
+                            });
+                        });
+                    });
+                },
+                preConfirm: () => {
+                    const rating = document.getElementById('swal-rating').value;
+                    const review = document.getElementById('swal-review').value;
+
+                    if (rating === "0") {
+                        Swal.showValidationMessage('Please select a rating');
+                        return false;
+                    }
+                    if (!review) {
+                        Swal.showValidationMessage('Please write a review');
+                        return false;
+                    }
+
+                    return { rating, review };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const { rating, review } = result.value;
+                    const data = {
+                        productId: productId,
+                        orderId: orderId,
+                        review: review,
+                        rating: rating,
+                    };
+
+                    fetch('/productDetailsPage/review', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data),
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: 'Success',
+                                    text: data.message || 'Review submitted successfully.',
+                                    icon: 'success',
+                                    confirmButtonColor: '#3085d6'
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: data.message || 'Failed to submit review.',
+                                    icon: 'error',
+                                    confirmButtonColor: '#3085d6'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Fetch Error:', error);
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'An error occurred while submitting your review.',
+                                icon: 'error',
+                                confirmButtonColor: '#3085d6'
+                            });
+                        });
+                }
+            });
+        };
+    </script>
+
+    <script>
+        async function retryPayment(orderId) {
+            try {
+                const response = await fetch('/retry-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderId })
+                });
+                const data = await response.json();
+
+                if (data.success && data.paymentMethod === 'razorpay') {
+                    const rzp = new Razorpay({
+                        ...data.razorpayOptions,
+                        handler: async (response) => {
+                            const verifyResponse = await fetch('/verify-razorpay-payment', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    orderId,
+                                    razorpayOrderId: response.razorpay_order_id,
+                                    razorpayPaymentId: response.razorpay_payment_id,
+                                    razorpaySignature: response.razorpay_signature
+                                })
+                            });
+                            const verifyData = await verifyResponse.json();
+                            if (verifyData.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Payment Successful',
+                                    text: 'Redirecting to thank you page...'
+                                }).then(() => {
+                                    window.location.href = `/thank-you?orderId=${orderId}`;
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Payment Verification Failed',
+                                    text: verifyData.message
+                                });
+                            }
+                        }
+                    });
+
+                    rzp.on('payment.failed', async (response) => {
+                        await fetch('/handle-payment-failure', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                orderId,
+                                failureReason: response.error.description
+                            })
+                        });
+                        window.location.href = `/transaction-failure?orderId=${orderId}`;
+                    });
+
+                    rzp.open();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'Failed to initiate retry payment.'
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while retrying payment.'
+                });
+            }
+        }
+
+        function handleRazorpayRetry(options) {
+            if (typeof Razorpay === 'undefined') {
+                console.error('Razorpay script not loaded');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Payment gateway script failed to load. Please refresh the page and try again.'
+                });
+                return;
+            }
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+
+            rzp.on('payment.failed', async (response) => {
+                console.log('Payment failed:', response);
+                await fetch('/handle-payment-failure', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        orderId: options.order_id,
+                        failureReason: response.error.description
+                    })
+                });
+                window.location.href = `/transaction-failure?orderId=${options.notes.orderId}`;
+            });
+
+            rzp.on('payment.success', async (response) => {
+                console.log('Payment successful:', response);
+                try {
                     const verifyResponse = await fetch('/verify-razorpay-payment', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            orderId,
+                            orderId: options.notes.orderId,
                             razorpayOrderId: response.razorpay_order_id,
                             razorpayPaymentId: response.razorpay_payment_id,
                             razorpaySignature: response.razorpay_signature
                         })
                     });
                     const verifyData = await verifyResponse.json();
+                    console.log('Payment verification response:', verifyData);
+
                     if (verifyData.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Payment Successful',
-                            text: 'Redirecting to thank you page...'
-                        }).then(() => {
-                            window.location.href = `/thank-you?orderId=${orderId}`;
-                        });
+                        window.location.href = `/thank-you?orderId=${options.notes.orderId}`;
                     } else {
                         Swal.fire({
                             icon: 'error',
                             title: 'Payment Verification Failed',
-                            text: verifyData.message
+                            text: verifyData.message || 'Failed to verify payment. Please contact support.'
                         });
                     }
+                } catch (error) {
+                    console.error('Error verifying payment:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while verifying the payment.'
+                    });
                 }
             });
-
-            rzp.on('payment.failed', async (response) => {
-                await fetch('/handle-payment-failure', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        orderId,
-                        failureReason: response.error.description
-                    })
-                });
-                window.location.href = `/transaction-failure?orderId=${orderId}`;
-            });
-
-            rzp.open();
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: data.message || 'Failed to initiate retry payment.'
-            });
         }
-    } catch (error) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'An error occurred while retrying payment.'
-        });
-    }
-}
-
-function handleRazorpayRetry(options) {
-    if (typeof Razorpay === 'undefined') {
-        console.error('Razorpay script not loaded');
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Payment gateway script failed to load. Please refresh the page and try again.'
-        });
-        return;
-    }
-
-    const rzp = new Razorpay(options);
-    rzp.open();
-
-    rzp.on('payment.failed', async (response) => {
-        console.log('Payment failed:', response);
-        await fetch('/handle-payment-failure', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                orderId: options.order_id,
-                failureReason: response.error.description
-            })
-        });
-        window.location.href = `/transaction-failure?orderId=${options.notes.orderId}`;
-    });
-
-    rzp.on('payment.success', async (response) => {
-        console.log('Payment successful:', response);
-        try {
-            const verifyResponse = await fetch('/verify-razorpay-payment', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    orderId: options.notes.orderId,
-                    razorpayOrderId: response.razorpay_order_id,
-                    razorpayPaymentId: response.razorpay_payment_id,
-                    razorpaySignature: response.razorpay_signature
-                })
-            });
-            const verifyData = await verifyResponse.json();
-            console.log('Payment verification response:', verifyData);
-
-            if (verifyData.success) {
-                window.location.href = `/thank-you?orderId=${options.notes.orderId}`;
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Payment Verification Failed',
-                    text: verifyData.message || 'Failed to verify payment. Please contact support.'
-                });
-            }
-        } catch (error) {
-            console.error('Error verifying payment:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'An error occurred while verifying the payment.'
-            });
-        }
-    });
-}
         window.openCancelModal = function (orderId) {
             Swal.fire({
                 title: 'Cancel Order',
@@ -1525,6 +1841,7 @@ function handleRazorpayRetry(options) {
             }
         });
     </script>
+
 </body>
 
 </html>
