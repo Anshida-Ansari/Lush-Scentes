@@ -80,6 +80,13 @@
             color: #dc3545;
             font-size: 14px;
             margin-top: 0.5rem;
+        }
+        
+        .show-error {
+            display: block;
+        }
+        
+        .hide-error {
             display: none;
         }
     </style>
@@ -93,15 +100,82 @@
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" required>
-                <div class="error-message">Please enter a valid email address</div>
+                <div class="error-message hide-error" id="email-error">Please enter a valid email address</div>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
-                <div class="error-message">Please enter your password</div>
+                <div class="error-message hide-error" id="password-error">Please enter a password (minimum 6 characters)</div>
             </div>
             <button type="submit">Login</button>
         </form>
     </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent form submission until validation
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const emailError = document.getElementById('email-error');
+            const passwordError = document.getElementById('password-error');
+            
+            let isValid = true;
+
+            // Email validation
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                emailError.classList.remove('hide-error');
+                emailError.classList.add('show-error');
+                isValid = false;
+            } else {
+                emailError.classList.remove('show-error');
+                emailError.classList.add('hide-error');
+            }
+
+            // Password validation
+            if (password.length < 6) {
+                passwordError.classList.remove('hide-error');
+                passwordError.classList.add('show-error');
+                isValid = false;
+            } else {
+                passwordError.classList.remove('show-error');
+                passwordError.classList.add('hide-error');
+            }
+
+            // If all validations pass, submit the form
+            if (isValid) {
+                this.submit();
+            }
+        });
+
+        // Real-time validation
+        document.getElementById('email').addEventListener('input', function() {
+            const email = this.value;
+            const emailError = document.getElementById('email-error');
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailPattern.test(email) && email.length > 0) {
+                emailError.classList.remove('hide-error');
+                emailError.classList.add('show-error');
+            } else {
+                emailError.classList.remove('show-error');
+                emailError.classList.add('hide-error');
+            }
+        });
+
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const passwordError = document.getElementById('password-error');
+
+            if (password.length < 6 && password.length > 0) {
+                passwordError.classList.remove('hide-error');
+                passwordError.classList.add('show-error');
+            } else {
+                passwordError.classList.remove('show-error');
+                passwordError.classList.add('hide-error');
+            }
+        });
+    </script>
 </body>
 </html>

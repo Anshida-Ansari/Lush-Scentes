@@ -55,6 +55,35 @@ const processCheckout = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Cart is empty' });
         }
 
+        const blockedProduct = cart.items.find(item => item.productId.isBlocked);
+        if (blockedProduct) {
+            return res.status(400).json({
+                success: false,
+                message: `The product "${blockedProduct.productId.productName}" is blocked and cannot be ordered.`
+            });
+        }
+
+        const outOfStockItems = [];
+        for (const item of cart.items) {
+            const variant = item.productId.variants.find(v => v.size === item.variant.size);
+            if (!variant || variant.quantity < item.variant.quantity) {
+                outOfStockItems.push({
+                    productName: item.productId.productName,
+                    size: item.variant.size,
+                    requested: item.variant.quantity,
+                    available: variant ? variant.quantity : 0
+                });
+            }
+        }
+
+        if (outOfStockItems.length > 0) {
+            const message = outOfStockItems.map(item => 
+                `${item.productName} (${item.size}): Requested ${item.requested}, Available ${item.available}`
+            ).join(', ');
+            return res.status(400).json({ success: false, message: `Stock limit reached: ${message}` });
+        }
+
+
         const stockUpdates = [];
         for (const item of cart.items) {
             const variant = item.productId.variants.find(v => v.size === item.variant.size);
@@ -248,6 +277,32 @@ const createRazorpayOrder = async (req, res) => {
         const cart = await Cart.findOne({ userId }).populate('items.productId');
         if (!cart || !cart.items.length) {
             return res.status(400).json({ success: false, message: 'Cart is empty' });
+        }
+        const blockedProduct = cart.items.find(item => item.productId.isBlocked);
+        if (blockedProduct) {
+            return res.status(400).json({
+                success: false,
+                message: `The product "${blockedProduct.productId.productName}" is blocked and cannot be ordered.`
+            });
+        }
+        const outOfStockItems = [];
+        for (const item of cart.items) {
+            const variant = item.productId.variants.find(v => v.size === item.variant.size);
+            if (!variant || variant.quantity < item.variant.quantity) {
+                outOfStockItems.push({
+                    productName: item.productId.productName,
+                    size: item.variant.size,
+                    requested: item.variant.quantity,
+                    available: variant ? variant.quantity : 0
+                });
+            }
+        }
+
+        if (outOfStockItems.length > 0) {
+            const message = outOfStockItems.map(item => 
+                `${item.productName} (${item.size}): Requested ${item.requested}, Available ${item.available}`
+            ).join(', ');
+            return res.status(400).json({ success: false, message: `Stock limit reached: ${message}` });
         }
 
         const orderId = `ORD${Date.now()}`;

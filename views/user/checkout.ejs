@@ -448,6 +448,16 @@
                     const selectedAddress = document.querySelector('input[name="deliveryAddressId"]:checked')?.value;
                     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
                     const finalAmount = parseFloat(finalAmountSpan.textContent.replace('₹', ''));
+
+                    const hasBlockedProduct = <%- JSON.stringify(cart.items) %>.some(item => item.productId.isBlocked);
+            if (hasBlockedProduct) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Blocked Product',
+                    text: 'This product is already blocked. You cannot place an order.'
+                });
+                return;
+            }
         
         
                     if (!selectedAddress) {

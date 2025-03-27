@@ -949,69 +949,205 @@
         }
 
         function setupFormValidation() {
-            document.addEventListener('change', function (e) {
-                if (
-                    e.target.classList.contains('variant-size') ||
-                    e.target.classList.contains('variant-quantity') ||
-                    e.target.classList.contains('variant-regular-price') ||
-                    e.target.classList.contains('variant-sales-price')
-                ) {
-                    updateVariantsData();
-                }
-            });
+        const form = document.getElementById('productForm');
+        const inputs = {
+            productName: document.getElementById('product_name'),
+            description: document.getElementById('descriptionid'),
+            category: document.getElementById('category'),
+            variantsContainer: document.getElementById('variants'),
+        };
 
-            document.getElementById('productForm').addEventListener('submit', function (e) {
-                let isValid = true;
+        // Real-time validation for text inputs
+        inputs.productName.addEventListener('input', validateProductName);
+        inputs.description.addEventListener('input', validateDescription);
+        inputs.category.addEventListener('change', validateCategory);
 
-                if (!document.getElementById('product_name').value.trim()) {
-                    document.getElementById('productName-error').textContent = 'Product name is required';
-                    isValid = false;
-                } else {
-                    document.getElementById('productName-error').textContent = '';
-                }
+        // Validate variants on change
+        inputs.variantsContainer.addEventListener('change', (e) => {
+            if (
+                e.target.classList.contains('variant-size') ||
+                e.target.classList.contains('variant-quantity') ||
+                e.target.classList.contains('variant-regular-price') ||
+                e.target.classList.contains('variant-sales-price')
+            ) {
+                validateVariants();
+                updateVariantsData();
+            }
+        });
 
-                if (!document.getElementById('descriptionid').value.trim()) {
-                    document.getElementById('description-error').textContent = 'Description is required';
-                    isValid = false;
-                } else {
-                    document.getElementById('description-error').textContent = '';
-                }
+        // Form submission validation
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            let isValid = true;
 
-                if (!document.getElementById('category').value) {
-                    document.getElementById('category-error').textContent = 'Category is required';
-                    isValid = false;
-                } else {
-                    document.getElementById('category-error').textContent = '';
-                }
+            isValid = validateProductName() && isValid;
+            isValid = validateDescription() && isValid;
+            isValid = validateCategory() && isValid;
+            isValid = validateVariants() && isValid;
+            isValid = validateImages() && isValid;
 
-                const variants = JSON.parse(document.getElementById('variants-data').value || '[]');
-                if (variants.length === 0) {
-                    document.getElementById('variants-error').textContent = 'At least one size variant is required';
-                    isValid = false;
-                } else {
-                    let variantValid = true;
-                    for (const variant of variants) {
-                        if (!variant.size || variant.quantity === undefined || variant.regularPrice === undefined) {
-                            variantValid = false;
-                            break;
-                        }
-                    }
+            if (isValid) {
+                // Proceed with form submission (your existing fetch logic)
+                submitForm(this);
+            }
+        });
 
-                    if (!variantValid) {
-                        document.getElementById('variants-error').textContent =
-                            'All size variants must have size, quantity, and regular price';
-                        isValid = false;
-                    } else {
-                        document.getElementById('variants-error').textContent = '';
-                    }
-                }
-
-                if (!isValid) {
-                    e.preventDefault();
-                }
-            });
+        function validateProductName() {
+            const value = inputs.productName.value.trim();
+            const errorElement = document.getElementById('productName-error');
+            if (!value) {
+                errorElement.textContent = 'Product name is required';
+                return false;
+            } else if (value.length < 3) {
+                errorElement.textContent = 'Product name must be at least 3 characters';
+                return false;
+            } else if (value.length > 100) {
+                errorElement.textContent = 'Product name must not exceed 100 characters';
+                return false;
+            }
+            errorElement.textContent = '';
+            return true;
         }
-    </script>
+
+        function validateDescription() {
+            const value = inputs.description.value.trim();
+            const errorElement = document.getElementById('description-error');
+            if (!value) {
+                errorElement.textContent = 'Description is required';
+                return false;
+            } else if (value.length < 10) {
+                errorElement.textContent = 'Description must be at least 10 characters';
+                return false;
+            } else if (value.length > 1000) {
+                errorElement.textContent = 'Description must not exceed 1000 characters';
+                return false;
+            }
+            errorElement.textContent = '';
+            return true;
+        }
+
+        function validateCategory() {
+            const value = inputs.category.value;
+            const errorElement = document.getElementById('category-error');
+            if (!value) {
+                errorElement.textContent = 'Please select a category';
+                return false;
+            }
+            errorElement.textContent = '';
+            return true;
+        }
+
+        function validateVariants() {
+            const variants = JSON.parse(document.getElementById('variants-data').value || '[]');
+            const errorElement = document.getElementById('variants-error');
+            const sizes = new Set();
+
+            if (variants.length === 0) {
+                errorElement.textContent = 'At least one size variant is required';
+                return false;
+            }
+
+            for (const variant of variants) {
+                if (!variant.size) {
+                    errorElement.textContent = 'All variants must have a size selected';
+                    return false;
+                }
+                if (sizes.has(variant.size)) {
+                    errorElement.textContent = 'Duplicate variant sizes are not allowed';
+                    return false;
+                }
+                sizes.add(variant.size);
+
+                if (variant.quantity === undefined || variant.quantity < 0) {
+                    errorElement.textContent = 'Quantity must be 0 or greater';
+                    return false;
+                }
+                if (variant.regularPrice === undefined || variant.regularPrice <= 0) {
+                    errorElement.textContent = 'Regular price must be greater than 0';
+                    return false;
+                }
+                if (variant.salesPrice && variant.salesPrice >= variant.regularPrice) {
+                    errorElement.textContent = 'Sale price must be less than regular price';
+                    return false;
+                }
+                if (variant.salesPrice && variant.salesPrice < 0) {
+                    errorElement.textContent = 'Sale price cannot be negative';
+                    return false;
+                }
+            }
+            errorElement.textContent = '';
+            return true;
+        }
+
+        function validateImages() {
+            const errorElement = document.createElement('div');
+            errorElement.className = 'error-message';
+            const container = document.getElementById('imagesPreviewContainer');
+            container.querySelector('.error-message')?.remove();
+            container.insertBefore(errorElement, container.firstChild);
+
+            if (selectedProductImages.length < 3) {
+                errorElement.textContent = `Please upload at least 3 images (${selectedProductImages.length} selected)`;
+                return false;
+            }
+            if (selectedProductImages.length > 4) {
+                errorElement.textContent = `Maximum 4 images allowed (${selectedProductImages.length} selected)`;
+                return false;
+            }
+            for (const file of selectedProductImages) {
+                if (file.size > 5 * 1024 * 1024) { 
+                    errorElement.textContent = `Image ${file.name} exceeds 5MB limit`;
+                    return false;
+                }
+                if (!['image/png', 'image/jpeg', 'image/jpg'].includes(file.type)) {
+                    errorElement.textContent = `Image ${file.name} must be PNG or JPEG`;
+                    return false;
+                }
+            }
+            errorElement.textContent = '';
+            return true;
+        }
+
+        function submitForm(form) {
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Uploading...';
+
+            // Your existing fetch logic
+            fetch('/admin/addProducts', {
+                method: 'POST',
+                body: formData,
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        return response.text().then((text) => {
+                            const data = JSON.parse(text);
+                            throw new Error(data.error || 'Upload failed');
+                        });
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    if (data.success) {
+                        window.location.href = '/admin/product';
+                    } else {
+                        alert(data.error || 'An error occurred while saving the product');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('Error: ' + error.message);
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                });
+        }
+    }
+   
+   </script>
 </body>
 </html>
 

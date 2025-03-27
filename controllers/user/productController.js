@@ -58,6 +58,7 @@ const productDetails = async (req, res) => {
         regularPrice,
         discountedPrice: discountedPrice.toFixed(2),
         discountPercentage: highestDiscount,
+        quantity: variant.quantity >= 0 ? variant.quantity : 0
       };
     });
 
