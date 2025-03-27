@@ -146,6 +146,12 @@ const processCheckout = async (req, res) => {
                     $push: { walletHistory: { transactionId: `WAL${Date.now()}`, type: 'debit', amount: finalAmount, status: 'Completed' } }
                 }
             );
+            order.status = 'Processing';
+            await order.save()
+        }
+        if (paymentMethod === 'Cash on Delivery') {
+            order.status = 'Processing';
+            await order.save();
         }
 
         for (const update of stockUpdates) {
@@ -321,7 +327,7 @@ const createRazorpayOrder = async (req, res) => {
             finalAmount: amount,
             address: selectedAddress,
             paymentMethod: 'razorpay',
-            status: 'Pending',
+            status: 'Payment Pending',
             couponApplied: !!couponCode,
             couponCode: couponCode || null
         });
@@ -352,6 +358,44 @@ const createRazorpayOrder = async (req, res) => {
 
 
 
+// const verifyRazorpayPayment = async (req, res) => {
+//     try {
+//         const { orderId, razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
+
+//         const expectedSignature = crypto
+//             .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+//             .update(`${razorpayOrderId}|${razorpayPaymentId}`)
+//             .digest('hex');
+
+//         if (expectedSignature !== razorpaySignature) {
+//             return res.status(400).json({ success: false, message: 'Invalid payment signature' });
+//         }
+
+//         const order = await Order.findOneAndUpdate(
+//             { orderId },
+//             {
+//                 status: 'Pending', 
+//                 'paymentDetails.razorpayOrderId': razorpayOrderId,
+//                 'paymentDetails.razorpayPaymentId': razorpayPaymentId,
+//                 'paymentDetails.razorpaySignature': razorpaySignature,
+//                 'paymentDetails.succeededAt': new Date(),
+//                 'paymentDetails.failureReason': null 
+//             },
+//             { new: true }
+//         );
+
+//         if (!order) {
+//             return res.status(404).json({ success: false, message: 'Order not found' });
+//         }
+
+//         res.status(200).json({ success: true, orderId: order.orderId, message: 'Payment verified' });
+//     } catch (error) {
+//         console.error('Error verifying payment:', error);
+//         res.status(500).json({ success: false, message: 'Payment verification failed' });
+//     }
+// };
+
+
 const verifyRazorpayPayment = async (req, res) => {
     try {
         const { orderId, razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
@@ -365,30 +409,50 @@ const verifyRazorpayPayment = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid payment signature' });
         }
 
-        const order = await Order.findOneAndUpdate(
-            { orderId },
-            {
-                status: 'Pending', 
-                'paymentDetails.razorpayOrderId': razorpayOrderId,
-                'paymentDetails.razorpayPaymentId': razorpayPaymentId,
-                'paymentDetails.razorpaySignature': razorpaySignature,
-                'paymentDetails.succeededAt': new Date(),
-                'paymentDetails.failureReason': null 
-            },
-            { new: true }
-        );
-
+        const order = await Order.findOne({ orderId }).populate('orderedItems.product');
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        res.status(200).json({ success: true, orderId: order.orderId, message: 'Payment verified' });
+        order.status = 'Processing';
+        order.paymentDetails = {
+            razorpayOrderId,
+            razorpayPaymentId,
+            razorpaySignature,
+            succeededAt: new Date(),
+            failureReason: null
+        };
+
+        const stockUpdates = order.orderedItems.map(item => ({
+            productId: item.product._id,
+            size: item.variant.size,
+            quantity: item.variant.quantity
+        }));
+
+        for (const update of stockUpdates) {
+            const product = await Product.findOne({ _id: update.productId });
+            const variant = product.variants.find(v => v.size === update.size);
+            if (!variant || variant.quantity < update.quantity) {
+                order.status = 'Cancelled';
+                order.paymentDetails.failureReason = `Insufficient stock for ${product.productName}`;
+                await order.save();
+                return res.status(400).json({ success: false, message: `Insufficient stock for ${product.productName}` });
+            }
+
+            await Product.updateOne(
+                { _id: update.productId, 'variants.size': update.size },
+                { $inc: { 'variants.$.quantity': -update.quantity } }
+            );
+        }
+
+        await order.save();
+
+        res.status(200).json({ success: true, orderId: order.orderId, message: 'Payment verified and order processing started' });
     } catch (error) {
         console.error('Error verifying payment:', error);
         res.status(500).json({ success: false, message: 'Payment verification failed' });
     }
 };
-
 
 const loadThankYouPage = async (req, res) => {
     try {

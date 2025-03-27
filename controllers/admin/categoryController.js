@@ -50,6 +50,7 @@ const addCategory = async (req, res) => {
         if (!nameRegex.test(name)) {
             return res.status(400).json({ error: 'Category name can only contain letters, numbers, and spaces' });
         }
+        
 
         const existingCategory = await Category.findOne({
             name: { $regex: `^${name}$`, $options: 'i' } 
