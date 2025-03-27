@@ -38,7 +38,7 @@ const loadHomePage = async (req, res) => {
         
         productData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         
-        const featuredProducts = productData.slice(0, 4)
+        const featuredProducts = productData.slice(0, 3)
 
         if (user) {
             const userData = await User.findOne({ _id: user._id })
