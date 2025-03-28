@@ -273,6 +273,9 @@ const userProfile = async (req, res) => {
         const paginatedWalletHistory = sortedWalletHistory.slice(walletSkip, walletSkip + walletLimit);
         const totalWalletTransactions = userData.walletHistory ? userData.walletHistory.length : 0;
         const totalWalletPages = Math.ceil(totalWalletTransactions / walletLimit);
+console.log('i reached the profile page area')
+
+
 
         res.render('profile', {
             user: { ...userData, walletHistory: paginatedWalletHistory },
@@ -298,6 +301,9 @@ const userProfile = async (req, res) => {
             },
             activeTab 
         });
+
+
+        console.log('byeee')
     } catch (error) {
         console.error('Error retrieving profile data:', error);
         res.status(500).send('Internal Server Error: ' + error.message);
