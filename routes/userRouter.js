@@ -6,7 +6,7 @@ const cartController = require('../controllers/user/cartController')
 const checkoutController = require('../controllers/user/checkoutController')
 const couponController = require('../controllers/user/couponController')
 const wishlistController = require('../controllers/user/wishlistController')
-const {userAuth,userLogin} = require('../middlewares/userAuth')
+const {userAuth,userLogin,isUserBlocked} = require('../middlewares/userAuth')
 const passport = require('passport')
 const router=express.Router()
 
@@ -45,9 +45,9 @@ async (req,res)=>{
     }
 })
 
-router.get('/productDetailsPage', productController.productDetails)
-router.get('/productDetailsPage/:id/stock',productController.getProductStock)
-router.post('/productDetailsPage/review',productController.submitReview)
+router.get('/productDetailsPage',userAuth,productController.productDetails)
+router.get('/productDetailsPage/:id/stock',userAuth,productController.getProductStock)
+router.post('/productDetailsPage/review',userAuth,productController.submitReview)
 
 router.get('/login',userLogin,userControllers.loadLogin)
 router.post('/login',userLogin,userControllers.login)
@@ -63,7 +63,7 @@ router.post('/reset-password',userLogin,profileController.resetPassword)
 router.post('/verify-passForgot-otp',userLogin,profileController.verifyForgotPassOtp)
 
 router.get('/',userControllers.loadHomePage)
-router.get('/shop',userControllers.loadShoppingPage)
+router.get('/shop',isUserBlocked,userAuth,userControllers.loadShoppingPage)
 
 
 router.get('/userProfile',userAuth,profileController.userProfile)

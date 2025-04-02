@@ -648,19 +648,13 @@ const createDateFilter = (filter, startDate, endDate) => {
 const logout = async (req, res) => {
     try {
 
-        req.session.destroy(err => {
-            if (err) {
-                console.log('Error destroying session', err);
-                return res.redirect('/pageerror')
-            } else {
-                res.redirect('/admin/login')
-            }
-        })
+        
+        req.session.admin=null
+        return res.redirect('/admin/login')
 
     } catch (error) {
-
-        console.log('unexpected error during logout', error);
-        res.redirect('/pageerror')
+   console.log('Logout error');
+        res.redirect('/pageNotFound')
 
 
     }
