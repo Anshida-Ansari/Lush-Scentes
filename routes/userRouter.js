@@ -45,7 +45,7 @@ async (req,res)=>{
     }
 })
 
-router.get('/productDetailsPage',userAuth,productController.productDetails)
+router.get('/productDetailsPage',isUserBlocked,userAuth,productController.productDetails)
 router.get('/productDetailsPage/:id/stock',userAuth,productController.getProductStock)
 router.post('/productDetailsPage/review',userAuth,productController.submitReview)
 
@@ -62,11 +62,11 @@ router.get('/reset-password',userLogin,profileController.getResetPassPage)
 router.post('/reset-password',userLogin,profileController.resetPassword)
 router.post('/verify-passForgot-otp',userLogin,profileController.verifyForgotPassOtp)
 
-router.get('/',userControllers.loadHomePage)
+router.get('/',isUserBlocked,userControllers.loadHomePage)
 router.get('/shop',isUserBlocked,userAuth,userControllers.loadShoppingPage)
 
 
-router.get('/userProfile',userAuth,profileController.userProfile)
+router.get('/userProfile',isUserBlocked,userAuth,profileController.userProfile)
 router.get('/change-pass',userAuth,profileController.changePassWord)
 router.post('/change-pass',userAuth,profileController.changePassWordValid)
 router.post('/verify-changepassword-otp',userAuth,profileController.verifyChangePassOtp)
@@ -79,15 +79,15 @@ router.get('/editAddress',userAuth,profileController.editAddress)
 router.post('/editAddress',userAuth,profileController.postEditAddress)
 router.get('/deleteAddress',userAuth,profileController.deleteAddress)
 
-router.get('/cart',userAuth,cartController.loadcartPage)
+router.get('/cart',isUserBlocked,userAuth,cartController.loadcartPage)
 router.post('/add',userAuth,cartController.addToCart)
 router.put('/update/:productId/:size',userAuth,cartController.updateCart)
 router.delete('/update/:productId/:size',cartController.removeFromCart);
 
 
 
-router.get('/checkout', userAuth, checkoutController.loadCheckoutPage);
-router.post('/checkout', userAuth, checkoutController.processCheckout);
+router.get('/checkout', isUserBlocked,userAuth, checkoutController.loadCheckoutPage);
+router.post('/checkout', isUserBlocked,userAuth, checkoutController.processCheckout);
 router.get('/checkout-address',userAuth,checkoutController.loadCheckoutAddress)
 router.post('/add-checkout-address',userAuth,checkoutController.addressPost)
 router.get('/edit-address/:id',userAuth,checkoutController.loadcheckoutEditAddress)
@@ -108,7 +108,7 @@ router.post('/cancel-product',userAuth,checkoutController.cancelProduct)
 router.post('/return-product',userAuth,checkoutController.returnProduct)
 
 
-router.get('/wishlist',userAuth,wishlistController.loadWishlist)
+router.get('/wishlist',isUserBlocked,userAuth,wishlistController.loadWishlist)
 router.post('/addWishlist',userAuth,wishlistController.addWishlist)
 router.post('/removeFromWishlist',userAuth,wishlistController.removeFromWishlist)
 
