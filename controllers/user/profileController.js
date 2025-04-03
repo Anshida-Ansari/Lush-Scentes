@@ -328,7 +328,16 @@ const changePassWordValid = async (req, res) => {
        
 
         const { email } = req.body
+        console.log('email:',email)
         const userExist = await User.findOne({ email })
+        console.log('hii:',userExist)
+         if (!req.session.user) {
+            return res.redirect('/login');
+        }
+
+        if (email !== req.session.user.email) {
+            return res.json({ success: false, message: 'The email does not match your logged in email' });
+        }
         if (userExist) {
             const otp = generateOtp()
             const emailSent = await sendVerificationEmail(email, otp)
@@ -356,7 +365,6 @@ const changePassWordValid = async (req, res) => {
 
     }
 }
-
 
 const verifyChangePassOtp = async (req, res) => {
     try {

@@ -593,7 +593,7 @@
                                 <label class="form-label">Phone Number</label>
                                 <div class="input-group">
                                     <h6>
-                                        <%= user.phone %>
+                                        <%= user.phone && user.phone.trim() !== '' ? user.phone : 'N/A' %>
                                     </h6>
                                 </div>
                             </div>

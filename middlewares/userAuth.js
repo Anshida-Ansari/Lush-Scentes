@@ -25,7 +25,7 @@ const isUserBlocked = async (req, res, next) => {
             }
 
             if (user.isBlocked) {
-                req.session.destroy(); // Destroy session if user is blocked
+                req.session.destroy(); 
                 return res.redirect('/login');
             }
         }

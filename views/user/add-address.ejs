@@ -1,4 +1,3 @@
-
 <%-include('../../views/partials/user/header')%>
 
 <!DOCTYPE html>
@@ -68,7 +67,6 @@
         </div>
     </div>
 
-  
     <div class="container py-4">
         <div class="row justify-content-center">
             <div class="col-md-8">
@@ -132,10 +130,10 @@
                                     <div class="invalid-feedback">Please enter a valid 10-digit phone number</div>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Alternative Number</label>
-                                    <input type="tel" id="altPhone" name="altPhone" class="form-control" required
-                                           data-validation="required phone">
-                                    <div class="invalid-feedback">Please enter a different 10-digit phone number</div>
+                                    <label class="form-label">Alternative Number (Optional)</label>
+                                    <input type="tel" id="altPhone" name="altPhone" class="form-control"
+                                           data-validation="phone">
+                                    <div class="invalid-feedback">Please enter a valid 10-digit phone number (must be different from primary)</div>
                                 </div>
                             </div>
 
@@ -161,14 +159,12 @@
             const form = document.getElementById('addressForm');
             const inputs = form.querySelectorAll('input[data-validation]');
             
-            
             const patterns = {
                 alphabets: /^[A-Za-z\s]+$/,
                 pincode: /^\d{6}$/,
                 phone: /^\d{10}$/
             };
 
-           
             inputs.forEach(input => {
                 input.addEventListener('input', function() {
                     validateInput(this);
@@ -178,16 +174,15 @@
             function validateInput(input) {
                 const validations = input.dataset.validation.split(' ');
                 let isValid = true;
-                
-                
+
                 input.classList.remove('is-valid', 'is-invalid');
 
-              
+                // Skip 'required' validation for optional fields (like altPhone)
                 if (validations.includes('required') && !input.value.trim()) {
                     isValid = false;
                 }
 
-             
+                // Validate pattern only if there's a value
                 if (input.value.trim()) {
                     validations.forEach(validation => {
                         if (patterns[validation] && !patterns[validation].test(input.value)) {
@@ -196,13 +191,20 @@
                     });
                 }
 
-               
-                if (input.id === 'altPhone' && input.value === document.getElementById('phone').value) {
-                    isValid = false;
-                    input.nextElementSibling.textContent = 'Alternative number must be different from primary number';
+                // Special validation for altPhone: must differ from phone if provided
+                if (input.id === 'altPhone' && input.value.trim()) {
+                    if (input.value === document.getElementById('phone').value) {
+                        isValid = false;
+                        input.nextElementSibling.textContent = 'Alternative number must be different from primary number';
+                    } else {
+                        input.nextElementSibling.textContent = 'Please enter a valid 10-digit phone number';
+                    }
                 }
 
-                input.classList.add(isValid ? 'is-valid' : 'is-invalid');
+                // Apply validation classes only if there's a value or it's required
+                if (input.value.trim() || validations.includes('required')) {
+                    input.classList.add(isValid ? 'is-valid' : 'is-invalid');
+                }
                 return isValid;
             }
 
@@ -210,7 +212,6 @@
                 event.preventDefault();
                 let isValid = true;
 
-                
                 inputs.forEach(input => {
                     if (!validateInput(input)) {
                         isValid = false;
@@ -227,7 +228,6 @@
                     return;
                 }
 
-                
                 Swal.fire({
                     icon: 'success',
                     title: 'Success!',

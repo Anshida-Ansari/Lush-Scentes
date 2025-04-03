@@ -647,9 +647,8 @@ const createDateFilter = (filter, startDate, endDate) => {
 
 const logout = async (req, res) => {
     try {
-
-        
-        req.session.admin=null
+       
+       req.session.admin=null
         return res.redirect('/admin/login')
 
     } catch (error) {

@@ -1,11 +1,11 @@
 <%- include('../../views/partials/user/header') %>
 <style>
     .form-control:invalid {
-    border-color: #dc3545;
-}
-.text-danger {
-    font-size: 0.9rem;
-}
+        border-color: #dc3545;
+    }
+    .text-danger {
+        font-size: 0.9rem;
+    }
 </style>
 <div class="container mt-5">
     <h2>Edit Address</h2>
@@ -114,7 +114,7 @@
         function validateLandMark() {
             const value = $('#landMark').val().trim();
             const errorDiv = $('#landMarkError');
-            if (!value || !/^[A-Za-z0-9\s,.-]+$/.test(value)) { // Allow letters, numbers, and common punctuation
+            if (!value || !/^[A-Za-z0-9\s,.-]+$/.test(value)) {
                 errorDiv.text('Landmark is required and should contain valid characters.');
                 return false;
             }
@@ -157,22 +157,42 @@
 
         function validateAltPhone() {
             const value = $('#altPhone').val().trim();
+            const phoneNumber = $('#phoneNumber').val().trim();
             const errorDiv = $('#altPhoneError');
-            if (value && !/^\d{10}$/.test(value)) {
+
+            // If altPhone is empty, it's valid (since it's optional)
+            if (!value) {
+                errorDiv.text('');
+                return true;
+            }
+
+            // Check if it matches the phone number
+            if (value === phoneNumber) {
+                errorDiv.text('Alternative phone must be different from the primary phone number.');
+                return false;
+            }
+
+            // Check if it follows the 10-digit format
+            if (!/^\d{10}$/.test(value)) {
                 errorDiv.text('Alternative phone must be exactly 10 digits.');
                 return false;
             }
+
             errorDiv.text('');
             return true;
         }
 
+        // Bind validation to input events
         $('#addressType').on('input', validateAddressType);
         $('#name').on('input', validateName);
         $('#city').on('input', validateCity);
         $('#landMark').on('input', validateLandMark);
         $('#state').on('input', validateState);
         $('#pincode').on('input', validatePincode);
-        $('#phoneNumber').on('input', validatePhoneNumber);
+        $('#phoneNumber').on('input', function() {
+            validatePhoneNumber();
+            validateAltPhone(); // Re-validate altPhone when phoneNumber changes
+        });
         $('#altPhone').on('input', validateAltPhone);
 
         $('#editAddressForm').on('submit', function(event) {

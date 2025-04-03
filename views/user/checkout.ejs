@@ -463,7 +463,7 @@
                 const couponMessage = document.getElementById('couponMessage');
                 const finalAmountSpan = document.getElementById('final-amount');
                 let appliedCoupon = localStorage.getItem('appliedCoupon') || null;
-        
+                console.log("coupon applied",appliedCoupon)
                 if (appliedCoupon) fetchAppliedCouponStatus();
         
                 const addressCards = document.querySelectorAll('.address-card');
@@ -481,7 +481,7 @@
                     card.addEventListener('click', () => {
                         const couponCode = card.getAttribute('data-coupon');
                         couponInput.value = couponCode;
-                        applyCoupon(couponCode);
+                        
                     });
                 });
         
@@ -506,33 +506,36 @@
                             removeCouponBtn.style.display = 'none';
                             showCouponMessage(data.message, 'success');
                         } else {
-                            showCouponMessage(data.message, 'error');
+                            showCouponMessage(data.message,error);
                         }
                     } catch (error) {
-                        showCouponMessage('Error removing coupon', 'error');
+                        showCouponMessage('Error removing coupon', error);
                     }
                 });
         
                 async function applyCoupon(couponCode) {
+                    console.log("apply couponddddddddd")
                     try {
                         const subtotal = parseFloat(finalAmountSpan.textContent.replace('₹', ''));
+                        console.log(subtotal)
                         const response = await fetch('/apply-coupon', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ couponCode, orderTotal: subtotal })
                         });
                         const data = await response.json();
+                        console.log("hai",data)
                         if (data.success) {
-                            appliedCoupon = couponCode;
-                            localStorage.setItem('appliedCoupon', couponCode);
-                            updateCouponUI(data.discountAmount, data.newTotal);
-                            removeCouponBtn.style.display = 'inline-block';
-                            showCouponMessage(data.message, 'success');
-                        } else {
-                            showCouponMessage(data.message, 'error');
-                        }
+    appliedCoupon = couponCode;
+    localStorage.setItem('appliedCoupon', couponCode);
+    updateCouponUI(data.discount, data.finalAmount); // Change from discountAmount to discount and newTotal to finalAmount
+    removeCouponBtn.style.display = 'inline-block';
+    showCouponMessage(data.message, 'success');
+} else {
+    showCouponMessage(data.message, 'error'); // Add quotes around 'error'
+}
                     } catch (error) {
-                        showCouponMessage('Error applying coupon', 'error');
+                        showCouponMessage('Error applying coupon', error.message);
                     }
                 }
         
@@ -562,9 +565,10 @@
                             body: JSON.stringify({ couponCode: appliedCoupon, orderTotal: subtotal })
                         });
                         const data = await response.json();
+                        conosle.log("coupondata",data)
                         if (data.success) {
-                            updateCouponUI(data.discountAmount, data.newTotal);
-                            removeCouponBtn.style.display = 'inline-block';
+    updateCouponUI(data.discount, data.finalAmount); // Change property names
+    removeCouponBtn.style.display = 'inline-block';
                         } else {
                             appliedCoupon = null;
                             localStorage.removeItem('appliedCoupon');
