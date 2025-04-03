@@ -10,9 +10,12 @@ const db= require('./config/db')
 const User = require('./models/userSchema.js')
 const cloudinary = require('./config/cloudinary.js')
 const errorHandling = require('./middlewares/errorHandling.js')
+const morgan = require('morgan')
 
 db()
 
+
+app.use(morgan('dev'))
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(session({
