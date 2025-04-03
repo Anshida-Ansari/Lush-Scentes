@@ -253,7 +253,7 @@
                                             <h3 class="product-name"><%= item.productId.productName %></h3>
                                             <p class="product-variant">
                                               Size: <%= item.variant.size %> | 
-                                              Price: $<%= item.variant.salesPrice || item.variant.regularPrice %>
+                                              Price: ₹<%= item.variant.salesPrice || item.variant.regularPrice %>
                                               <% if (item.productId.isBlocked) { %>
                                                 <span style="color: #d9534f;"> (Blocked - Unavailable)</span>
                                               <% } %>
@@ -272,7 +272,7 @@
                                           <div class="stock-message" id="stock-msg-<%= item.productId._id %>-<%= item.variant.size %>"></div>
                                         </td>
                                         <td class="product-price" data-product-id="<%= item.productId._id %>" data-size="<%= item.variant.size %>">
-                                          $<%= ((item.variant.salesPrice || item.variant.regularPrice) * item.variant.quantity).toFixed(2) %>
+                                          ₹<%= ((item.variant.salesPrice || item.variant.regularPrice) * item.variant.quantity).toFixed(2) %>
                                         </td>
                                         <td style="width: 30px;">
                                           <button class="remove-btn" data-product-id="<%= item.productId._id %>" data-size="<%= item.variant.size %>">×</button>
@@ -296,12 +296,12 @@
                     <h4 class="summary-title">Summary</h4>
                     <div class="summary-item">
                         <span>Subtotal</span>
-                        <span>$<%= subtotal.toFixed(2) %></span>
+                        <span>₹<%= subtotal.toFixed(2) %></span>
                     </div>
                     <% if (discount > 0) { %>
                         <div class="summary-item">
                             <span>Discount</span>
-                            <span>-$<%= discount.toFixed(2) %></span>
+                            <span>-₹<%= discount.toFixed(2) %></span>
                         </div>
                     <% } %>
                     <div class="summary-item">
@@ -310,7 +310,7 @@
                     </div>
                     <div class="summary-item total">
                         <span>Estimated Total</span>
-                        <span>$<%= total.toFixed(2) %></span>
+                        <span>₹<%= total.toFixed(2) %></span>
                     </div>
                     <button class="btn-checkout" <%= cart.items.length === 0 ? 'disabled' : '' %>>
                         Checkout
@@ -333,7 +333,7 @@
     
                 const totalCell = input.closest('tr').querySelector('.product-price');
                 if (totalCell) {
-                    totalCell.textContent = `$${itemTotal.toFixed(2)}`;
+                    totalCell.textContent = `₹${itemTotal.toFixed(2)}`;
                 }
             });
     
@@ -343,8 +343,8 @@
             const subtotalElement = document.querySelector('.summary-item:nth-child(2) span:last-child');
             const totalElement = document.querySelector('.summary-item.total span:last-child');
     
-            if (subtotalElement) subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
-            if (totalElement) totalElement.textContent = `$${total.toFixed(2)}`;
+            if (subtotalElement) subtotalElement.textContent = `₹${subtotal.toFixed(2)}`;
+            if (totalElement) totalElement.textContent = `₹${total.toFixed(2)}`;
         }
     
         function showStockLimitMessage(productId, size, stock) {
@@ -417,7 +417,7 @@
             const total = price * quantity;
             const totalCell = input.closest('tr').querySelector('.product-price');
             if (totalCell) {
-                totalCell.textContent = `$${total.toFixed(2)}`;
+                totalCell.textContent = `₹${total.toFixed(2)}`;
             }
             updateCartTotals();
         }
