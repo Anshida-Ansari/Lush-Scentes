@@ -1,8 +1,8 @@
 const Product = require('../../models/productSchema');
 const Category = require('../../models/categorySchema');
 const User = require('../../models/userSchema');
-const Offer = require('../../models/offerSchema')
-const Order = require('../../models/orderSchema')
+const Offer = require('../../models/offerSchema');
+const Order = require('../../models/orderSchema');
 
 const productDetails = async (req, res) => {
   try {
@@ -25,16 +25,12 @@ const productDetails = async (req, res) => {
       _id: { $ne: product._id },
     });
 
-  
     const currentDate = new Date();
     const offers = await Offer.find({
       status: true,
       startDate: { $lte: currentDate },
       endDate: { $gte: currentDate },
-      $or: [
-        { productId: product._id }, 
-        { categoryId: product.category._id }, 
-      ],
+      $or: [{ productId: product._id }, { categoryId: product.category._id }],
     });
 
     let appliedOffer = null;
@@ -59,12 +55,18 @@ const productDetails = async (req, res) => {
         regularPrice,
         discountedPrice: discountedPrice.toFixed(2),
         discountPercentage: highestDiscount,
-        quantity: variant.quantity >= 0 ? variant.quantity : 0
+        quantity: variant.quantity >= 0 ? variant.quantity : 0,
       };
     });
 
-    const totalRatings = product.reviews.reduce((sum, review) => sum + review.rating, 0);
-    const averageRating = product.reviews.length > 0 ? (totalRatings / product.reviews.length).toFixed(1) : 0;
+    const totalRatings = product.reviews.reduce(
+      (sum, review) => sum + review.rating,
+      0
+    );
+    const averageRating =
+      product.reviews.length > 0
+        ? (totalRatings / product.reviews.length).toFixed(1)
+        : 0;
 
     res.render('product-details', {
       user: userData,
@@ -86,157 +88,156 @@ const productDetails = async (req, res) => {
 };
 
 const getProductStock = async (req, res) => {
-    try {
-        const { id: productId } = req.params;
-        const { size } = req.query;
+  try {
+    const { id: productId } = req.params;
+    const { size } = req.query;
 
-        console.log(`Getting stock for product: ${productId}, size: ${size}`);
+    console.log(`Getting stock for product: ${productId}, size: ${size}`);
 
-
-        if (!productId || !size) {
-            return res.status(400).json({
-                success: false,
-                message: 'Product ID and size are required'
-            });
-        }
-
-        const product = await Product.findById(productId);
-        if (!product) {
-            return res.status(404).json({
-                success: false,
-                message: 'Product not found'
-            });
-        }
-
-        const variant = product.variants.find(v => v.size === size);
-        if (!variant) {
-            return res.status(404).json({
-                success: false,
-                message: 'Variant not found'
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            stock: variant.quantity
-        });
-    } catch (error) {
-        console.error('Error fetching product stock:', error);
-        return res.status(500).json({
-            success: false,
-            message: 'Server error while fetching stock information'
-        });
+    if (!productId || !size) {
+      return res.status(400).json({
+        success: false,
+        message: 'Product ID and size are required',
+      });
     }
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found',
+      });
+    }
+
+    const variant = product.variants.find((v) => v.size === size);
+    if (!variant) {
+      return res.status(404).json({
+        success: false,
+        message: 'Variant not found',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      stock: variant.quantity,
+    });
+  } catch (error) {
+    console.error('Error fetching product stock:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error while fetching stock information',
+    });
+  }
 };
 
-
-
-
-
 const submitReview = async (req, res) => {
-    try {
-        const userId = req.session.user;
-        if (!userId) {
-            return res.status(401).json({
-                success: false,
-                message: 'Please log in to submit a review',
-            });
-        }
-
-        const { productId, orderId, review, rating } = req.body;
-
-        if (!productId || !orderId || !review || !rating) {
-            return res.status(400).json({
-                success: false,
-                message: 'All fields (productId, orderId, review, rating) are required',
-            });
-        }
-
-        if (isNaN(rating) || rating < 1 || rating > 5) {
-            return res.status(400).json({
-                success: false,
-                message: 'Rating must be a number between 1 and 5',
-            });
-        }
-
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found',
-            });
-        }
-
-        const product = await Product.findById(productId);
-        if (!product) {
-            return res.status(404).json({
-                success: false,
-                message: 'Product not found',
-            });
-        }
-
-        const order = await Order.findOne({
-            _id: orderId,
-            userId: userId,
-            status: 'Delivered',
-            orderedItems: {
-                $elemMatch: {
-                    product: productId,
-                },
-            },
-        });
-
-        if (!order) {
-            return res.status(403).json({
-                success: false,
-                message: 'You can only review products from delivered orders you purchased',
-            });
-        }
-
-        const existingReview = product.reviews.find(
-            (r) => r.user.toString() === userId.toString()
-        );
-        if (existingReview) {
-            return res.status(400).json({
-                success: false,
-                message: 'You have already reviewed this product',
-            });
-        }
-
-        const newReview = {
-            user: userId,
-            name: user.name,
-            email: user.email,
-            review,
-            rating: parseInt(rating),
-            createdAt: new Date(),
-        };
-
-        product.reviews.push(newReview);
-
-        const totalRatings = product.reviews.reduce((sum, rev) => sum + rev.rating, 0);
-        product.rating = product.reviews.length > 0 ? totalRatings / product.reviews.length : 0;
-
-        await product.save();
-
-        return res.status(200).json({
-            success: true,
-            message: 'Review submitted successfully',
-            averageRating: product.rating,
-            newReview,
-        });
-    } catch (error) {
-        console.error('Error submitting review:', error);
-        return res.status(500).json({
-            success: false,
-            message: 'Server error while submitting review',
-        });
+  try {
+    const userId = req.session.user;
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Please log in to submit a review',
+      });
     }
+
+    const { productId, orderId, review, rating } = req.body;
+
+    if (!productId || !orderId || !review || !rating) {
+      return res.status(400).json({
+        success: false,
+        message: 'All fields (productId, orderId, review, rating) are required',
+      });
+    }
+
+    if (isNaN(rating) || rating < 1 || rating > 5) {
+      return res.status(400).json({
+        success: false,
+        message: 'Rating must be a number between 1 and 5',
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found',
+      });
+    }
+
+    const order = await Order.findOne({
+      _id: orderId,
+      userId: userId,
+      status: 'Delivered',
+      orderedItems: {
+        $elemMatch: {
+          product: productId,
+        },
+      },
+    });
+
+    if (!order) {
+      return res.status(403).json({
+        success: false,
+        message:
+          'You can only review products from delivered orders you purchased',
+      });
+    }
+
+    const existingReview = product.reviews.find(
+      (r) => r.user.toString() === userId.toString()
+    );
+    if (existingReview) {
+      return res.status(400).json({
+        success: false,
+        message: 'You have already reviewed this product',
+      });
+    }
+
+    const newReview = {
+      user: userId,
+      name: user.name,
+      email: user.email,
+      review,
+      rating: parseInt(rating),
+      createdAt: new Date(),
+    };
+
+    product.reviews.push(newReview);
+
+    const totalRatings = product.reviews.reduce(
+      (sum, rev) => sum + rev.rating,
+      0
+    );
+    product.rating =
+      product.reviews.length > 0 ? totalRatings / product.reviews.length : 0;
+
+    await product.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Review submitted successfully',
+      averageRating: product.rating,
+      newReview,
+    });
+  } catch (error) {
+    console.error('Error submitting review:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error while submitting review',
+    });
+  }
 };
 
 module.exports = {
-    productDetails,
-    getProductStock,
-    submitReview
+  productDetails,
+  getProductStock,
+  submitReview,
 };
-

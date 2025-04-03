@@ -1,107 +1,113 @@
-const mongoose = require('mongoose')
-const {Schema}=mongoose
+const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
 const userSchema = new Schema({
-    name:{
-        type:String,
-        required : true
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  phone: {
+    type: String,
+    required: false,
+    unique: false,
+    sparce: true,
+    default: null,
+  },
+  googleId: {
+    type: String,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: false,
+  },
+  isBlocked: {
+    type: Boolean,
+    default: false,
+  },
+  isAdmin: {
+    type: Boolean,
+    default: false,
+  },
+  cart: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Cart',
     },
-    email:{
-        type:String,
-        required:true,
-        unique:true
+  ],
+  wishlist: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Wishlist',
     },
-    phone:{
-        type:String,
-        required:false,
-        unique: false,
-        sparce:true,  
-        default:null
-    },
-    googleId:{
-        type:String,
-        unique:true
-    },
-    password:{
-        type:String,
-        required:false
-    },
-    isBlocked:{
-        type:Boolean,
-        default:false
-    },
-    isAdmin:{
-        type:Boolean,
-        default:false
-    },
-    cart:[{
-        type:Schema.Types.ObjectId,
-        ref:'Cart'
-
-    }],
-    wishlist:[{
-        type:Schema.Types.ObjectId,
-        ref:'Wishlist'
-
-    }],
-    wallet: {
+  ],
+  wallet: {
+    type: Number,
+    default: 0,
+  },
+  walletHistory: [
+    {
+      transactionId: String,
+      date: {
+        type: Date,
+        default: Date.now,
+      },
+      type: {
+        type: String,
+        enum: ['credit', 'debit'],
+        required: true,
+      },
+      amount: {
         type: Number,
-        default: 0
+        required: true,
+      },
+      status: {
+        type: String,
+        enum: ['Completed', 'Pending'],
+        default: 'Completed',
+      },
     },
-    walletHistory: [{
-        transactionId: String,
-        date: {
-            type: Date,
-            default: Date.now
-        },
-        type: {
-            type: String,
-            enum: ["credit", "debit"],
-            required: true
-        },
-        amount: {
-            type: Number,
-            required: true
-        },
-        status: {
-            type: String,
-            enum: ["Completed", "Pending"],
-            default: "Completed"
-        }
-    }],
-    orderHistory:[{
-        type:Schema.Types.ObjectId,
-    ref:'Orders'
-    }],
-    createdOn:{
-        type:Date,
-        default:Date.now
+  ],
+  orderHistory: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Orders',
     },
-    referralCode:{
-        type:String
+  ],
+  createdOn: {
+    type: Date,
+    default: Date.now,
+  },
+  referralCode: {
+    type: String,
+  },
+  redeemed: {
+    type: Boolean,
+  },
+  redeemedUsers: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
     },
-    redeemed:{
-        type:Boolean
+  ],
+  searchHistory: [
+    {
+      category: {
+        type: Schema.Types.ObjectId,
+        ref: 'Category',
+      },
+      searchOn: {
+        type: Date,
+        default: Date.now,
+      },
     },
-    redeemedUsers:[{
-        type:Schema.Types.ObjectId,
-        ref:'User'
-    }],
-    searchHistory:[{
-        category:{
-            type:Schema.Types.ObjectId,
-            ref:'Category'
-        },
-        searchOn:{
-            type:Date,
-            default:Date.now
-        }
-    }]
+  ],
+});
 
-
-})
-
-
-
-const User=mongoose.model('User',userSchema)
-module.exports = User
+const User = mongoose.model('User', userSchema);
+module.exports = User;

@@ -1,7 +1,7 @@
 const cloudinary = require('cloudinary').v2;
 const dotenv = require('dotenv');
 
-dotenv.config()
+dotenv.config();
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -13,7 +13,7 @@ async function handleUpload(file) {
   try {
     const res = await cloudinary.uploader.upload(file, {
       resource_type: 'auto',
-      folder: 'perfume_images'
+      folder: 'perfume_images',
     });
     return res;
   } catch (error) {
@@ -21,4 +21,4 @@ async function handleUpload(file) {
     throw new Error('Failed to upload image to Cloudinary: ' + error.message);
   }
 }
-module.exports = {handleUpload};
+module.exports = { handleUpload };
